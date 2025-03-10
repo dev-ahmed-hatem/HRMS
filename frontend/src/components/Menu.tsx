@@ -67,6 +67,7 @@ const items: MenuProps["items"] = [
     label: <NavLink to="/files">الملفات</NavLink>,
   },
 ];
+
 const Menu = ({
   menuOpen,
   setMenuOpen,
@@ -101,7 +102,7 @@ const Menu = ({
           className="logo h-20 flex items-center justify-center rounded-lg mb-10"
           onClick={() => setMenuOpen(false)}
         >
-          <Logo className="fill-calypso-900 h-full rounded-lg" />
+          <Logo className="fill-calypso-900 hover:fill-calypso-950 h-full rounded-lg" />
         </NavLink>
 
         <AntdMenu

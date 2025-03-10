@@ -4,6 +4,7 @@ import { RxAvatar } from "react-icons/rx";
 import { Popover } from "antd";
 import { useState } from "react";
 import UserMenu from "./UserMenu";
+import { NavLink } from "react-router";
 
 const Navbar = ({
   menuOpen,
@@ -21,13 +22,15 @@ const Navbar = ({
   return (
     <div className="padding-container flex justify-between items-center bg-orange py-2">
       <IoMenu
-        className="text-calypso-900 text-4xl md:text-5xl cursor-pointer"
+        className="text-calypso-900 hover:text-calypso-950 text-4xl md:text-5xl cursor-pointer"
         onClick={() => {
           setMenuOpen(!menuOpen);
         }}
       />
       <div className="logo h-12 md:h-16">
-        <Logo className="fill-calypso-900" />
+        <NavLink to={"/"}>
+          <Logo className="fill-calypso-900 hover:fill-calypso-950" />
+        </NavLink>
       </div>
       <div className="user">
         <Popover
@@ -37,7 +40,7 @@ const Navbar = ({
           open={open}
           onOpenChange={handleOpenChange}
         >
-          <RxAvatar className="text-4xl md:text-5xl text-calypso-900 cursor-pointer" />
+          <RxAvatar className="text-4xl md:text-5xl text-calypso-900 hover:text-calypso-950 cursor-pointer" />
         </Popover>
       </div>
     </div>

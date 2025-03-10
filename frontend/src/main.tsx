@@ -3,9 +3,20 @@ import { createRoot } from "react-dom/client";
 import "./styles/index.css";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import routes from "./app/routes";
+import { arEG } from "./utils/locale";
+import { ConfigProvider } from "antd";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={createBrowserRouter(routes)} />
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: "#0E6B81",
+        },
+      }}
+      locale={arEG}
+    >
+      <RouterProvider router={createBrowserRouter(routes)} />
+    </ConfigProvider>
   </StrictMode>
 );

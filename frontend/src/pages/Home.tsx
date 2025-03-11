@@ -1,9 +1,17 @@
 import Calendar from "../components/home/calendar/Calendar";
+import EmployeesOverview from "../components/home/EmployeesOverview";
+import RecentActions from "../components/home/RecentActions";
 
 const Home = () => {
   return (
     <div className="font-bold text-xl padding-container pt-10">
+      <div className="flex max-md:flex-col gap-y-8 gap-x-6 justify-between md:max-g-[360px]">
+        <EmployeesOverview />
+        <RecentActions />
+      </div>
+      <div className="my-16"></div>
       <Calendar />
+      <div className="my-16"></div>
     </div>
   );
 };

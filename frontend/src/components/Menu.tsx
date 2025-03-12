@@ -12,6 +12,7 @@ import { GiMoneyStack, GiPayMoney, GiReceiveMoney } from "react-icons/gi";
 import "../styles/menu.css";
 import { NavLink, useLocation } from "react-router";
 import { useEffect, useState } from "react";
+import { LuNotebookPen } from "react-icons/lu";
 
 const items: MenuProps["items"] = [
   {
@@ -60,6 +61,11 @@ const items: MenuProps["items"] = [
     key: "/schedules",
     icon: <FaCalendarDays />,
     label: <NavLink to="/schedules">جدول المواعيد</NavLink>,
+  },
+  {
+    key: "/notes",
+    icon: <LuNotebookPen />,
+    label: <NavLink to="/notes">المذكرات</NavLink>,
   },
   {
     key: "/files",

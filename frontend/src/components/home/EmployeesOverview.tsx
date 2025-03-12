@@ -1,4 +1,5 @@
 import { FaUsers } from "react-icons/fa6";
+import { NavLink } from "react-router";
 
 const EmployeesOverview = () => {
   const stats = [
@@ -11,13 +12,16 @@ const EmployeesOverview = () => {
   return (
     <div className="flex flex-col md:flex-row rounded-lg shadow-lg w-full max-w-3xl overflow-hidden">
       {/* Left Section - Total Employees */}
-      <div className="bg-calypso-800 flex flex-col text-white py-10 px-6 gap-y-4 w-full md:w-1/3">
+      <NavLink
+        to={"/employees"}
+        className="bg-calypso-800 flex flex-col text-white py-10 px-6 gap-y-4 w-full md:w-1/3"
+      >
         <div className="flex items-center justify-between">
           <h2 className="text-lg md:text-xl font-semibold">إجمالي الموظفين</h2>
           <FaUsers className="text-3xl md:text-4xl" />
         </div>
         <p className="text-4xl md:text-5xl font-bold">300</p>
-      </div>
+      </NavLink>
 
       {/* Right Section - Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6 w-full md:w-2/3">
@@ -30,7 +34,9 @@ const EmployeesOverview = () => {
               {item.title}
             </h3>
             <div className="flex items-center mt-1">
-              <p className="text-2xl font-bold text-calypso-600">{item.count}</p>
+              <p className="text-2xl font-bold text-calypso-600">
+                {item.count}
+              </p>
             </div>
             <p className="text-xs text-gray-500">
               {item.count > 10 || item.count < 3 ? "موظف" : "موظفين"}

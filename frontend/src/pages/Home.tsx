@@ -1,5 +1,6 @@
 import Calendar from "../components/home/calendar/Calendar";
 import EmployeesOverview from "../components/home/EmployeesOverview";
+import LatestNotes from "../components/home/LatestNotes";
 import RecentActions from "../components/home/RecentActions";
 
 const Home = () => {
@@ -11,6 +12,8 @@ const Home = () => {
       </div>
       <div className="my-16"></div>
       <Calendar />
+      <div className="my-16"></div>
+      <LatestNotes />
       <div className="my-16"></div>
     </div>
   );

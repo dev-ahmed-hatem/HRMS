@@ -42,6 +42,10 @@ const routes: RouteObject[] = [
         element: <EmployeesPage />,
       },
       {
+        path: "/notes",
+        element: <EmployeesPage />,
+      },
+      {
         path: "/files",
         element: <EmployeesPage />,
       },

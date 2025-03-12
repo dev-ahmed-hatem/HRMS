@@ -1,6 +1,7 @@
 import Calendar from "../components/home/calendar/Calendar";
 import EmployeesOverview from "../components/home/EmployeesOverview";
 import LatestNotes from "../components/home/LatestNotes";
+import NavigationGrid from "../components/home/NavigationGrid";
 import RecentActions from "../components/home/RecentActions";
 
 const Home = () => {
@@ -14,6 +15,8 @@ const Home = () => {
       <Calendar />
       <div className="my-16"></div>
       <LatestNotes />
+      <div className="my-16"></div>
+      <NavigationGrid />
       <div className="my-16"></div>
     </div>
   );

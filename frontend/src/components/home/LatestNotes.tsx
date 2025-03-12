@@ -1,4 +1,3 @@
-import { FaEllipsisV, FaVolumeUp } from "react-icons/fa";
 import { MdEditNote } from "react-icons/md";
 import { NavLink } from "react-router";
 
@@ -38,7 +37,7 @@ const LatestNotes = () => {
          mb-4 border-b flex items-center gap-2 bg-calypso-800 p-4"
       >
         <MdEditNote className="text-2xl" />
-        المذكرات
+        المذكرات الأخيرة
       </NavLink>
 
       {/* Notes List */}

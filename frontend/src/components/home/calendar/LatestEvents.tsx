@@ -8,7 +8,7 @@ const LatestEvents = ({ dateSelected }: { dateSelected: string }) => {
       gap-4 border-b pb-2"
     >
       <h1 className="border-b pb-2">
-        المواعيد <span className="inline-block ms-1">{dateSelected}</span>
+        مواعيد يوم: <span className="inline-block ms-1">{dateSelected}</span>
       </h1>
       <div className="events flex flex-col justify-between flex-2 gap-4">
         {/* <h1 className="text-center text-orange-600">لا توجد مواعيد</h1> */}

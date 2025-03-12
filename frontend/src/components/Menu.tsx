@@ -1,78 +1,26 @@
-import { Drawer, MenuProps, Menu as AntdMenu } from "antd";
+import { Drawer, Menu as AntdMenu } from "antd";
 import Logo from "./Logo";
-import { FaMoneyBill, FaUser } from "react-icons/fa";
-import {
-  FaCalendarCheck,
-  FaCalendarDays,
-  FaDiagramProject,
-  FaFile,
-} from "react-icons/fa6";
-import { MdAssignment } from "react-icons/md";
-import { GiMoneyStack, GiPayMoney, GiReceiveMoney } from "react-icons/gi";
 import "../styles/menu.css";
 import { NavLink, useLocation } from "react-router";
-import { useEffect, useState } from "react";
-import { LuNotebookPen } from "react-icons/lu";
+import { useEffect, useMemo, useState } from "react";
+import appRoutes, { type AppRoute } from "../app/appRoutes";
+import { ItemType } from "antd/es/menu/interface";
 
-const items: MenuProps["items"] = [
-  {
-    key: "/employees",
-    icon: <FaUser />,
-    label: <NavLink to="/employees">الموظفين</NavLink>,
-  },
-  {
-    key: "/projects",
-    icon: <FaDiagramProject />,
-    label: <NavLink to="/projects">المشاريع</NavLink>,
-  },
-  {
-    key: "/tasks",
-    icon: <MdAssignment />,
-    label: <NavLink to="/tasks">التكليفات</NavLink>,
-  },
-  {
-    key: "/attendance",
-    icon: <FaCalendarCheck />,
-    label: <NavLink to="/attendance">الحضور والانصراف</NavLink>,
-  },
-  {
-    key: "financials",
-    icon: <FaMoneyBill />,
-    label: "الماليات",
-    children: [
-      {
-        key: "/incomes",
-        icon: <GiReceiveMoney />,
-        label: <NavLink to="/incomes">الإيرادات</NavLink>,
-      },
-      {
-        key: "/expenses",
-        icon: <GiPayMoney />,
-        label: <NavLink to="/expenses">المصروفات</NavLink>,
-      },
-      {
-        key: "/salaries",
-        icon: <GiMoneyStack />,
-        label: <NavLink to="/salaries">المرتبات</NavLink>,
-      },
-    ],
-  },
-  {
-    key: "/schedules",
-    icon: <FaCalendarDays />,
-    label: <NavLink to="/schedules">جدول المواعيد</NavLink>,
-  },
-  {
-    key: "/notes",
-    icon: <LuNotebookPen />,
-    label: <NavLink to="/notes">المذكرات</NavLink>,
-  },
-  {
-    key: "/files",
-    icon: <FaFile />,
-    label: <NavLink to="/files">الملفات</NavLink>,
-  },
-];
+const mapRoute = ({ path, label, icon, children }: AppRoute): ItemType => ({
+  key: path!,
+  icon,
+  label:
+    children && children?.length > 0 ? (
+      label
+    ) : (
+      <NavLink to={path!}>{label}</NavLink>
+    ),
+  children: children?.length
+    ? children.map((subRoute) =>
+        mapRoute({ ...subRoute, path: `${path}/${subRoute.path}` })
+      )
+    : undefined,
+});
 
 const Menu = ({
   menuOpen,
@@ -86,6 +34,10 @@ const Menu = ({
   };
   const location = useLocation();
   const [openKeys, setOpenKeys] = useState<string[]>([]);
+
+  const items = useMemo(() => {
+    return appRoutes[0].children!.map(mapRoute);
+  }, []);
 
   useEffect(() => {
     const activeSubMenu = items.find((item: any) =>

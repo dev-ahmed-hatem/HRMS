@@ -64,7 +64,7 @@ const Menu = ({
         </NavLink>
 
         <AntdMenu
-          selectedKeys={[location.pathname]}
+          selectedKeys={[location.pathname.slice(1)]}
           defaultOpenKeys={openKeys}
           mode="inline"
           items={items}

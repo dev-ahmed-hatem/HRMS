@@ -17,37 +17,37 @@ export type AppRoute = RouteObject & {
 
 export const appRoutes: AppRoute[] = [
   {
-    path: "/",
+    path: "",
     element: <Base />,
     errorElement: <Error />,
     children: [
       {
-        path: "/employees",
+        path: "employees",
         element: <EmployeesPage />,
         icon: <FaUser />,
         label: "الموظفين",
       },
       {
-        path: "/projects",
+        path: "projects",
         element: <EmployeesPage />,
         icon: <FaDiagramProject />,
         label: "المشاريع",
       },
       {
-        path: "/tasks",
+        path: "tasks",
         element: <EmployeesPage />,
         icon: <MdAssignment />,
         label: "التكليفات",
       },
       {
-        path: "/attendance",
+        path: "attendance",
         element: <EmployeesPage />,
         icon: <FaCalendarCheck />,
         label: "الحضور والانصراف",
       },
 
       {
-        path: "/financials",
+        path: "financials",
         icon: <FaMoneyBill />,
         label: "الماليات",
         element: <EmployeesPage />,
@@ -73,19 +73,19 @@ export const appRoutes: AppRoute[] = [
         ],
       },
       {
-        path: "/schedules",
+        path: "schedules",
         element: <EmployeesPage />,
         icon: <FaCalendarDays />,
         label: "جدول المواعيد",
       },
       {
-        path: "/notes",
+        path: "notes",
         element: <EmployeesPage />,
         icon: <LuNotebookPen />,
         label: "المذكرات",
       },
       {
-        path: "/files",
+        path: "files",
         element: <EmployeesPage />,
         icon: <FaFile />,
         label: "الملفات",

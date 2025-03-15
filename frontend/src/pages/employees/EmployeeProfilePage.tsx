@@ -25,7 +25,6 @@ const employee: Employee = {
   department: "الموارد البشرية",
   hireDate: "04 يونيو 2018",
   employeeID: "TF 2002",
-  enterpriseID: "MGT 5565",
   cv: "https://example.com/ted_cv.pdf",
   avatar: "",
   mode: "من المقر",
@@ -111,7 +110,9 @@ const EmployeeProfilePage: React.FC = () => {
 
       {/* Tabs Section */}
       <Tabs
-        // defaultActiveKey="0"
+        renderTabBar={(props, DefaultTabBar) => (
+          <DefaultTabBar {...props} className="md:ps-2" />
+        )}
         className="mt-4"
         items={items}
         direction="rtl"
@@ -120,10 +121,11 @@ const EmployeeProfilePage: React.FC = () => {
       {/* Action Button */}
       <div className="flex md:justify-end mt-4 flex-wrap gap-4">
         <Button type="primary" icon={<EditOutlined />}>
-          تعديل المعلومات
+          تعديل البيانات
         </Button>
         <Button
-          className="bg-red-500 border-red-500 hover:border-red-400 hover:bg-red-400 text-white"
+          className="enabled:bg-red-500 enabled:border-red-500 enabled:shadow-[0_2px_0_rgba(0,58,58,0.31)]
+          enabled:hover:border-red-400 enabled:hover:bg-red-400 enabled:text-white"
           icon={<DeleteOutlined />}
         >
           حذف الموظف

@@ -68,7 +68,7 @@ const Attendance = ({ attendance }: { attendance: Employee["attendance"] }) => {
         <DatePicker
           picker="month"
           onChange={(date) => setSelectedMonth(date || dayjs())}
-          format="[شهر ]MM - [سنة ]GGGG"
+          format="[شهر ]MM - [سنة ]YYYY"
           placeholder="اختر الشهر"
           className="w-full md:w-60"
         />

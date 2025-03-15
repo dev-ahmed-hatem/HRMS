@@ -14,7 +14,7 @@ import {
   LeftOutlined,
   RightOutlined,
 } from "@ant-design/icons";
-import { Outlet, useMatch, useNavigate } from "react-router";
+import { Link, Outlet, useMatch, useNavigate } from "react-router";
 import { getInitials } from "../../utils";
 
 const employees = [
@@ -289,15 +289,14 @@ const EmployeesPage = () => {
         />
 
         {/* Add Button */}
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          size="large"
-          className="shadow-sm hover:shadow-lg h-10
-           bg-green-700 hover:bg-green-600"
+        <Link
+          to={"/employees/add"}
+          className="hover:shadow-lg h-10 w-40 flex items-center text-white gap-2 rounded-lg
+         bg-green-700 hover:bg-green-600 px-2 shadow-[0_2px_0_rgba(0,58,58,0.31)]"
         >
-          إضافة موظف
-        </Button>
+          <PlusOutlined />
+          <span>إضافة موظف</span>
+        </Link>
       </div>
       {/* Table */}
       <ConfigProvider

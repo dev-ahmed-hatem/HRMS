@@ -13,7 +13,6 @@ export type Employee = {
   department: string;
   hireDate: string;
   employeeID: string;
-  enterpriseID: string;
   cv?: string;
   avatar?: string;
   mode: "عن بُعد" | "من المقر" | "هجين";

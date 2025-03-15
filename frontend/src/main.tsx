@@ -12,6 +12,7 @@ createRoot(document.getElementById("root")!).render(
       theme={{
         token: {
           colorPrimary: "#0E6B81",
+          fontFamily: "cairo"
         },
       }}
       locale={arEG}

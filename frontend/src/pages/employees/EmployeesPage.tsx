@@ -14,7 +14,8 @@ import {
   LeftOutlined,
   RightOutlined,
 } from "@ant-design/icons";
-import { useNavigate } from "react-router";
+import { Outlet, useMatch, useNavigate } from "react-router";
+import { getInitials } from "../../utils";
 
 const employees = [
   {
@@ -219,15 +220,9 @@ const employees = [
 const EmployeesPage = () => {
   const [searchText, setSearchText] = useState("");
   const navigate = useNavigate();
+  const isEmployees = useMatch("/employees");
 
-  // Generate initials for names without images
-  const getInitials = (name: string) =>
-    name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+  if (!isEmployees) return <Outlet />;
 
   // Search Function
   const onSearch = (value: string) => {
@@ -236,7 +231,7 @@ const EmployeesPage = () => {
 
   const columns = [
     {
-      title: "اسم الموظف / الكود",
+      title: "اسم الموظف",
       dataIndex: "name",
       key: "name",
       render: (text: string, record: any) => (
@@ -281,7 +276,9 @@ const EmployeesPage = () => {
 
   return (
     <div className="p-7">
-      <h1 className="mb-6 text-2xl md:text-3xl text-centr font-bold">الموظفين</h1>
+      <h1 className="mb-6 text-2xl md:text-3xl text-centr font-bold">
+        الموظفين
+      </h1>
       {/* Search Input */}
       <div className="flex justify-between flex-wrap mb-4">
         <Input
@@ -312,7 +309,7 @@ const EmployeesPage = () => {
           dataSource={employees.filter((e) => e.name.includes(searchText))}
           columns={columns}
           onRow={(record) => ({
-            onClick: () => navigate(`employee-data/${record.id}`),
+            onClick: () => navigate(`employee-profile/${record.id}`),
           })}
           rowKey="id"
           pagination={{

@@ -1,5 +1,5 @@
 import Base from "../pages/Base";
-import EmployeesPage from "../pages/EmployeesPage";
+import EmployeesPage from "../pages/employees/EmployeesPage";
 import Error from "../pages/Error";
 import { FaUser, FaCalendarCheck, FaMoneyBill, FaFile } from "react-icons/fa";
 import { FaDiagramProject, FaCalendarDays } from "react-icons/fa6";

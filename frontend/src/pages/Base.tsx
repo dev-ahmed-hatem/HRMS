@@ -4,6 +4,7 @@ import Menu from "../components/Menu";
 import { Outlet, useMatch } from "react-router";
 import Home from "./Home";
 import Footer from "../components/Footer";
+import Breadcrumbs from "../components/BreadCrumbs";
 
 const Base = () => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -12,7 +13,14 @@ const Base = () => {
     <>
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
       <Menu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-      {isHome ? <Home /> : <Outlet />}
+      {isHome ? (
+        <Home />
+      ) : (
+        <div className="padding-container py-7">
+          <Breadcrumbs />
+          <Outlet />
+        </div>
+      )}
       <Footer />
     </>
   );

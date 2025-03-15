@@ -56,15 +56,15 @@ export default {
           },
           "@screen lg": {
             // maxWidth: "1024",
-            marginInline: "5rem",
+            marginInline: "4rem",
           },
           "@screen xl": {
             // maxWidth: "1280px",
-            marginInline: "7rem",
+            marginInline: "5rem",
           },
           "@screen 2xl": {
             // maxWidth: "1536px",
-            marginInline: "9rem",
+            marginInline: "7rem",
           },
         },
 

@@ -81,7 +81,7 @@ const items = [
 
 const EmployeeProfilePage: React.FC = () => {
   return (
-    <div className="padding-container mx-auto py-6">
+    <>
       {/* Employee Header */}
       <Card className="shadow-lg rounded-xl">
         <div className="flex items-center justify-between flex-wrap gap-y-6">
@@ -131,7 +131,7 @@ const EmployeeProfilePage: React.FC = () => {
           حذف الموظف
         </Button>
       </div>
-    </div>
+    </>
   );
 };
 

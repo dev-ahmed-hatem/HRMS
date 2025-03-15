@@ -275,7 +275,7 @@ const EmployeesPage = () => {
   ];
 
   return (
-    <div className="p-7">
+    <>
       <h1 className="mb-6 text-2xl md:text-3xl text-centr font-bold">
         الموظفين
       </h1>
@@ -291,7 +291,7 @@ const EmployeesPage = () => {
         {/* Add Button */}
         <Link
           to={"/employees/add"}
-          className="hover:shadow-lg h-10 w-40 flex items-center text-white gap-2 rounded-lg
+          className="h-10 w-40 flex items-center text-white gap-2 rounded-lg
          bg-green-700 hover:bg-green-600 px-2 shadow-[0_2px_0_rgba(0,58,58,0.31)]"
         >
           <PlusOutlined />
@@ -335,7 +335,7 @@ const EmployeesPage = () => {
           scroll={{ x: "max-content" }}
         />
       </ConfigProvider>
-    </div>
+    </>
   );
 };
 

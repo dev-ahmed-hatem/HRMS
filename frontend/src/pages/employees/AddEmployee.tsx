@@ -14,7 +14,7 @@ const AddEmployee = ({
   const [form] = Form.useForm();
 
   return (
-    <div className="px-2 md:px-6 py-6">
+    <>
       <h1 className="mb-6 text-2xl text-centr font-bold">
         {initialValues ? "تعديل" : "إضافة"} موظف
       </h1>
@@ -207,7 +207,7 @@ const AddEmployee = ({
           </Button>
         </Form.Item>
       </Form>
-    </div>
+    </>
   );
 };
 

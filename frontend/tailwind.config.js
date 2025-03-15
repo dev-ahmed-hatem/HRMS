@@ -78,13 +78,13 @@ export default {
             paddingInline: "3rem",
           },
           "@screen lg": {
-            paddingInline: "5rem",
+            paddingInline: "4rem",
           },
           "@screen xl": {
-            paddingInline: "7rem",
+            paddingInline: "5rem",
           },
           "@screen 2xl": {
-            paddingInline: "9rem",
+            paddingInline: "7rem",
           },
         },
       });

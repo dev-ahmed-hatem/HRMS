@@ -2,7 +2,7 @@ import Logo from "./Logo";
 
 const Footer = () => {
   return (
-    <footer className="bg-calypso-950 text-white py-6 px-4 mt-10">
+    <footer className="bg-calypso-950 text-white py-6 padding-container mt-10">
       <div
         className="max-w-7xl mx-auto flex flex-wrap
       justify-between items-center gap-4"

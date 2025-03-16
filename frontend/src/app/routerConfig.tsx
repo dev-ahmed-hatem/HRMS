@@ -2,6 +2,7 @@ import { RouteObject } from "react-router";
 import appRoutes, { AppRoute } from "./appRoutes";
 import EmployeeProfilePage from "../pages/employees/EmployeeProfilePage";
 import AddEmployee from "../pages/employees/AddEmployee";
+import ProjectDetails from "../pages/projects/ProjectDetails";
 
 const alterRoute = function (
   appRoutes: AppRoute[],
@@ -68,9 +69,13 @@ const addChildrenRoutes = function (
   });
 };
 
-const routes: RouteObject[] = addChildrenRoutes(appRoutes, "employees", [
+let routes: RouteObject[] = addChildrenRoutes(appRoutes, "employees", [
   { path: "employee-profile/:emp_id", element: <EmployeeProfilePage /> },
   { path: "add", element: <AddEmployee /> },
+]);
+
+routes = addChildrenRoutes(routes, "projects", [
+  { path: "project-details/:project_id", element: <ProjectDetails /> },
 ]);
 
 export default routes;

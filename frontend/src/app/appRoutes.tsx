@@ -7,6 +7,7 @@ import { GiReceiveMoney, GiPayMoney, GiMoneyStack } from "react-icons/gi";
 import { LuNotebookPen } from "react-icons/lu";
 import { MdAssignment } from "react-icons/md";
 import { RouteObject } from "react-router";
+import ProjectsPage from "../pages/projects/ProjectsPage";
 
 export type AppRoute = RouteObject & {
   key?: string;
@@ -29,7 +30,7 @@ export const appRoutes: AppRoute[] = [
       },
       {
         path: "projects",
-        element: <EmployeesPage />,
+        element: <ProjectsPage />,
         icon: <FaDiagramProject />,
         label: "المشاريع",
       },

@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 import routes from "./app/routerConfig";
 import { arEG } from "./utils/locale";
 import { ConfigProvider } from "antd";
+import "./styles/tables.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

@@ -1,13 +1,9 @@
 import { useState } from "react";
-import { Table, Input, Avatar, Space, ConfigProvider, Badge } from "antd";
-import {
-  SearchOutlined,
-  PlusOutlined,
-  LeftOutlined,
-  RightOutlined,
-} from "@ant-design/icons";
+import { Table, Input, Avatar, Space, Badge } from "antd";
+import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import { Link, Outlet, useMatch, useNavigate } from "react-router";
 import { getInitials } from "../../utils";
+import { tablePaginationConfig } from "../../utils/antd";
 
 const employees = [
   {
@@ -214,8 +210,6 @@ const EmployeesPage = () => {
   const navigate = useNavigate();
   const isEmployees = useMatch("/employees");
 
-  if (!isEmployees) return <Outlet />;
-
   // Search Function
   const onSearch = (value: string) => {
     setSearchText(value);
@@ -266,6 +260,7 @@ const EmployeesPage = () => {
     },
   ];
 
+  if (!isEmployees) return <Outlet />;
   return (
     <>
       <h1 className="mb-6 text-2xl md:text-3xl text-centr font-bold">
@@ -291,42 +286,18 @@ const EmployeesPage = () => {
         </Link>
       </div>
       {/* Table */}
-      <ConfigProvider
-        theme={{
-          components: { Table: { headerBg: "#105569", headerColor: "white" } },
-        }}
-      >
-        <Table
-          dataSource={employees.filter((e) => e.name.includes(searchText))}
-          columns={columns}
-          onRow={(record) => ({
-            onClick: () => navigate(`employee-profile/${record.id}`),
-          })}
-          rowKey="id"
-          pagination={{
-            pageSize: 20,
-            itemRender(page, type, element) {
-              if (type === "prev") {
-                return (
-                  <button className="ant-pagination-item-link">
-                    <RightOutlined />
-                  </button>
-                );
-              }
-              if (type === "next") {
-                return (
-                  <button className="ant-pagination-item-link">
-                    <LeftOutlined />
-                  </button>
-                );
-              }
-              return element;
-            },
-          }}
-          bordered
-          scroll={{ x: "max-content" }}
-        />
-      </ConfigProvider>
+      <Table
+        dataSource={employees.filter((e) => e.name.includes(searchText))}
+        columns={columns}
+        onRow={(record) => ({
+          onClick: () => navigate(`employee-profile/${record.id}`),
+        })}
+        rowKey="id"
+        pagination={tablePaginationConfig()}
+        bordered
+        scroll={{ x: "max-content" }}
+        className="clickable-table  calypso-header"
+      />
     </>
   );
 };

@@ -1,6 +1,9 @@
 import { Form, Input, Select, DatePicker, Button, Row, Col, Card } from "antd";
 import dayjs from "dayjs";
 import { Employee } from "../../types/employee";
+import "../../styles/add-employee.css";
+import UploadImage from "../../components/employee/UploadImage";
+import { useState } from "react";
 
 const { Option } = Select;
 
@@ -12,6 +15,7 @@ const AddEmployee = ({
   onSubmit?: (values: Employee) => void;
 }) => {
   const [form] = Form.useForm();
+  const [image, setImage] = useState<File | null>(null);
 
   return (
     <>
@@ -31,9 +35,10 @@ const AddEmployee = ({
             ? dayjs(initialValues.hireDate)
             : dayjs(),
         }}
+        id="add-employee-form"
       >
         {/* Personal Details Section */}
-        <Card title="البيانات الشخصية" style={{ marginBottom: 20 }}>
+        <Card title="البيانات الشخصية" className="mb-16">
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>
               <Form.Item
@@ -134,6 +139,11 @@ const AddEmployee = ({
                   <Option value="مطلق">مطلق</Option>
                   <Option value="أرمل">أرمل</Option>
                 </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={12}>
+              <Form.Item name="picture" label="الصورة">
+                <UploadImage setFile={setImage} />
               </Form.Item>
             </Col>
           </Row>

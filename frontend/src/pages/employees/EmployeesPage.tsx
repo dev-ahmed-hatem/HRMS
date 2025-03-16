@@ -1,13 +1,5 @@
 import { useState } from "react";
-import {
-  Table,
-  Input,
-  Button,
-  Avatar,
-  Space,
-  ConfigProvider,
-  Badge,
-} from "antd";
+import { Table, Input, Avatar, Space, ConfigProvider, Badge } from "antd";
 import {
   SearchOutlined,
   PlusOutlined,
@@ -291,8 +283,8 @@ const EmployeesPage = () => {
         {/* Add Button */}
         <Link
           to={"/employees/add"}
-          className="h-10 w-40 flex items-center text-white gap-2 rounded-lg
-         bg-green-700 hover:bg-green-600 px-2 shadow-[0_2px_0_rgba(0,58,58,0.31)]"
+          className="h-10 px-6 flex items-center text-white gap-2 rounded-lg
+         bg-green-700 hover:bg-green-600 shadow-[0_2px_0_rgba(0,58,58,0.31)]"
         >
           <PlusOutlined />
           <span>إضافة موظف</span>

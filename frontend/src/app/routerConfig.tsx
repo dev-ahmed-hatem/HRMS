@@ -35,47 +35,39 @@ const alterRoute = function (
   });
 };
 
-const addChildrenRoutes = function (
+const addSubRoutes = (
   appRoutes: AppRoute[],
-  routePath: string,
-  children: RouteObject[],
+  subRoutes: { [key: string]: RouteObject[] },
   parentPath?: string
-): AppRoute[] {
+): AppRoute[] => {
   return appRoutes.map((route) => {
     const currentRoutePath = parentPath
       ? `${parentPath}/${route.path}`
       : route.path;
 
-    if (currentRoutePath === routePath) {
-      return {
-        ...route,
-        children: route.children ? route.children.concat(children) : children,
-      } as RouteObject;
-    }
+    const matchedChildren = subRoutes[currentRoutePath!];
 
-    if (route.children?.length) {
-      return {
-        ...route,
-        children: addChildrenRoutes(
-          route.children,
-          routePath,
-          children,
-          currentRoutePath
-        ),
-      };
-    }
-
-    return route;
+    return {
+      ...route,
+      children: [
+        ...(route.children || []),
+        ...(matchedChildren || []),
+        ...(route.children
+          ? addSubRoutes(route.children, subRoutes, currentRoutePath)
+          : []),
+      ],
+    } as AppRoute;
   });
 };
 
-let routes: RouteObject[] = addChildrenRoutes(appRoutes, "employees", [
-  { path: "employee-profile/:emp_id", element: <EmployeeProfilePage /> },
-  { path: "add", element: <AddEmployee /> },
-]);
-
-routes = addChildrenRoutes(routes, "projects", [
-  { path: "project-details/:project_id", element: <ProjectDetails /> },
-]);
+let routes: RouteObject[] = addSubRoutes(appRoutes, {
+  employees: [
+    { path: "employee-profile/:emp_id", element: <EmployeeProfilePage /> },
+    { path: "add", element: <AddEmployee /> },
+  ],
+  projects: [
+    { path: "project-details/:project_id", element: <ProjectDetails /> },
+  ],
+});
 
 export default routes;

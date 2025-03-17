@@ -1,7 +1,6 @@
 import { Form, Input, Select, DatePicker, Button, Row, Col, Card } from "antd";
 import dayjs from "dayjs";
 import { Employee } from "../../types/employee";
-import "../../styles/add-employee.css";
 import UploadImage from "../../components/employee/UploadImage";
 import { useState } from "react";
 
@@ -19,7 +18,7 @@ const AddEmployee = ({
 
   return (
     <>
-      <h1 className="mb-6 text-2xl text-centr font-bold">
+      <h1 className="mb-6 text-2xl font-bold">
         {initialValues ? "تعديل" : "إضافة"} موظف
       </h1>
       <Form
@@ -35,7 +34,7 @@ const AddEmployee = ({
             ? dayjs(initialValues.hireDate)
             : dayjs(),
         }}
-        id="add-employee-form"
+        className="add-form"
       >
         {/* Personal Details Section */}
         <Card title="البيانات الشخصية" className="mb-16">
@@ -155,7 +154,7 @@ const AddEmployee = ({
             <Col xs={24} md={12}>
               <Form.Item
                 name="employeeID"
-                label="معرف الموظف"
+                label="معرف الموظف (الكود)"
                 rules={[{ required: true, message: "يرجى إدخال معرف الموظف" }]}
               >
                 <Input placeholder="أدخل معرف الموظف" />

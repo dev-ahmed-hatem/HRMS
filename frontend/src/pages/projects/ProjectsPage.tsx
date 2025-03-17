@@ -1,12 +1,12 @@
 import ProjectsOverview from "../../components/projects/ProjectOverview";
 import { Input, Table, Tag } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { useState } from "react";
 import { Project } from "../../types/project";
 import { tablePaginationConfig } from "../../utils/antd";
-import { Outlet, useMatch, useNavigate } from "react-router";
+import { Link, Outlet, useMatch, useNavigate } from "react-router";
 
 const sampleProjects: Project[] = [
   {
@@ -105,6 +105,7 @@ const ProjectsPage = () => {
       <h1 className="my-6 text-2xl md:text-3xl text-centr font-bold">
         المشاريع
       </h1>
+
       <div className="flex justify-between flex-wrap mb-4">
         <Input
           placeholder="ابحث عن مشروع..."
@@ -112,7 +113,18 @@ const ProjectsPage = () => {
           onChange={(e) => onSearch(e.target.value)}
           className="mb-4 w-full max-w-md h-10"
         />
+
+        {/* Add Button */}
+        <Link
+          to={"/projects/add"}
+          className="h-10 px-6 flex items-center text-white gap-2 rounded-lg
+         bg-green-700 hover:bg-green-600 shadow-[0_2px_0_rgba(0,58,58,0.31)]"
+        >
+          <PlusOutlined />
+          <span>إضافة مشروع</span>
+        </Link>
       </div>
+
       <Table
         columns={columns}
         onRow={(record) => ({

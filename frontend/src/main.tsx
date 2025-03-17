@@ -6,6 +6,7 @@ import routes from "./app/routerConfig";
 import { arEG } from "./utils/locale";
 import { ConfigProvider } from "antd";
 import "./styles/tables.css";
+import "./styles/add-form.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

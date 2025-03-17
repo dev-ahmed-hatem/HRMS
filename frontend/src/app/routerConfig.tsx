@@ -3,6 +3,7 @@ import appRoutes, { AppRoute } from "./appRoutes";
 import EmployeeProfilePage from "../pages/employees/EmployeeProfilePage";
 import AddEmployee from "../pages/employees/AddEmployee";
 import ProjectDetails from "../pages/projects/ProjectDetails";
+import AddProject from "../pages/projects/AddProject";
 
 const alterRoute = function (
   appRoutes: AppRoute[],
@@ -67,6 +68,7 @@ let routes: RouteObject[] = addSubRoutes(appRoutes, {
   ],
   projects: [
     { path: "project-details/:project_id", element: <ProjectDetails /> },
+    { path: "add", element: <AddProject /> },
   ],
 });
 

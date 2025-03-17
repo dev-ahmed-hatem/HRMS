@@ -266,7 +266,7 @@ const EmployeesPage = () => {
       <h1 className="mb-6 text-2xl md:text-3xl text-centr font-bold">
         الموظفين
       </h1>
-      {/* Search Input */}
+
       <div className="flex justify-between flex-wrap mb-4">
         <Input
           placeholder="ابحث عن موظف..."
@@ -285,6 +285,7 @@ const EmployeesPage = () => {
           <span>إضافة موظف</span>
         </Link>
       </div>
+
       {/* Table */}
       <Table
         dataSource={employees.filter((e) => e.name.includes(searchText))}

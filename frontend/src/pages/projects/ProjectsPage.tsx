@@ -7,31 +7,46 @@ import { useState } from "react";
 import { Project } from "../../types/project";
 import { tablePaginationConfig } from "../../utils/antd";
 import { Link, Outlet, useMatch, useNavigate } from "react-router";
-
 const sampleProjects: Project[] = [
   {
+    projectID: "PRJ-001",
     id: "P001",
     name: "مشروع تطوير الموقع",
     status: "قيد التنفيذ",
     startDate: "2024-03-01",
     endDate: "2024-06-01",
     assignedTeam: "فريق التطوير",
+    client: "شركة التقنية الحديثة",
+    teamMembers: ["أحمد علي", "سارة محمد", "خالد إبراهيم"],
+    budget: 50000,
+    description: "تطوير موقع إلكتروني حديث باستخدام أحدث التقنيات.",
   },
   {
+    projectID: "PRJ-002",
     id: "P002",
     name: "تحليل بيانات السوق",
     status: "مكتمل",
     startDate: "2023-10-10",
     endDate: "2024-01-10",
     assignedTeam: "قسم التحليل",
+    client: "شركة التسويق الرقمي",
+    teamMembers: ["ليلى سمير", "يوسف عبد الله"],
+    budget: 30000,
+    description:
+      "تحليل البيانات السوقية لاكتشاف الاتجاهات وتحسين الاستراتيجيات.",
   },
   {
+    projectID: "PRJ-003",
     id: "P003",
     name: "تحديث البنية التحتية",
     status: "قيد الموافقة",
     startDate: "2024-04-15",
     endDate: "2024-08-15",
     assignedTeam: "فريق التكنولوجيا",
+    client: "مؤسسة الحلول الذكية",
+    teamMembers: ["محمد فؤاد", "هند محمود", "زياد حسن"],
+    budget: 75000,
+    description: "تحسين البنية التحتية لتكنولوجيا المعلومات وزيادة الكفاءة.",
   },
 ];
 
@@ -128,7 +143,7 @@ const ProjectsPage = () => {
       <Table
         columns={columns}
         onRow={(record) => ({
-          onClick: () => navigate(`project-details/${record.id}`),
+          onClick: () => navigate(`project/${record.id}`),
         })}
         dataSource={projects.filter((p) => p.name.includes(searchText))}
         rowKey="id"

@@ -5,12 +5,14 @@ import { Outlet, useMatch } from "react-router";
 import Home from "./Home";
 import Footer from "../components/Footer";
 import Breadcrumbs from "../components/BreadCrumbs";
+import ScrollToTop from "../components/ScrollToTop";
 
 const Base = () => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const isHome = useMatch("/");
   return (
     <>
+      <ScrollToTop />
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
       <Menu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
       {isHome ? (

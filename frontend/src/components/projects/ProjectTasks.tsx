@@ -2,10 +2,12 @@ import { Select, Button, Tag, Table } from "antd";
 import { useState } from "react";
 import { Task } from "../../types/task";
 import { tablePaginationConfig } from "../../utils/antd";
+import { useNavigate } from "react-router";
 
 const { Option } = Select;
 
 const ProjectTasks = ({ tasks }: { tasks: Task[] }) => {
+  const navigate = useNavigate();
   const [filteredTasks, setFilteredTasks] = useState(tasks);
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
   const [filterDepartment, setFilterDepartment] = useState<string | null>(null);
@@ -75,6 +77,9 @@ const ProjectTasks = ({ tasks }: { tasks: Task[] }) => {
       </div>
       <Table
         columns={columns}
+        onRow={(record) => ({
+          onClick: () => navigate(`/tasks/task/${record.id}`),
+        })}
         dataSource={filteredTasks}
         rowKey="id"
         pagination={tablePaginationConfig()}

@@ -70,6 +70,10 @@ let routes: RouteObject[] = addSubRoutes(appRoutes, {
     { path: "project/:project_id", element: <ProjectProfilePage /> },
     { path: "add", element: <AddProject /> },
   ],
+  tasks: [
+    // { path: "project/:project_id", element: <ProjectProfilePage /> },
+    // { path: "add", element: <AddProject /> },
+  ],
 });
 
 export default routes;

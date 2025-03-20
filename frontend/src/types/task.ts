@@ -8,4 +8,5 @@ export type Task = {
   priority: "منخفض" | "متوسط" | "مرتفع";
   dueDate: string;
   assignedTo: string;
+  project?: { id: string; name: string } | null; // Nullable project reference
 };

@@ -8,6 +8,7 @@ import { LuNotebookPen } from "react-icons/lu";
 import { MdAssignment } from "react-icons/md";
 import { RouteObject } from "react-router";
 import ProjectsPage from "../pages/projects/ProjectsPage";
+import TasksPage from "../pages/tasks/TasksPage";
 
 export type AppRoute = RouteObject & {
   key?: string;
@@ -36,9 +37,9 @@ export const appRoutes: AppRoute[] = [
       },
       {
         path: "tasks",
-        element: <EmployeesPage />,
+        element: <TasksPage />,
         icon: <MdAssignment />,
-        label: "التكليفات",
+        label: "المهام",
       },
       {
         path: "attendance",

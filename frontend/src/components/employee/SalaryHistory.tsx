@@ -108,6 +108,7 @@ const SalaryHistory = ({
         bordered
         title={() => `سجل الراتب - سنة ${dayjs(selectedYear).format("YYYY")}`}
         scroll={{ x: "max-content" }}
+        className="calypso-header"
       />
     </div>
   );

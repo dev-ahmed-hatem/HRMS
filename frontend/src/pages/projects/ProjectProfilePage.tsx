@@ -3,7 +3,7 @@ import { Card, Avatar, Tabs, Button } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getInitials } from "../../utils";
 import ProjectDetails from "../../components/projects/ProjectDetails";
-import TasksOverview from "../../components/projects/TasksOverview";
+import TasksOverview from "../../components/tasks/TasksOverview";
 import { Project } from "../../types/project";
 import { Task } from "../../types/task";
 import ProjectTasks from "../../components/projects/ProjectTasks";

@@ -87,6 +87,7 @@ const Attendance = ({ attendance }: { attendance: Employee["attendance"] }) => {
           ).format("YYYY")}`
         }
         scroll={{ x: "max-content" }}
+        className="calypso-header"
       />
     </div>
   );

@@ -94,11 +94,6 @@ const RelatedTasks: React.FC<RelatedTasksProps> = ({ taskId }) => {
         return <Tag color={colorMap[status]}>{status}</Tag>;
       },
     },
-    {
-      title: "المسؤول",
-      dataIndex: "assignedTo",
-      key: "assignedTo",
-    },
   ];
 
   return (

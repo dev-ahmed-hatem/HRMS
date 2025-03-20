@@ -5,6 +5,7 @@ import AddEmployee from "../pages/employees/AddEmployee";
 import AddProject from "../pages/projects/AddProject";
 import ProjectProfilePage from "../pages/projects/ProjectProfilePage";
 import TaskProfilePage from "../pages/tasks/TaskProfilePage";
+import AddTask from "../pages/tasks/AddTask";
 
 const alterRoute = function (
   appRoutes: AppRoute[],
@@ -73,7 +74,7 @@ let routes: RouteObject[] = addSubRoutes(appRoutes, {
   ],
   tasks: [
     { path: "task/:task_id", element: <TaskProfilePage /> },
-    { path: "add", element: <AddProject /> },
+    { path: "add", element: <AddTask /> },
   ],
 });
 

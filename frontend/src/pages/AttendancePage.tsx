@@ -1,5 +1,6 @@
 import { Card, Tabs } from "antd";
 import AttendanceRecords from "../components/attendance/AttendanceRecords";
+import AttendanceSummary from "../components/attendance/AttendanceSummary";
 
 const AttendancePage: React.FC = () => {
   const tabItems = [
@@ -11,7 +12,7 @@ const AttendancePage: React.FC = () => {
     {
       key: "2",
       label: "ملخص الحضور",
-      children: <Card>ملخص الحضور سيتم إضافته قريبًا</Card>,
+      children: <AttendanceSummary />,
     },
     {
       key: "3",

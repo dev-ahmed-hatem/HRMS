@@ -9,6 +9,7 @@ import { MdAssignment } from "react-icons/md";
 import { RouteObject } from "react-router";
 import ProjectsPage from "../pages/projects/ProjectsPage";
 import TasksPage from "../pages/tasks/TasksPage";
+import AttendancePage from "../pages/AttendancePage";
 
 export type AppRoute = RouteObject & {
   key?: string;
@@ -43,7 +44,7 @@ export const appRoutes: AppRoute[] = [
       },
       {
         path: "attendance",
-        element: <EmployeesPage />,
+        element: <AttendancePage />,
         icon: <FaCalendarCheck />,
         label: "الحضور والانصراف",
       },

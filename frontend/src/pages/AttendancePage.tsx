@@ -1,6 +1,7 @@
 import { Card, Tabs } from "antd";
 import AttendanceRecords from "../components/attendance/AttendanceRecords";
 import AttendanceSummary from "../components/attendance/AttendanceSummary";
+import AttendanceSettings from "../components/attendance/AttendanceSettings";
 
 const AttendancePage: React.FC = () => {
   const tabItems = [
@@ -17,7 +18,7 @@ const AttendancePage: React.FC = () => {
     {
       key: "3",
       label: "إعدادات",
-      children: <Card>إعدادات النظام سيتم إضافتها لاحقًا</Card>,
+      children: <AttendanceSettings />,
     },
   ];
 

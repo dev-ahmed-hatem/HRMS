@@ -19,15 +19,15 @@ const savedAttendanceRecords = [
   {
     key: "rec-001",
     employee: "محمد",
-    checkIn: "2024-03-17 08:30",
-    checkOut: "2024-03-17 17:00",
+    checkIn: "08:30",
+    checkOut: "17:00",
     editable: false, // Saved records are not editable
   },
   {
     key: "rec-002",
     employee: "أحمد",
-    checkIn: "2024-03-17 09:00",
-    checkOut: "2024-03-17 18:00",
+    checkIn: "09:00",
+    checkOut: "18:00",
     editable: false, // Saved records are not editable
   },
 ];

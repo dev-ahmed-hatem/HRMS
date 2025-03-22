@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { Table, DatePicker, TimePicker, Card, Select } from "antd";
-import dayjs from "dayjs";
+import { useState } from "react";
+import { Table, DatePicker, Card } from "antd";
+import dayjs, { Dayjs } from "dayjs";
 import { tablePaginationConfig } from "../../utils/antd";
 
 const AttendanceSummary = () => {
@@ -59,7 +59,7 @@ const AttendanceSummary = () => {
     {
       title: "الخصم (دقائق)",
       key: "deduction",
-      render: (_, record) =>
+      render: (_: string, record: { checkIn: string; checkOut: string }) =>
         calculateDeduction(record.checkIn, record.checkOut),
     },
   ];
@@ -73,24 +73,6 @@ const AttendanceSummary = () => {
           onChange={setSelectedDate}
           format="YYYY-MM-DD"
         />
-      </div>
-      <div className="flex gap-6 md:gap-12 mb-4 flex-wrap mt-8">
-        <div className="flex gap-x-4 items-center flex-wrap">
-          <span className="font-semibold">وقت الحضور الرسمي:</span>
-          <TimePicker
-            value={dayjs(standardCheckIn, "HH:mm")}
-            format="HH:mm"
-            onChange={(time) => setStandardCheckIn(time.format("HH:mm"))}
-          />
-        </div>
-        <div className="flex gap-x-4 items-center flex-wrap">
-          <span className="font-semibold">وقت الانصراف الرسمي:</span>
-          <TimePicker
-            value={dayjs(standardCheckOut, "HH:mm")}
-            format="HH:mm"
-            onChange={(time) => setStandardCheckOut(time.format("HH:mm"))}
-          />
-        </div>
       </div>
       <Table
         dataSource={attendanceRecords}

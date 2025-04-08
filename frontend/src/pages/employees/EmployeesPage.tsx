@@ -263,7 +263,7 @@ const EmployeesPage = () => {
   if (!isEmployees) return <Outlet />;
   return (
     <>
-      <h1 className="mb-6 text-2xl md:text-3xl text-centr font-bold">
+      <h1 className="mb-6 text-2xl md:text-3xl font-bold">
         الموظفين
       </h1>
 

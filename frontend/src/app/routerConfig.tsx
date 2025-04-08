@@ -6,6 +6,7 @@ import AddProject from "../pages/projects/AddProject";
 import ProjectProfilePage from "../pages/projects/ProjectProfilePage";
 import TaskProfilePage from "../pages/tasks/TaskProfilePage";
 import AddTask from "../pages/tasks/AddTask";
+import FinancialRecords from "../pages/financials/FinancialRecords";
 
 const alterRoute = function (
   appRoutes: AppRoute[],
@@ -75,6 +76,14 @@ let routes: RouteObject[] = addSubRoutes(appRoutes, {
   tasks: [
     { path: "task/:task_id", element: <TaskProfilePage /> },
     { path: "add", element: <AddTask /> },
+  ],
+  "financials/incomes": [
+    { path: "income/:income_id", element: <TaskProfilePage /> },
+    { path: "add", element: <FinancialRecords financialItem="income" /> },
+  ],
+  "financials/expenses": [
+    { path: "expenses/:expense_id", element: <TaskProfilePage /> },
+    { path: "add", element: <FinancialRecords financialItem="expense" /> },
   ],
 });
 

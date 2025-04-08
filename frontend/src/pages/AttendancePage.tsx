@@ -1,4 +1,4 @@
-import { Card, Tabs } from "antd";
+import { Tabs } from "antd";
 import AttendanceRecords from "../components/attendance/AttendanceRecords";
 import AttendanceSummary from "../components/attendance/AttendanceSummary";
 import AttendanceSettings from "../components/attendance/AttendanceSettings";

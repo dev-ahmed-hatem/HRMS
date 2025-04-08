@@ -10,6 +10,7 @@ import { RouteObject } from "react-router";
 import ProjectsPage from "../pages/projects/ProjectsPage";
 import TasksPage from "../pages/tasks/TasksPage";
 import AttendancePage from "../pages/AttendancePage";
+import FinancialsPage from "../pages/financials/FinancialsPage";
 
 export type AppRoute = RouteObject & {
   key?: string;
@@ -48,16 +49,15 @@ export const appRoutes: AppRoute[] = [
         icon: <FaCalendarCheck />,
         label: "الحضور والانصراف",
       },
-
       {
         path: "financials",
         icon: <FaMoneyBill />,
         label: "الماليات",
-        element: <EmployeesPage />,
+        element: <FinancialsPage />,
         children: [
           {
             path: "incomes",
-            element: <EmployeesPage />,
+            element: <FinancialsPage />,
             icon: <GiReceiveMoney />,
             label: "الإيرادات",
           },

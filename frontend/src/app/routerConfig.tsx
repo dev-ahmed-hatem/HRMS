@@ -8,6 +8,7 @@ import TaskProfilePage from "../pages/tasks/TaskProfilePage";
 import AddTask from "../pages/tasks/AddTask";
 import FinancialRecords from "../pages/financials/FinancialRecords";
 import FinancialForm from "../pages/financials/FinancialForm";
+import FinancialProfilePage from "../pages/financials/FinancialProfilePage";
 
 const alterRoute = function (
   appRoutes: AppRoute[],
@@ -81,12 +82,12 @@ let routes: RouteObject[] = addSubRoutes(appRoutes, {
   "financials/incomes": [
     { path: "", element: <FinancialRecords financialItem="income" /> },
     { path: "add", element: <FinancialForm financialItem="income" /> },
-    { path: "income/:income_id", element: <TaskProfilePage /> },
+    { path: ":income_id", element: <FinancialProfilePage /> },
   ],
   "financials/expenses": [
     { path: "", element: <FinancialRecords financialItem="expense" /> },
     { path: "add", element: <FinancialForm financialItem="expense" /> },
-    { path: "expenses/:expense_id", element: <TaskProfilePage /> },
+    { path: ":expense_id", element: <FinancialProfilePage /> },
   ],
 });
 

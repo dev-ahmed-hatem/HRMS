@@ -174,7 +174,7 @@ const FinancialRecords: React.FC<Props> = ({ financialItem }) => {
         scroll={{ x: "max-content" }}
         className="clickable-table calypso-header"
         onRow={(record) => ({
-          onClick: () => navigate(`/financials/${financialItem}/${record.id}`),
+          onClick: () => navigate(`/financials/${financialItem}s/${record.id}`),
         })}
       />
     </>

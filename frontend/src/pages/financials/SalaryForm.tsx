@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Form,
   InputNumber,
@@ -166,7 +166,7 @@ const SalaryForm: React.FC = () => {
             <Form.Item name="notes" label="ملاحظات:">
               <Input.TextArea
                 rows={4}
-                placeholder="أدخل أي ملاحظات متعلقة بالراتب..."
+                placeholder="أدخل أي ملاحظات متعلقة بالراتب ..."
                 className="w-full"
                 allowClear
               />
@@ -233,8 +233,13 @@ const SalaryForm: React.FC = () => {
         </Row>
       </Card>
 
-      <div className="text-center md:text-end">
-        <Button type="primary" htmlType="submit" icon={<WalletOutlined />}>
+      <div className="text-center">
+        <Button
+          type="primary"
+          htmlType="submit"
+          size="large"
+          icon={<WalletOutlined />}
+        >
           حفظ البيانات
         </Button>
       </div>

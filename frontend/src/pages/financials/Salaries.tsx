@@ -139,13 +139,11 @@ const SalariesPage: React.FC = () => {
   );
 
   return (
-    <div className="p-4 space-y-6">
-      <Title level={3} className="text-center md:text-right">
-        إدارة الرواتب الشهرية
-      </Title>
+    <>
+      <h1 className="mb-6 text-2xl md:text-3xl font-bold">الرواتب الشهرية</h1>
 
       {/* Filter */}
-      <Card className="shadow-sm">
+      <Card className="shadow-sm mb-4">
         <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
           <div className="flex items-center gap-4 w-full md:w-auto">
             <label className="font-semibold whitespace-nowrap">
@@ -156,15 +154,6 @@ const SalariesPage: React.FC = () => {
               value={month}
               onChange={(val) => val && setMonth(val)}
               className="w-full md:w-48"
-            />
-          </div>
-
-          <div className="flex items-center gap-2 w-full md:w-1/3">
-            <Input
-              placeholder="بحث عن موظف"
-              prefix={<SearchOutlined />}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
             />
           </div>
 
@@ -179,6 +168,16 @@ const SalariesPage: React.FC = () => {
 
       {/* Table */}
       <Card>
+        <div className="flex justify-between flex-wrap gap-2 mb-4">
+          <Input
+            placeholder="بحث عن موظف ..."
+            prefix={<SearchOutlined />}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            className="w-full max-w-sm h-10"
+          />
+        </div>
+
         <Table
           columns={columns}
           dataSource={filteredData}
@@ -192,7 +191,7 @@ const SalariesPage: React.FC = () => {
           })}
         />
       </Card>
-    </div>
+    </>
   );
 };
 

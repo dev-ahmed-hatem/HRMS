@@ -71,7 +71,7 @@ export const appRoutes: AppRoute[] = [
             path: "salaries",
             element: <EmployeesPage />,
             icon: <GiMoneyStack />,
-            label: "المرتبات",
+            label: "الرواتب",
           },
         ],
       },

@@ -3,7 +3,6 @@ import { Link, useNavigate, useMatch, Outlet } from "react-router";
 import appRoutes, { AppRoute } from "../../app/appRoutes";
 
 const FinancialsPage: React.FC = () => {
-  const navigate = useNavigate();
   const isFinancials = useMatch("/financials");
 
   if (!isFinancials) return <Outlet />;

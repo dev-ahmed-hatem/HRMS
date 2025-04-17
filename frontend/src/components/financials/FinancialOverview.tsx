@@ -1,6 +1,5 @@
 import { Card, Col, Row, Statistic } from "antd";
 import {
-  DollarCircleOutlined,
   ArrowDownOutlined,
   ArrowUpOutlined,
   CalendarOutlined,
@@ -66,6 +65,18 @@ const FinancialOverview = () => {
       </Col>
 
       <Col xs={24} md={12} lg={8}>
+        <Card style={cardStyle}>
+          <Statistic
+            title="إجمالي المرتبات هذا الشهر"
+            value={12000}
+            prefix={<UserOutlined />}
+            suffix="ج.م"
+            valueStyle={{ color: "#722ed1" }}
+          />
+        </Card>
+      </Col>
+
+      <Col xs={24} md={12} lg={8}>
         <Card
           style={{ ...cardStyle, backgroundColor: "#006d75", color: "white" }}
         >
@@ -75,18 +86,6 @@ const FinancialOverview = () => {
             prefix={<BankOutlined />}
             suffix="ج.م"
             valueStyle={{ color: "white" }}
-          />
-        </Card>
-      </Col>
-
-      <Col xs={24} md={12} lg={8}>
-        <Card style={cardStyle}>
-          <Statistic
-            title="إجمالي المرتبات هذا الشهر"
-            value={12000}
-            prefix={<UserOutlined />}
-            suffix="ج.م"
-            valueStyle={{ color: "#722ed1" }}
           />
         </Card>
       </Col>

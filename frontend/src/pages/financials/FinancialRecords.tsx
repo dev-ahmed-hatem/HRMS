@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 import { Link, useNavigate } from "react-router";
 import type { FinancialItem } from "../../types/financial_item";
 import { tablePaginationConfig } from "../../utils/antd";
+import { ColumnsType } from "antd/es/table";
 
 export const data: FinancialItem[] = [
   {
@@ -99,7 +100,7 @@ const FinancialRecords: React.FC<Props> = ({ financialItem }) => {
       item.type === financialItem
   );
 
-  const columns = [
+  const columns: ColumnsType<FinancialItem> = [
     {
       title: "التاريخ",
       dataIndex: "date",
@@ -130,6 +131,7 @@ const FinancialRecords: React.FC<Props> = ({ financialItem }) => {
           }}
         />
       ),
+      sorter: (a, b) => a.amount - b.amount,
     },
   ];
 

@@ -11,7 +11,6 @@ import { Schedule, ScheduleType } from "../../types/schedule";
 import { CollapseProps } from "antd/lib";
 
 const { Title } = Typography;
-const { Panel } = Collapse;
 
 const exampleSchedules: Schedule[] = [
   {
@@ -103,7 +102,7 @@ const SchedulesPage: React.FC = () => {
       </div>
 
       {/* Controls */}
-      <Card className="shadow-sm">
+      <Card className="shadow-sm mb-8">
         <Title level={4} className="mb-4">
           اختر اليوم:
         </Title>

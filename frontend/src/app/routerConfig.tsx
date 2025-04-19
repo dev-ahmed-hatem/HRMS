@@ -1,15 +1,15 @@
 import { RouteObject } from "react-router";
 import appRoutes, { AppRoute } from "./appRoutes";
-import EmployeeProfilePage from "../pages/employees/EmployeeProfilePage";
-import AddEmployee from "../pages/employees/AddEmployee";
-import AddProject from "../pages/projects/AddProject";
-import ProjectProfilePage from "../pages/projects/ProjectProfilePage";
-import TaskProfilePage from "../pages/tasks/TaskProfilePage";
-import AddTask from "../pages/tasks/AddTask";
-import FinancialForm from "../pages/financials/FinancialForm";
-import FinancialProfilePage from "../pages/financials/FinancialProfilePage";
-import SalaryForm from "../pages/financials/SalaryForm";
-import AddSchedule from "../pages/schedules/AddSchedule";
+import EmployeeProfilePage from "@/pages/employees/EmployeeProfilePage";
+import AddEmployee from "@/pages/employees/AddEmployee";
+import AddProject from "@/pages/projects/AddProject";
+import ProjectProfilePage from "@/pages/projects/ProjectProfilePage";
+import TaskProfilePage from "@/pages/tasks/TaskProfilePage";
+import AddTask from "@/pages/tasks/AddTask";
+import FinancialForm from "@/pages/financials/FinancialForm";
+import FinancialProfilePage from "@/pages/financials/FinancialProfilePage";
+import SalaryForm from "@/pages/financials/SalaryForm";
+import AddSchedule from "@/pages/schedules/AddSchedule";
 
 const alterRoute = function (
   appRoutes: AppRoute[],

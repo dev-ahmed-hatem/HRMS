@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Table, Input, Button, DatePicker, Statistic } from "antd";
+import { Table, Input, DatePicker, Statistic } from "antd";
 import {
   SearchOutlined,
   PlusOutlined,

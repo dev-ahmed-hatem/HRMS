@@ -1,6 +1,5 @@
 import {
   Card,
-  Typography,
   Input,
   Button,
   Upload,
@@ -16,10 +15,9 @@ import {
   DeleteOutlined,
   EyeOutlined,
   ArrowLeftOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
-
-const { Title } = Typography;
 
 type FileItem = {
   id: string;
@@ -62,6 +60,7 @@ const mockData: Item[] = [
 const FilesPage = () => {
   const [currentFolder, setCurrentFolder] = useState<FolderItem | null>(null);
   const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
+  const [searchText, setSearchText] = useState("");
 
   const itemsToShow = currentFolder ? currentFolder.files : mockData;
 
@@ -69,18 +68,27 @@ const FilesPage = () => {
   const handleBack = () => setCurrentFolder(null);
   const handlePreview = (file: FileItem) => setPreviewFile(file);
 
+  // Search Function
+  const onSearch = (value: string) => {
+    setSearchText(value);
+  };
+
   return (
-    <div className="p-4 space-y-6">
-      <Title level={3} className="text-center md:text-right">
-        إدارة الملفات
-      </Title>
+    <>
+      <h1 className="mb-6 text-2xl md:text-3xl font-bold">الملفات</h1>
 
       {/* Controls */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-        <Input.Search
-          placeholder="ابحث عن ملف أو مجلد"
-          className="w-full md:w-1/2"
+
+      <div className="flex justify-between flex-wrap mb-4">
+        <Input
+          placeholder="ابحث عن ملف أو مجلد..."
+          prefix={<SearchOutlined />}
+          onChange={(e) => onSearch(e.target.value)}
+          className="mb-4 w-full max-w-md h-10"
         />
+
+        {/* Add Button */}
+
         <Upload
           beforeUpload={() => {
             message.success("تم رفع الملف (وهميًا)");
@@ -88,7 +96,7 @@ const FilesPage = () => {
           }}
           multiple
         >
-          <Button icon={<UploadOutlined />} className="bg-blue-600 text-white">
+          <Button icon={<UploadOutlined />} className="bg-blue-600 text-white" size="large">
             رفع ملف
           </Button>
         </Upload>
@@ -154,7 +162,7 @@ const FilesPage = () => {
       >
         <p>هنا يمكن عرض محتوى الملف أو رابط للتحميل.</p>
       </Modal>
-    </div>
+    </>
   );
 };
 

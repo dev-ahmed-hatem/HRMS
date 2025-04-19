@@ -14,6 +14,7 @@ import FinancialsPage from "@/pages/financials/FinancialsPage";
 import FilesPage from "@/pages/files/FilesPage";
 import SalariesPage from "@/pages/financials/Salaries";
 import FinancialRecords from "@/pages/financials/FinancialRecords";
+import NotesPage from "@/pages/notes/NotesPage";
 import SchedulesPage from "@/pages/schedules/SchedulesPage";
 
 export type AppRoute = RouteObject & {
@@ -87,7 +88,7 @@ export const appRoutes: AppRoute[] = [
       },
       {
         path: "notes",
-        element: <EmployeesPage />,
+        element: <NotesPage />,
         icon: <LuNotebookPen />,
         label: "المذكرات",
       },

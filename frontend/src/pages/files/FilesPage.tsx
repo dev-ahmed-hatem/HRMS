@@ -7,6 +7,8 @@ import {
   Breadcrumb,
   Empty,
   Modal,
+  Popconfirm,
+  Select,
 } from "antd";
 import {
   FolderOpenOutlined,
@@ -16,8 +18,11 @@ import {
   EyeOutlined,
   ArrowLeftOutlined,
   SearchOutlined,
+  FolderAddOutlined,
+  SortAscendingOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
+import { ItemType } from "antd/lib/breadcrumb/Breadcrumb";
 
 type FileItem = {
   id: string;
@@ -33,6 +38,8 @@ type FolderItem = {
 };
 
 type Item = FileItem | FolderItem;
+
+const { Option } = Select;
 
 const mockData: Item[] = [
   {
@@ -60,12 +67,32 @@ const mockData: Item[] = [
 const FilesPage = () => {
   const [currentFolder, setCurrentFolder] = useState<FolderItem | null>(null);
   const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
+  const [openPopConfirm, setOpenPopConfirm] = useState<boolean>(false);
+  const [folderName, setFolderName] = useState("");
   const [searchText, setSearchText] = useState("");
+  const [breadCrumbsItems, setBreadCrumbsItems] = useState<ItemType[]>([
+    {
+      title: "الملفات",
+    },
+  ]);
+
+  // sorting options
+  const [sort, setSort] = useState("name");
+
+  const handleChange = (value: string) => {
+    setSort(value);
+  };
 
   const itemsToShow = currentFolder ? currentFolder.files : mockData;
 
-  const handleOpenFolder = (folder: FolderItem) => setCurrentFolder(folder);
-  const handleBack = () => setCurrentFolder(null);
+  const handleOpenFolder = (folder: FolderItem) => {
+    setBreadCrumbsItems((old) => [...old, { title: folder.name }]);
+    setCurrentFolder(folder);
+  };
+  const handleBack = () => {
+    setBreadCrumbsItems((old) => [old[0]]);
+    setCurrentFolder(null);
+  };
   const handlePreview = (file: FileItem) => setPreviewFile(file);
 
   // Search Function
@@ -73,13 +100,20 @@ const FilesPage = () => {
     setSearchText(value);
   };
 
+  const handleCreateFolder = () => {
+    if (!folderName.trim()) return;
+    console.log("Creating folder:", folderName);
+    // Add your async logic here
+    setOpenPopConfirm(false);
+    setFolderName("");
+  };
+
   return (
     <>
       <h1 className="mb-6 text-2xl md:text-3xl font-bold">الملفات</h1>
 
       {/* Controls */}
-
-      <div className="flex justify-between flex-wrap mb-4">
+      <div className="flex justify-between flex-wrap gap-4 mb-4">
         <Input
           placeholder="ابحث عن ملف أو مجلد..."
           prefix={<SearchOutlined />}
@@ -87,43 +121,99 @@ const FilesPage = () => {
           className="mb-4 w-full max-w-md h-10"
         />
 
-        {/* Add Button */}
+        <div className="flex gap-4 flex-wrap">
+          {/* Create Folder Button */}
+          <Popconfirm
+            title={
+              <div className="w-64">
+                <p className="mb-2 font-semibold">أدخل اسم المجلد</p>
+                <Input
+                  placeholder="اسم المجلد"
+                  value={folderName}
+                  onChange={(e) => setFolderName(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+            }
+            onConfirm={handleCreateFolder}
+            onCancel={() => setOpenPopConfirm(false)}
+            // open={openPopConfirm}
+            icon={<FolderOpenOutlined className="text-blue-500" />}
+            okText="إنشاء"
+            cancelText="إلغاء"
+          >
+            <Button
+              onClick={() => setOpenPopConfirm(true)}
+              size="large"
+              className="bg-blue-600 hover:bg-blue-500 border-none text-white"
+              icon={<FolderAddOutlined />}
+            >
+              إنشاء مجلد
+            </Button>
+          </Popconfirm>
 
-        <Upload
-          beforeUpload={() => {
-            message.success("تم رفع الملف (وهميًا)");
-            return false;
-          }}
-          multiple
-        >
-          <Button icon={<UploadOutlined />} className="bg-blue-600 text-white" size="large">
-            رفع ملف
-          </Button>
-        </Upload>
+          {/* Add File Button */}
+          <Upload
+            beforeUpload={() => {
+              message.success("تم رفع الملف)");
+              return false;
+            }}
+            multiple
+          >
+            <Button
+              icon={<UploadOutlined />}
+              className="bg-blue-600 hover:bg-blue-500 border-none text-white"
+              size="large"
+            >
+              رفع ملف
+            </Button>
+          </Upload>
+        </div>
       </div>
 
-      {/* Breadcrumb */}
-      {currentFolder && (
+      <div className="flex justify-between items-start flex-wrap my-6 gap-4">
+        {/* Breadcrumb */}
         <div className="text-right">
-          <Button
-            icon={<ArrowLeftOutlined />}
-            onClick={handleBack}
-            className="mb-4"
-          >
-            الرجوع للمجلدات
-          </Button>
-          <Breadcrumb className="text-sm">
-            <Breadcrumb.Item>الملفات</Breadcrumb.Item>
-            <Breadcrumb.Item>{currentFolder.name}</Breadcrumb.Item>
-          </Breadcrumb>
+          <Breadcrumb
+            className="text-sm"
+            items={breadCrumbsItems}
+            itemRender={(route) => <span>{route.title}&nbsp;/</span>}
+            separator={" "}
+          />
+
+          {currentFolder && (
+            <Button
+              icon={<ArrowLeftOutlined />}
+              onClick={handleBack}
+              className="mt-4"
+            >
+              الرجوع للمجلدات
+            </Button>
+          )}
         </div>
-      )}
+
+        {/* Sorting Options */}
+        <div className="flex items-center gap-2">
+          <SortAscendingOutlined className="text-lg text-gray-600" />
+          <Select
+            value={sort}
+            onChange={handleChange}
+            className="min-w-[160px]"
+            size="middle"
+            defaultValue={"name"}
+          >
+            <Option value="name">الاسم</Option>
+            <Option value="date">تاريخ الإضافة</Option>
+            <Option value="size">الحجم</Option>
+          </Select>
+        </div>
+      </div>
 
       {/* Files and Folders Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {itemsToShow.length === 0 && (
           <div className="col-span-full">
-            <Empty description="لا توجد ملفات حالياً" />
+            <Empty description="مجلد فارغ" />
           </div>
         )}
 
@@ -160,7 +250,7 @@ const FilesPage = () => {
         footer={null}
         title={previewFile?.name}
       >
-        <p>هنا يمكن عرض محتوى الملف أو رابط للتحميل.</p>
+        <p>رابط التحميل</p>
       </Modal>
     </>
   );

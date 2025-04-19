@@ -6,7 +6,7 @@ import {
   CalendarOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { Link, useNavigate } from "react-router";
+import { Link, Outlet, useMatch, useNavigate } from "react-router";
 import type { FinancialItem } from "../../types/financial_item";
 import { tablePaginationConfig } from "../../utils/antd";
 import { ColumnsType } from "antd/es/table";
@@ -83,6 +83,7 @@ type Props = {
 };
 
 const FinancialRecords: React.FC<Props> = ({ financialItem }) => {
+  const isFinancials = useMatch(`/financials/${financialItem}s`);
   const [searchText, setSearchText] = useState("");
   const [selectedDate, setSelectedDate] = useState<string>(
     dayjs().format("YYYY-MM-DD")
@@ -135,6 +136,7 @@ const FinancialRecords: React.FC<Props> = ({ financialItem }) => {
     },
   ];
 
+  if (!isFinancials) return <Outlet />;
   return (
     <>
       <h1 className="mb-6 text-2xl md:text-3xl font-bold">{pageTitle}</h1>

@@ -6,12 +6,9 @@ import AddProject from "../pages/projects/AddProject";
 import ProjectProfilePage from "../pages/projects/ProjectProfilePage";
 import TaskProfilePage from "../pages/tasks/TaskProfilePage";
 import AddTask from "../pages/tasks/AddTask";
-import FinancialRecords from "../pages/financials/FinancialRecords";
 import FinancialForm from "../pages/financials/FinancialForm";
 import FinancialProfilePage from "../pages/financials/FinancialProfilePage";
-import SalariesPage from "../pages/financials/Salaries";
 import SalaryForm from "../pages/financials/SalaryForm";
-import SchedulesPage from "../pages/schedules/SchedulesPage";
 import AddSchedule from "../pages/schedules/AddSchedule";
 
 const alterRoute = function (
@@ -60,7 +57,6 @@ const addSubRoutes = (
     return {
       ...route,
       children: [
-        ...(route.children || []),
         ...(matchedChildren || []),
         ...(route.children
           ? addSubRoutes(route.children, subRoutes, currentRoutePath)
@@ -84,23 +80,19 @@ let routes: RouteObject[] = addSubRoutes(appRoutes, {
     { path: "add", element: <AddTask /> },
   ],
   "financials/incomes": [
-    { path: "", element: <FinancialRecords financialItem="income" /> },
+    // { path: "", element: <FinancialRecords financialItem="income" /> },
     { path: "add", element: <FinancialForm financialItem="income" /> },
     { path: ":income_id", element: <FinancialProfilePage /> },
   ],
   "financials/expenses": [
-    { path: "", element: <FinancialRecords financialItem="expense" /> },
+    // { path: "", element: <FinancialRecords financialItem="expense" /> },
     { path: "add", element: <FinancialForm financialItem="expense" /> },
     { path: ":expense_id", element: <FinancialProfilePage /> },
   ],
-  "financials/salaries": [
-    { path: "", element: <SalariesPage /> },
-    { path: "edit", element: <SalaryForm /> },
-  ],
-  schedules: [
-    { path: "", element: <SchedulesPage /> },
-    { path: "add", element: <AddSchedule /> },
-  ],
+  "financials/salaries": [{ path: "edit", element: <SalaryForm /> }],
+  schedules: [{ path: "add", element: <AddSchedule /> }],
 });
+
+console.log(routes);
 
 export default routes;

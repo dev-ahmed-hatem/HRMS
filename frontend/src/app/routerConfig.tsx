@@ -93,6 +93,4 @@ let routes: RouteObject[] = addSubRoutes(appRoutes, {
   schedules: [{ path: "add", element: <AddSchedule /> }],
 });
 
-console.log(routes);
-
 export default routes;

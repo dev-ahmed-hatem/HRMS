@@ -6,8 +6,9 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
-import { Link } from "react-router";
+import { Link, Outlet, useMatch } from "react-router";
 import { Schedule, ScheduleType } from "../../types/schedule";
+import { CollapseProps } from "antd/lib";
 
 const { Title } = Typography;
 const { Panel } = Collapse;
@@ -39,6 +40,7 @@ const exampleSchedules: Schedule[] = [
 const SchedulesPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
   const [schedules] = useState<Schedule[]>(exampleSchedules);
+  const isSchedules = useMatch("/schedules");
 
   const renderTypeTag = (type: ScheduleType) => {
     switch (type) {
@@ -53,6 +55,37 @@ const SchedulesPage: React.FC = () => {
     }
   };
 
+  const items: CollapseProps["items"] = exampleSchedules.map((schedule) => ({
+    key: schedule.id,
+    label: (
+      <Space direction="vertical" size={0}>
+        <span className="font-semibold text-base mb-3 inline-block">
+          {schedule.title}
+        </span>
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          {renderTypeTag(schedule.type)}
+          {schedule.type === "وقت محدد" && (
+            <span className="text-gray-600 flex items-center gap-1">
+              <ClockCircleOutlined />
+              {schedule.time}
+            </span>
+          )}
+          {schedule.type === "فترة من اليوم" && schedule.period && (
+            <span className="text-gray-600">
+              من {schedule.period.start} إلى {schedule.period.end}
+            </span>
+          )}
+        </div>
+      </Space>
+    ),
+    children: (
+      <p className="text-sm text-gray-700">
+        {schedule.description || "لا توجد تفاصيل إضافية."}
+      </p>
+    ),
+  }));
+
+  if (!isSchedules) return <Outlet />;
   return (
     <>
       <h1 className="mb-6 text-2xl md:text-3xl font-bold">جدول المواعيد</h1>
@@ -100,38 +133,8 @@ const SchedulesPage: React.FC = () => {
             expandIcon={({ isActive }) => (
               <DownOutlined rotate={isActive ? 180 : 0} />
             )}
-          >
-            {schedules.map((schedule) => (
-              <Panel
-                key={schedule.id}
-                header={
-                  <Space direction="vertical" size={0}>
-                    <span className="font-semibold text-base mb-3 inline-block">
-                      {schedule.title}
-                    </span>
-                    <div className="flex flex-wrap items-center gap-2 text-sm">
-                      {renderTypeTag(schedule.type)}
-                      {schedule.type === "وقت محدد" && (
-                        <span className="text-gray-600 flex items-center gap-1">
-                          <ClockCircleOutlined />
-                          {schedule.time}
-                        </span>
-                      )}
-                      {schedule.type === "فترة من اليوم" && schedule.period && (
-                        <span className="text-gray-600">
-                          من {schedule.period.start} إلى {schedule.period.end}
-                        </span>
-                      )}
-                    </div>
-                  </Space>
-                }
-              >
-                <p className="text-sm text-gray-700">
-                  {schedule.description || "لا توجد تفاصيل إضافية."}
-                </p>
-              </Panel>
-            ))}
-          </Collapse>
+            items={items}
+          />
         ) : (
           <Empty description="لا توجد جداول لهذا اليوم" />
         )}

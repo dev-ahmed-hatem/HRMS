@@ -10,6 +10,7 @@ import FinancialForm from "@/pages/financials/FinancialForm";
 import FinancialProfilePage from "@/pages/financials/FinancialProfilePage";
 import SalaryForm from "@/pages/financials/SalaryForm";
 import AddSchedule from "@/pages/schedules/AddSchedule";
+import NotePreview from "@/pages/notes/NotePreview";
 
 const alterRoute = function (
   appRoutes: AppRoute[],
@@ -90,6 +91,9 @@ let routes: RouteObject[] = addSubRoutes(appRoutes, {
     { path: ":expense_id", element: <FinancialProfilePage /> },
   ],
   "financials/salaries": [{ path: "edit", element: <SalaryForm /> }],
+  notes: [
+    { path: ":note_id", element: <NotePreview /> },
+  ],
   schedules: [{ path: "add", element: <AddSchedule /> }],
 });
 

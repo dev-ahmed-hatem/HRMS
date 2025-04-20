@@ -16,6 +16,7 @@ import SalariesPage from "@/pages/financials/Salaries";
 import FinancialRecords from "@/pages/financials/FinancialRecords";
 import NotesPage from "@/pages/notes/NotesPage";
 import SchedulesPage from "@/pages/schedules/SchedulesPage";
+import LoginPage from "@/pages/LoginPage";
 
 export type AppRoute = RouteObject & {
   key?: string;
@@ -100,6 +101,11 @@ export const appRoutes: AppRoute[] = [
       },
     ],
   },
+  {
+    path: "login",
+    element: <LoginPage />,
+    errorElement: <Error />
+  }
 ];
 
 export default appRoutes;

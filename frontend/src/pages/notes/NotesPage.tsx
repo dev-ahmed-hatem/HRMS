@@ -6,7 +6,7 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { Link } from "react-router";
+import { Link, Outlet, useMatch } from "react-router";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -64,6 +64,7 @@ const mockNotes: Note[] = [
 ];
 
 const NotesPage: React.FC = () => {
+  const isNotes = useMatch("/notes");
   const handleEdit = (note: Note) => {
     console.log("Edit note:", note);
   };
@@ -76,6 +77,7 @@ const NotesPage: React.FC = () => {
     console.log("View note:", note);
   };
 
+  if (!isNotes) return <Outlet />;
   return (
     <>
       <div className="flex justify-between items-center mb-6">

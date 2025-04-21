@@ -112,9 +112,11 @@ const NotesPage: React.FC = () => {
                   : "bg-yellow-50"
               }`}
               actions={[
-                <Tooltip title="عرض">
-                  <EyeOutlined onClick={() => handleView(note)} />
-                </Tooltip>,
+                <Link to={"1"}>
+                  <Tooltip title="عرض">
+                    <EyeOutlined onClick={() => handleView(note)} />
+                  </Tooltip>
+                </Link>,
                 <Tooltip title="تعديل">
                   <EditOutlined onClick={() => handleEdit(note)} />
                 </Tooltip>,

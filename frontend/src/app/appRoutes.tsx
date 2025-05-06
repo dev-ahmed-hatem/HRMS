@@ -17,6 +17,7 @@ import FinancialRecords from "@/pages/financials/FinancialRecords";
 import NotesPage from "@/pages/notes/NotesPage";
 import SchedulesPage from "@/pages/schedules/SchedulesPage";
 import LoginPage from "@/pages/LoginPage";
+import AuthProvider from "@/providers/AuthProvider";
 
 export type AppRoute = RouteObject & {
   key?: string;
@@ -28,8 +29,12 @@ export type AppRoute = RouteObject & {
 export const appRoutes: AppRoute[] = [
   {
     path: "",
-    element: <Base />,
-    errorElement: <Error />,
+    element: (
+      <AuthProvider>
+        <Base />
+      </AuthProvider>
+    ),
+    errorElement: <Base error={true} />,
     children: [
       {
         path: "employees",
@@ -104,8 +109,7 @@ export const appRoutes: AppRoute[] = [
   {
     path: "login",
     element: <LoginPage />,
-    errorElement: <Error />
-  }
+  },
 ];
 
 export default appRoutes;

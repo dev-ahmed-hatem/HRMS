@@ -7,6 +7,8 @@ import { arEG } from "./utils/locale";
 import { ConfigProvider } from "antd";
 import "./styles/tables.css";
 import "./styles/add-form.css";
+import { Provider as ReduxProvider } from "react-redux";
+import store from "./app/redux/store";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -19,7 +21,9 @@ createRoot(document.getElementById("root")!).render(
       }}
       locale={arEG}
     >
-      <RouterProvider router={createBrowserRouter(routes)} />
+      <ReduxProvider store={store}>
+        <RouterProvider router={createBrowserRouter(routes)} />
+      </ReduxProvider>
     </ConfigProvider>
   </StrictMode>
 );

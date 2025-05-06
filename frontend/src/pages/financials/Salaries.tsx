@@ -10,11 +10,9 @@ import {
 } from "antd";
 import { DownloadOutlined, SearchOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { useNavigate } from "react-router";
+import { Outlet, useMatch, useNavigate } from "react-router";
 import { ColumnType } from "antd/lib/table";
 import { tablePaginationConfig } from "../../utils/antd";
-
-const { Title } = Typography;
 
 type SalaryRecord = {
   id: string;
@@ -57,6 +55,7 @@ const initialData: SalaryRecord[] = [
 ];
 
 const SalariesPage: React.FC = () => {
+  const isSalaries = useMatch("/financials/salaries");
   const [salaryData, setSalaryData] = useState(initialData);
   const [month, setMonth] = useState(dayjs());
   const [searchText, setSearchText] = useState("");
@@ -138,6 +137,7 @@ const SalariesPage: React.FC = () => {
     </div>
   );
 
+  if (!isSalaries) return <Outlet />;
   return (
     <>
       <h1 className="mb-6 text-2xl md:text-3xl font-bold">الرواتب الشهرية</h1>

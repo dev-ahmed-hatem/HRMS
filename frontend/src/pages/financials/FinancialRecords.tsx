@@ -39,7 +39,7 @@ export const data: FinancialItem[] = [
   {
     id: "inc-4",
     type: "income",
-    date: "2025-04-06",
+    date: "2025-05-04",
     category: "مبيعات",
     description: "بيع معدات مكتبية",
     amount: 600,
@@ -63,7 +63,7 @@ export const data: FinancialItem[] = [
   {
     id: "exp-3",
     type: "expense",
-    date: "2025-04-06",
+    date: "2025-05-04",
     category: "صيانة",
     description: "صيانة التكييف",
     amount: 400,

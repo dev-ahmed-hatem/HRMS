@@ -1,3 +1,6 @@
+# for this project
+from corsheaders.defaults import default_headers
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -129,5 +132,15 @@ REST_FRAMEWORK = {
     ]
 }
 
+# corsheaders
 CORS_ALLOW_ALL_ORIGINS = True
-CSRF_TRUSTED_ORIGINS = ['http://localhost:5173/', ]
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'X-CSRFToken'
+]
+
+# csrf
+CSRF_TRUSTED_ORIGINS = ['http://localhost:5173', ]
+CSRF_COOKIE_NAME = 'csrftoken'
+CSRF_HEADER_NAME = 'X-CSRFToken'
+CSRF_COOKIE_HTTPONLY = True

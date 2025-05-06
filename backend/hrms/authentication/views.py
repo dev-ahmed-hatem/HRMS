@@ -5,6 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
+from django.middleware.csrf import get_token
+
 from datetime import timedelta
 
 from users.models import User
@@ -26,7 +28,7 @@ SIMPLE_JWT = {
 }
 
 
-def set_response_cookies(access_token, refresh_token, response):
+def set_response_cookies(access_token, refresh_token, request, response):
     response.set_cookie(
         key=SIMPLE_JWT["AUTH_COOKIE"],
         value=access_token,
@@ -50,13 +52,23 @@ def set_response_cookies(access_token, refresh_token, response):
         samesite=SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
     )
 
+    csrftoken = get_token(request)
+    response.set_cookie(
+        key="csrftoken",
+        value=csrftoken,
+        secure=SIMPLE_JWT["AUTH_COOKIE_SECURE"],
+        path=SIMPLE_JWT["AUTH_COOKIE_PATH"],
+        httponly=SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
+        samesite=SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
+    )
+
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs) -> Response:
         response = super().post(request, *args, **kwargs)
         access_token = response.data["access"]
         refresh_token = response.data["refresh"]
-        set_response_cookies(access_token, refresh_token, response)
+        set_response_cookies(access_token, refresh_token, request, response)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = User.objects.get(username=serializer.initial_data["username"])
@@ -80,7 +92,7 @@ class CustomTokenRefreshView(TokenRefreshView):
             # Prepare the response
             response = Response({"access": access_token, "refresh": new_refresh_token})
 
-            set_response_cookies(access_token, new_refresh_token, response)
+            set_response_cookies(access_token, new_refresh_token, request, response)
 
             return response
 
@@ -118,6 +130,12 @@ class LogoutView(APIView):
         )
         response.delete_cookie(
             key=SIMPLE_JWT['REFRESH_COOKIE'],
+            path=SIMPLE_JWT['AUTH_COOKIE_PATH'],
+            domain=SIMPLE_JWT['AUTH_COOKIE_DOMAIN'],
+            samesite=SIMPLE_JWT['AUTH_COOKIE_SAMESITE'],
+        )
+        response.delete_cookie(
+            key="csrftoken",
             path=SIMPLE_JWT['AUTH_COOKIE_PATH'],
             domain=SIMPLE_JWT['AUTH_COOKIE_DOMAIN'],
             samesite=SIMPLE_JWT['AUTH_COOKIE_SAMESITE'],

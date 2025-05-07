@@ -7,7 +7,8 @@ def enforce_csrf(request):
     """
     Enforce CSRF validation.
     """
-    check = CSRFCheck(get_response=lambda req: None)
+    request.csrf_processing_done = False  # <-- Important!
+    check = CSRFCheck(get_response=lambda req: None)  # dummy get_response
     check.process_request(request)
     reason = check.process_view(request, None, (), {})
     if reason:
@@ -32,8 +33,12 @@ class HTTPCookieAuthentication(JWTAuthentication):
 
         validated_token = self.get_validated_token(raw_token)
 
+        ########## Deprecated ##########
+        """
+        not using csrf due to cross site domains
+        """
         # Enforce CSRF protection if the token is from a cookie
-        if "access_token" in request.COOKIES:
-            enforce_csrf(request)
+        # if "access_token" in request.COOKIES:
+        #     enforce_csrf(request)
 
         return self.get_user(validated_token), validated_token

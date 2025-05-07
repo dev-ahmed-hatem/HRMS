@@ -13,7 +13,7 @@ from users.models import User
 from users.serializers import UserSerializer
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=4),
     "REFRESH_TOKEN_LIFETIME": timedelta(hours=12),
     'BLACKLIST_AFTER_ROTATION': True,
 
@@ -29,38 +29,32 @@ SIMPLE_JWT = {
 
 
 def set_response_cookies(access_token, refresh_token, request, response):
+    access_token_lifetime = SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"]
+    refresh_token_lifetime = SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"]
+
     response.set_cookie(
         key=SIMPLE_JWT["AUTH_COOKIE"],
         value=access_token,
         domain=SIMPLE_JWT["AUTH_COOKIE_DOMAIN"],
         path=SIMPLE_JWT["AUTH_COOKIE_PATH"],
-        max_age=SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
-        expires=True,
-        secure=SIMPLE_JWT["AUTH_COOKIE_SECURE"],
-        httponly=SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
-        samesite=SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
-    )
-    response.set_cookie(
-        key=SIMPLE_JWT["REFRESH_COOKIE"],
-        value=refresh_token,
-        domain=SIMPLE_JWT["AUTH_COOKIE_DOMAIN"],
-        path=SIMPLE_JWT["AUTH_COOKIE_PATH"],
-        max_age=SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
-        expires=True,
+        max_age=int(access_token_lifetime.total_seconds()),
         secure=SIMPLE_JWT["AUTH_COOKIE_SECURE"],
         httponly=SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
         samesite=SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
     )
 
-    csrftoken = get_token(request)
     response.set_cookie(
-        key="csrftoken",
-        value=csrftoken,
-        secure=SIMPLE_JWT["AUTH_COOKIE_SECURE"],
+        key=SIMPLE_JWT["REFRESH_COOKIE"],
+        value=refresh_token,
+        domain=SIMPLE_JWT["AUTH_COOKIE_DOMAIN"],
         path=SIMPLE_JWT["AUTH_COOKIE_PATH"],
+        max_age=int(refresh_token_lifetime.total_seconds()),
+        secure=SIMPLE_JWT["AUTH_COOKIE_SECURE"],
         httponly=SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
         samesite=SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
     )
+
+    get_token(request)
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -143,7 +137,7 @@ class LogoutView(APIView):
         return response
 
 
-@api_view(["GET", "POST"])
+@api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def get_authenticated_user(request):
     is_authenticated = request.user.is_authenticated

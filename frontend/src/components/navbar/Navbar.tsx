@@ -5,6 +5,7 @@ import { Popover } from "antd";
 import { useState } from "react";
 import UserMenu from "./UserMenu";
 import { NavLink } from "react-router";
+import { useAppSelector } from "@/app/redux/hooks";
 
 const Navbar = ({
   menuOpen,
@@ -14,6 +15,7 @@ const Navbar = ({
   setMenuOpen: Function;
 }) => {
   const [open, setOpen] = useState(false);
+  const user = useAppSelector((state) => state.auth.user);
 
   const handleOpenChange = (newOpen: boolean) => {
     setOpen(newOpen);
@@ -34,8 +36,14 @@ const Navbar = ({
       </div>
       <div className="user">
         <Popover
-          content={<UserMenu />}
-          title="اسم المستخدم"
+          content={
+            <UserMenu
+              role={
+                user?.is_root ? "مطور" : user?.is_superuser ? "مدير" : "مشرف"
+              }
+            />
+          }
+          title={user?.name || <span className="text-red-500">بلا اسم</span>}
           trigger="click"
           open={open}
           onOpenChange={handleOpenChange}

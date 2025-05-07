@@ -1,5 +1,6 @@
 import { BaseQueryFn } from "@reduxjs/toolkit/query";
 import axios, { AxiosRequestConfig, type AxiosError } from "axios";
+import getCookie from "@/utils/getCookie";
 
 const api_base_url = import.meta.env.VITE_API_BASE_URL;
 
@@ -20,7 +21,14 @@ export const axiosInstance = axios.create({
     "Content-Type": "application/json",
   },
   xsrfCookieName: "csrftoken",
-  xsrfHeaderName: "X-CSRFToken",
+  xsrfHeaderName: "x-CSRFToken",
+});
+
+axiosInstance.interceptors.request.use((config) => {
+  // include csrftoken (not activated in this system)
+  const csrftoken = getCookie("csrftoken");
+  config.headers["X-CSRFToken"] = csrftoken;
+  return config;
 });
 
 axiosInstance.interceptors.response.use(

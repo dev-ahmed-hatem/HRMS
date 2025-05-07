@@ -22,7 +22,7 @@ const auth = api.injectEndpoints({
         method: "Get",
       }),
     }),
-    logout: builder.mutation({
+    logout: builder.mutation<void, void>({
       query: () => ({
         url: "/auth/logout/",
         method: "POST",
@@ -32,7 +32,7 @@ const auth = api.injectEndpoints({
       query: () => ({ url: "/auth/authenticated-user/", method: "POST" }),
     }),
   }),
-  overrideExisting: false
+  overrideExisting: false,
 });
 
 export const {

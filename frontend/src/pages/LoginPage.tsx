@@ -37,7 +37,12 @@ const LoginPage = () => {
     }
   }, [wrongCredentials]);
 
-  if (logged || verified) navigate("/");
+  useEffect(() => {
+    const next = params.get("next");
+    const path = next && next !== "/login" ? next : "/";
+    if (logged || verified) navigate(path);
+  }, [logged, verified]);
+
   if (verifying) return <Loading />;
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">

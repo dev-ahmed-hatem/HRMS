@@ -1,35 +1,47 @@
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { useGetAuthUserQuery } from "@/app/api/endpoints/auth";
+import { useAppDispatch } from "@/app/redux/hooks";
+import { setUser } from "@/app/slices/authSlice";
 import Loading from "@/components/Loading";
+import Base from "@/pages/Base";
 import { User } from "@/types/user";
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import React, { createContext, useContext, useEffect } from "react";
+import { Navigate, useLocation } from "react-router";
 
 interface ContextType {
-  user: User | null;
+  user: User | null; // in case passing user as a context value
 }
 
 const AuthContext = createContext<ContextType | null>(null);
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
+  const location = useLocation();
+
+  const dispatch = useAppDispatch();
   const { data, isLoading, isError, error } = useGetAuthUserQuery();
-  if (isError) {
-    const err = error as axiosBaseQueryError;
-    if (err?.status == 401) navigate("/login");
-  }
 
   useEffect(() => {
-    console.log(data);
-    console.log(error);
-    console.log(isError);
-  }, [data, error, isError]);
+    if (data) {
+      dispatch(setUser(data));
+    }
+  }, [data]);
+
+  if (isError) {
+  }
 
   if (isLoading) return <Loading />;
-  return (
-    <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
-  );
+  if (isError) {
+    const err = error as axiosBaseQueryError;
+    const next =
+      location.pathname !== "/"
+        ? `/login?next=${encodeURIComponent(
+            location.pathname + location.search
+          )}`
+        : `/login`;
+
+    return err?.status == 401 ? <Navigate to={next} /> : <Base error={true} />;
+  }
+  return <AuthContext.Provider value={null}>{children}</AuthContext.Provider>;
 };
 
 export default AuthProvider;

@@ -7,6 +7,7 @@ import Footer from "../components/Footer";
 import Breadcrumbs from "../components/BreadCrumbs";
 import ScrollToTop from "../components/ScrollToTop";
 import { Button } from "antd";
+import { ToastContainer } from "react-toastify";
 
 const Base = ({ error }: { error?: any }) => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -56,6 +57,7 @@ const Base = ({ error }: { error?: any }) => {
         </div>
       )}
       <Footer />
+      <ToastContainer />
     </>
   );
 };

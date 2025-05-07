@@ -9,10 +9,6 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
 
-  useEffect(() => {
-    console.log(params.get("next"));
-  }, [params]);
-
   // login flags
   const [
     login,

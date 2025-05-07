@@ -1,4 +1,7 @@
 # for this project
+from datetime import timedelta
+
+import pytz
 from corsheaders.defaults import default_headers
 
 from pathlib import Path
@@ -101,6 +104,7 @@ AUTH_PASSWORD_VALIDATORS = []
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
+CAIRO_TZ = pytz.timezone('Africa/Cairo')
 
 USE_I18N = True
 
@@ -130,6 +134,12 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         # 'rest_framework.permissions.IsAuthenticated',
     ]
+}
+
+# simple jwt:
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=3),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
 # corsheaders

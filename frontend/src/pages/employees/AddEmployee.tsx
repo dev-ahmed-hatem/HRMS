@@ -27,11 +27,11 @@ const AddEmployee = ({
         onFinish={onSubmit}
         initialValues={{
           ...initialValues,
-          birthDate: initialValues?.birthDate
-            ? dayjs(initialValues.birthDate)
+          birth_date: initialValues?.birth_date
+            ? dayjs(initialValues.birth_date)
             : dayjs(1970 - 1 - 1),
-          hireDate: initialValues?.hireDate
-            ? dayjs(initialValues.hireDate)
+          hire_date: initialValues?.hire_date
+            ? dayjs(initialValues.hire_date)
             : dayjs(),
         }}
         className="add-form"
@@ -163,10 +163,12 @@ const AddEmployee = ({
             <Col xs={24} md={12}>
               <Form.Item
                 name="position"
-                label="الوظيفة"
-                rules={[{ required: true, message: "يرجى إدخال الوظيفة" }]}
+                label="المسمى الوظيفي"
+                rules={[
+                  { required: true, message: "يرجى إدخال المسمى الوظيفي" },
+                ]}
               >
-                <Input placeholder="أدخل الوظيفة" />
+                <Input placeholder="أدخل المسمى الوظيفي" />
               </Form.Item>
             </Col>
           </Row>

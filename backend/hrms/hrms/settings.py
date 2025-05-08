@@ -36,6 +36,7 @@ INSTALLED_APPS = [
 
     'authentication.apps.AuthenticationConfig',
     'users.apps.UsersConfig',
+    'employees.apps.EmployeesConfig',
 ]
 
 MIDDLEWARE = [
@@ -133,7 +134,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         # 'rest_framework.permissions.IsAuthenticated',
-    ]
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'hrms.rest_framework_utils.custom_pagination.CustomPageNumberPagination'
 }
 
 # simple jwt:

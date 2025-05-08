@@ -24,7 +24,6 @@ class HTTPCookieAuthentication(JWTAuthentication):
         if header is None:
             # If no header, try to get the token from cookies
             raw_token = request.COOKIES.get("access_token")
-            print(raw_token)
         else:
             # If header is present, extract the token
             raw_token = self.get_raw_token(header)

@@ -1,5 +1,5 @@
-import React from "react";
-import { Card, Avatar, Tabs, Button } from "antd";
+import { useState } from "react";
+import { Card, Avatar, Tabs, Button, Switch } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getInitials } from "../../utils";
 import { Employee } from "../../types/employee";
@@ -11,23 +11,26 @@ import SalaryHistory from "../../components/employee/SalaryHistory";
 
 // Sample Employee Data
 const employee: Employee = {
-  id: "TF2018",
-  name: "تيد فيرغسون",
+  id: 1,
+  url: "http://127.0.0.1:8000/api/employees/employees/1/",
+  department: "Social Media",
   gender: "ذكر",
-  email: "ted.ferguson@example.com",
-  phone: "+966 50 123 4567",
-  address: "الرياض، المملكة العربية السعودية",
-  age: 40,
-  birthDate: "12 مارس 1984",
-  nationalId: "1234567890",
-  maritalStatus: "متزوج",
-  position: "مدير",
-  department: "الموارد البشرية",
-  hireDate: "04 يونيو 2018",
-  employeeID: "TF 2002",
-  cv: "https://example.com/ted_cv.pdf",
-  avatar: "",
-  mode: "من المقر",
+  marital_status: "أعزب",
+  mode: "عن بُعد",
+  created_by: "Dev Ahmed Hatem",
+  name: "Employee 1",
+  email: "e@a.com",
+  phone: "123",
+  employee_id: "E12",
+  address: "16 moharam bek",
+  birth_date: "2000-07-22",
+  age: 25,
+  national_id: "123123",
+  position: "Full Stack Developer",
+  hire_date: "2023-12-02",
+  cv: "http://127.0.0.1:8000/media/employees/cv/Screenshot_2025-03-18_221316.png",
+  image: "http://127.0.0.1:8000/media/employees/images/6mouhk.png",
+  created_at: "2025-05-08T14:31:02.935535Z",
 
   performance: {
     totalProjects: 15,
@@ -80,6 +83,12 @@ const items = [
 ];
 
 const EmployeeProfilePage: React.FC = () => {
+  const [status, setStatus] = useState("نشط");
+  const toggleStatus = (checked: boolean) => {
+    setStatus(checked ? "نشط" : "غير نشط");
+    // Optionally: call backend to update status
+  };
+
   return (
     <>
       {/* Employee Header */}
@@ -87,8 +96,8 @@ const EmployeeProfilePage: React.FC = () => {
         <div className="flex items-center justify-between flex-wrap gap-y-6">
           {/* Avatar with Fallback */}
           <div className="flex items-center flex-wrap gap-4">
-            {employee.avatar ? (
-              <Avatar size={80} src={employee.avatar} />
+            {employee.image ? (
+              <Avatar size={80} src={employee.image} />
             ) : (
               <Avatar size={80} className="bg-orange-700 font-semibold">
                 {getInitials(employee.name)}
@@ -102,8 +111,13 @@ const EmployeeProfilePage: React.FC = () => {
           </div>
 
           {/* Status */}
-          <div>
-            <Button type="primary">نشط</Button>
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={status === "نشط"}
+              onChange={toggleStatus}
+              checkedChildren="نشط"
+              unCheckedChildren="غير نشط"
+            />
           </div>
         </div>
       </Card>

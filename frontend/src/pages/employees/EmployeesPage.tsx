@@ -1,219 +1,29 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Table, Input, Avatar, Space, Badge } from "antd";
-import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import { Link, Outlet, useMatch, useNavigate } from "react-router";
 import { getInitials } from "../../utils";
 import { tablePaginationConfig } from "../../utils/antd";
-
-const employees = [
-  {
-    id: 1,
-    name: "هانا أرندت",
-    position: "مدير",
-    hireDate: "16 يونيو 2014",
-    assignments: 9,
-    img: "https://randomuser.me/api/portraits/women/72.jpg",
-  },
-  {
-    id: 2,
-    name: "توماس فاغنر",
-    position: "مدير حسابات",
-    hireDate: "7 أغسطس 2019",
-    assignments: 12,
-  },
-  {
-    id: 3,
-    name: "محمد علي",
-    position: "مدير الحسابات",
-    hireDate: "5 سبتمبر 1997",
-    assignments: 0,
-  },
-  {
-    id: 4,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 5,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 6,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 7,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 8,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 9,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 10,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 11,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 12,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 13,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 14,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 15,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 16,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 17,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 18,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 19,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 20,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 21,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 22,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 23,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 24,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 25,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 26,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 27,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-  {
-    id: 28,
-    name: "اسلام فوزي",
-    position: "مدير تسويق",
-    hireDate: "12 يناير 2011",
-    assignments: 4,
-  },
-];
+import { useGetEmployeesQuery } from "@/app/api/endpoints/employees";
+import Loading from "@/components/Loading";
+import Error from "../Error";
 
 const EmployeesPage = () => {
-  const [searchText, setSearchText] = useState("");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const navigate = useNavigate();
   const isEmployees = useMatch("/employees");
 
   // Search Function
   const onSearch = (value: string) => {
-    setSearchText(value);
+    setSearch(value);
   };
+
+  // handling employees
+  const { data, isFetching, isError, refetch } = useGetEmployeesQuery({
+    page,
+    search,
+  });
 
   const columns = [
     {
@@ -242,9 +52,14 @@ const EmployeesPage = () => {
       key: "position",
     },
     {
+      title: "القسم",
+      dataIndex: "department",
+      key: "department",
+    },
+    {
       title: "تاريخ التعيين",
-      dataIndex: "hireDate",
-      key: "hireDate",
+      dataIndex: "hire_date",
+      key: "hire_date",
       // sorter: (a, b) => a.hireDate
     },
     {
@@ -260,19 +75,23 @@ const EmployeesPage = () => {
     },
   ];
 
+  useEffect(() => {
+    refetch();
+  }, [search, page]);
+
   if (!isEmployees) return <Outlet />;
+  if (isFetching) return <Loading />;
+  if (isError) return <Error />;
   return (
     <>
-      <h1 className="mb-6 text-2xl md:text-3xl font-bold">
-        الموظفين
-      </h1>
+      <h1 className="mb-6 text-2xl md:text-3xl font-bold">الموظفين</h1>
 
       <div className="flex justify-between flex-wrap mb-4">
-        <Input
+        <Input.Search
           placeholder="ابحث عن موظف..."
-          prefix={<SearchOutlined />}
-          onChange={(e) => onSearch(e.target.value)}
+          onSearch={onSearch}
           className="mb-4 w-full max-w-md h-10"
+          defaultValue={search}
         />
 
         {/* Add Button */}
@@ -288,13 +107,19 @@ const EmployeesPage = () => {
 
       {/* Table */}
       <Table
-        dataSource={employees.filter((e) => e.name.includes(searchText))}
+        dataSource={data?.data}
         columns={columns}
         onRow={(record) => ({
           onClick: () => navigate(`employee-profile/${record.id}`),
         })}
         rowKey="id"
-        pagination={tablePaginationConfig()}
+        pagination={tablePaginationConfig({
+          total: data?.count,
+          current: data?.page,
+          onChange(page) {
+            setPage(page);
+          },
+        })}
         bordered
         scroll={{ x: "max-content" }}
         className="clickable-table  calypso-header"

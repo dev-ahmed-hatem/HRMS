@@ -1,21 +1,24 @@
 export type Employee = {
-  id: string;
-  name: string;
+  id: number;
+  url: string;
+  department: string;
   gender: "ذكر" | "أنثى";
+  marital_status: "أعزب" | "متزوج" | "مطلق" | "أرمل";
+  mode: "عن بُعد" | "من المقر" | "هجين";
+  created_by: string;
+  name: string;
   email: string;
   phone: string;
+  employee_id: string;
   address: string;
+  birth_date: string;
   age: number;
-  birthDate: string;
-  nationalId: string;
-  maritalStatus: "أعزب" | "متزوج" | "مطلق" | "أرمل";
+  national_id: string;
   position: string;
-  department: string;
-  hireDate: string;
-  employeeID: string;
+  hire_date: string;
   cv?: string;
-  avatar?: string;
-  mode: "عن بُعد" | "من المقر" | "هجين";
+  image?: string;
+  created_at: string;
 
   performance: {
     totalProjects: number;

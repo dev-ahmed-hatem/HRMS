@@ -1,0 +1,64 @@
+from rest_framework import serializers
+from .models import Department, Employee
+from hrms.utils import calculate_age
+
+
+class DepartmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Department
+        fields = '__all__'
+
+
+class EmployeeReadSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='employee-detail')
+    department = serializers.StringRelatedField(read_only=True)
+    gender = serializers.CharField(read_only=True, source='get_gender_display')
+    marital_status = serializers.CharField(read_only=True, source='get_marital_status_display')
+    mode = serializers.CharField(read_only=True, source='get_mode_display')
+    created_by = serializers.CharField(read_only=True, source='created_by.name')
+
+    class Meta:
+        model = Employee
+        fields = '__all__'
+
+
+class EmployeeListSerializer(serializers.ModelSerializer):
+    department = serializers.StringRelatedField(read_only=True)
+    assignments = serializers.SerializerMethodField()
+    url = serializers.HyperlinkedIdentityField(view_name='employee-detail')
+
+    class Meta:
+        model = Employee
+        fields = ['id', 'url', 'name', 'position', 'hire_date', 'assignments', 'image', 'department']
+
+    def get_assignments(self, obj):
+        return 5
+
+
+class EmployeeWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = '__all__'
+
+    def update(self, instance: Employee, validated_data):
+        cv = validated_data.pop('cv', None)
+        image = validated_data.pop('image', None)
+
+        birth_date = validated_data.get("birth_date")
+        if birth_date:
+            instance.age = calculate_age(birth_date)
+
+        instance = super().update(instance, validated_data)
+
+        if cv:
+            if instance.cv:
+                instance.cv.delete(save=False)
+            instance.cv = cv
+
+        if image:
+            if instance.image:
+                instance.image.delete(save=False)
+            instance.image = image
+
+        instance.save()
+        return instance

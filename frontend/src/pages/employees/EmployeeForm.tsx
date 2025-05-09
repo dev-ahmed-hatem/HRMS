@@ -1,21 +1,53 @@
-import { Form, Input, Select, DatePicker, Button, Row, Col, Card } from "antd";
+import {
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  Button,
+  Row,
+  Col,
+  Card,
+  Space,
+  Image,
+} from "antd";
 import dayjs from "dayjs";
 import { Employee } from "../../types/employee";
 import UploadImage from "../../components/employee/UploadImage";
 import { useState } from "react";
+import { useGetAllDepartmentsQuery } from "@/app/api/endpoints/employees";
+import Error from "../Error";
+import Loading from "@/components/Loading";
+import { calculateAge } from "@/utils";
 
 const { Option } = Select;
 
-const AddEmployee = ({
+type EmployeeFormValues = Omit<Employee, "image" | "cv"> & {
+  image?: File | null;
+  cv?: File | null;
+};
+
+const EmployeeForm = ({
   initialValues,
   onSubmit,
 }: {
   initialValues?: Employee;
   onSubmit?: (values: Employee) => void;
 }) => {
+  const {
+    data: departments,
+    isFetching,
+    isError,
+  } = useGetAllDepartmentsQuery();
   const [form] = Form.useForm();
   const [image, setImage] = useState<File | null>(null);
 
+  const handleSubmit = (values: EmployeeFormValues) => {
+    if (image) values.image = image;
+    console.log(dayjs(values.birth_date).format("YYYY-MM-DD"));
+  };
+
+  if (isFetching) return <Loading />;
+  if (isError) return <Error />;
   return (
     <>
       <h1 className="mb-6 text-2xl font-bold">
@@ -24,8 +56,17 @@ const AddEmployee = ({
       <Form
         form={form}
         layout="vertical"
-        onFinish={onSubmit}
+        onFinish={handleSubmit}
+        onValuesChange={(changed) => {
+          if (changed.birth_date) {
+            const age = calculateAge(
+              dayjs(changed.birth_date).format("YYYY-MM-DD")
+            );
+            form.setFieldsValue({ age });
+          }
+        }}
         initialValues={{
+          age: calculateAge(dayjs("1970-1-1").format("YYYY-MM-DD")),
           ...initialValues,
           birth_date: initialValues?.birth_date
             ? dayjs(initialValues.birth_date)
@@ -55,8 +96,8 @@ const AddEmployee = ({
                 rules={[{ required: true, message: "يرجى تحديد الجنس" }]}
               >
                 <Select placeholder="اختر الجنس">
-                  <Option value="ذكر">ذكر</Option>
-                  <Option value="أنثى">أنثى</Option>
+                  <Option value="male">ذكر</Option>
+                  <Option value="female">أنثى</Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -109,6 +150,7 @@ const AddEmployee = ({
                   format="YYYY-MM-DD"
                   className="w-full"
                   placeholder="اختر تاريخ الميلاد"
+                  maxDate={dayjs()}
                 />
               </Form.Item>
             </Col>
@@ -129,23 +171,47 @@ const AddEmployee = ({
                 ]}
               >
                 <Select placeholder="اختر الحالة الاجتماعية">
-                  <Option value="أعزب">أعزب</Option>
-                  <Option value="متزوج">متزوج</Option>
-                  <Option value="مطلق">مطلق</Option>
-                  <Option value="أرمل">أرمل</Option>
+                  <Option value="single">أعزب</Option>
+                  <Option value="married">متزوج</Option>
+                  <Option value="divorced">مطلق</Option>
+                  <Option value="widowed">أرمل</Option>
                 </Select>
               </Form.Item>
             </Col>
-            <Col xs={24} md={12}>
+            <Col xs={24} md={12} className="flex gap-6 flex-wrap">
               <Form.Item name="image" label="الصورة">
                 <UploadImage setFile={setImage} />
               </Form.Item>
+              {initialValues && (
+                <>
+                  {initialValues.image ? (
+                    <div className="flex flex-col gap-2">
+                      <p className="">الصورة الحالية:</p>
+                      <Space size={12} className="rounded">
+                        <Image
+                          width={100}
+                          src={initialValues.image}
+                          className="rounded-full"
+                          preview={{
+                            movable: false,
+                            toolbarRender: () => <></>,
+                          }}
+                        />
+                      </Space>
+                    </div>
+                  ) : (
+                    <div className="flex items-center">
+                      <p className="text-red-600">لا توجد صورة حالية</p>
+                    </div>
+                  )}
+                </>
+              )}
             </Col>
           </Row>
         </Card>
 
         {/* Job Details Section */}
-        <Card title="تفاصيل الوظيفة" style={{ marginBottom: 20 }}>
+        <Card title="التفاصيل الوظيفية" style={{ marginBottom: 20 }}>
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>
               <Form.Item
@@ -176,9 +242,15 @@ const AddEmployee = ({
               <Form.Item
                 name="department"
                 label="القسم"
-                rules={[{ required: true, message: "يرجى إدخال القسم" }]}
+                rules={[{ required: true, message: "يرجى تحديد القسم" }]}
               >
-                <Input placeholder="أدخل القسم" />
+                <Select placeholder="اختر القسم">
+                  {departments!.map((dep) => (
+                    <Option value={dep.id} key={dep.id}>
+                      {dep.name}
+                    </Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
@@ -187,6 +259,7 @@ const AddEmployee = ({
                   format="YYYY-MM-DD"
                   className="w-full"
                   placeholder="اختر تاريخ التوظيف"
+                  maxDate={dayjs()}
                 />
               </Form.Item>
             </Col>
@@ -220,4 +293,4 @@ const AddEmployee = ({
   );
 };
 
-export default AddEmployee;
+export default EmployeeForm;

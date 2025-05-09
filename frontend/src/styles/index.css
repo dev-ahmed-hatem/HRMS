@@ -33,6 +33,6 @@
   background-color: theme(colors.white);
 }
 
-/* body {
-  @apply bg-gray-200;
-} */
+.rounded .ant-image-mask {
+  @apply rounded-full;
+}

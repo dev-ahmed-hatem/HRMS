@@ -53,3 +53,5 @@ dist/
 # Others
 *.bak
 *.swp
+
+*.sqlite3

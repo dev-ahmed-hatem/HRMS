@@ -14,6 +14,16 @@ const employees = api.injectEndpoints({
         url: `/employees/employees?${qs.stringify(params || {})}`,
         method: "GET",
       }),
+      providesTags: (result) =>
+        result?.data
+          ? [
+              ...result.data.map((employee) => ({
+                type: "Employee" as const,
+                id: employee.id,
+              })),
+              { type: "Employee", id: "LIST" },
+            ]
+          : [{ type: "Employee", id: "LIST" }],
     }),
     getDetailedEmployee: builder.query<Employee, string>({
       query: (id) => ({
@@ -21,12 +31,32 @@ const employees = api.injectEndpoints({
         method: "GET",
       }),
     }),
-    getDepartments: builder.query<
-      PaginatedResponse<Department> | Department[],
+    switchEmployeeActive: builder.mutation<{ is_active: boolean }, string>({
+      query: (id) => ({
+        url: `/employees/employees/${id}/switch_active/`,
+        method: "GET",
+      }),
+    }),
+    deleteEmployee: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/employees/employees/${id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "Employee", id: "LIST" }],
+    }),
+    getPaginatedDepartments: builder.query<
+      PaginatedResponse<Department>,
       Record<string, any> | void
     >({
       query: (params) => ({
         url: `/employees/departments?${qs.stringify(params || {})}`,
+      }),
+    }),
+    getAllDepartments: builder.query<Department[], Record<string, any> | void>({
+      query: (params) => ({
+        url: `/employees/departments?no_pagination=true&${qs.stringify(
+          params || {}
+        )}`,
       }),
     }),
   }),
@@ -34,6 +64,9 @@ const employees = api.injectEndpoints({
 
 export const {
   useGetEmployeesQuery,
-  useGetDepartmentsQuery,
   useGetDetailedEmployeeQuery,
+  useSwitchEmployeeActiveMutation,
+  useDeleteEmployeeMutation,
+  useGetAllDepartmentsQuery,
+  useGetPaginatedDepartmentsQuery,
 } = employees;

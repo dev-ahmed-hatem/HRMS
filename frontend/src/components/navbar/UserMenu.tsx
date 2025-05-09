@@ -1,7 +1,7 @@
 import { useLogoutMutation } from "@/app/api/endpoints/auth";
 import { Button } from "antd";
 import { useEffect } from "react";
-import { toast, Bounce } from "react-toastify";
+import { toast } from "react-toastify";
 
 const UserMenu = ({ role }: { role: string }) => {
   const [logout, { isLoading, isSuccess, isError }] = useLogoutMutation();
@@ -14,16 +14,7 @@ const UserMenu = ({ role }: { role: string }) => {
 
   useEffect(() => {
     if (isError) {
-      toast.error("حدث خطأ! برجاء إعادة المحاولة", {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "dark",
-        transition: Bounce,
-      });
+      toast.error("حدث خطأ! برجاء إعادة المحاولة");
     }
   }, [isError]);
 

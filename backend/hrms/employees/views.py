@@ -27,6 +27,15 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         data = EmployeeReadSerializer(employee, context={"request": self.request}).data
         return Response(data)
 
+    @action(detail=True, methods=['get'])
+    def switch_active(self, request, pk=None):
+        employee = Employee.objects.filter(id=pk).first()
+        if not employee:
+            raise Employee.DoesNotExist
+        employee.is_active = not employee.is_active
+        employee.save()
+        return Response({"is_active": employee.is_active})
+
     def get_queryset(self):
         search = self.request.query_params.get('search', None)
         queryset = Employee.objects.all()

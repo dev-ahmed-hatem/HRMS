@@ -16,8 +16,13 @@ const columns: ColumnsType = [
     key: "name",
     render: (text: string, record: any) => (
       <Space>
-        {record.img ? (
-          <Avatar src={record.img} />
+        <span
+          className={`mx-2 rounded-full ${
+            record.is_active ? "bg-green-400" : "bg-yellow-400"
+          } size-2 inline-block`}
+        ></span>
+        {record.image ? (
+          <Avatar src={record.image} />
         ) : (
           <Avatar className="bg-orange-700 text-white font-semibold">
             {getInitials(record.name)}

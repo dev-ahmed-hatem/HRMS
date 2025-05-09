@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import Loading from "@/components/Loading";
 
 const LoginPage = () => {
-  const navigate = useNavigate();
   const [params] = useSearchParams();
 
   // login flags

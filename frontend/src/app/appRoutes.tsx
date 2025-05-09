@@ -110,6 +110,10 @@ export const appRoutes: AppRoute[] = [
     path: "login",
     element: <LoginPage />,
   },
+  {
+    path: "*",
+    element: <Error notFound={true} />,
+  },
 ];
 
 export default appRoutes;

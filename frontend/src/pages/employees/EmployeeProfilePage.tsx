@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
-import { Card, Avatar, Tabs, Button, Switch, Image, Space } from "antd";
+import {
+  Card,
+  Avatar,
+  Tabs,
+  Button,
+  Switch,
+  Image,
+  Space,
+  Popconfirm,
+} from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getInitials } from "../../utils";
 import { Employee } from "../../types/employee";
@@ -8,9 +17,16 @@ import PersonalInfo from "../../components/employee/PersonalInfo";
 import Performance from "../../components/employee/Performance";
 import Attendance from "../../components/employee/Attendance";
 import SalaryHistory from "../../components/employee/SalaryHistory";
-import { useGetDetailedEmployeeQuery } from "@/app/api/endpoints/employees";
+import {
+  useDeleteEmployeeMutation,
+  useGetDetailedEmployeeQuery,
+  useSwitchEmployeeActiveMutation,
+} from "@/app/api/endpoints/employees";
 import { useParams } from "react-router";
 import Loading from "@/components/Loading";
+import Error from "../Error";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router";
 
 // Sample Employee Data
 const employee3: Employee = {
@@ -93,22 +109,54 @@ const titledAvatar = (name: string) => (
 );
 
 const EmployeeProfilePage: React.FC = () => {
+  const navigate = useNavigate();
   const { emp_id } = useParams();
   const {
     data: employee,
     isFetching,
     isError,
   } = useGetDetailedEmployeeQuery(emp_id as string);
+  const [
+    switchActive,
+    { data: switchRes, isLoading: switching, isError: switchError },
+  ] = useSwitchEmployeeActiveMutation();
+  const [deleteEmployee, { isLoading: deleting, isSuccess: deleted }] =
+    useDeleteEmployeeMutation();
 
   const [imageError, setImageError] = useState(false);
+  const [isActive, setIsActive] = useState<boolean | null>(null);
 
-  const [status, setStatus] = useState("نشط");
-  const toggleStatus = (checked: boolean) => {
-    setStatus(checked ? "نشط" : "غير نشط");
-    // Optionally: call backend to update status
+  const toggleStatus = () => {
+    switchActive(emp_id as string);
   };
 
+  const handleDelete = () => {
+    deleteEmployee(emp_id as string);
+  };
+
+  useEffect(() => {
+    if (employee) setIsActive(employee.is_active);
+  }, [employee]);
+
+  useEffect(() => {
+    if (switchError) {
+      toast.error("حدث خطأ في تغيير الحالة ! برجاء إعادة المحاولة");
+    }
+  }, [switchError]);
+
+  useEffect(() => {
+    if (switchRes) {
+      if (employee) setIsActive(switchRes.is_active);
+      toast.success("تم تغيير الحالة بنجاح");
+    }
+  }, [switchRes]);
+
+  useEffect(() => {
+    if (deleted) navigate("/employees");
+  }, [deleted]);
+
   if (isFetching) return <Loading />;
+  if (isError) return <Error />;
   return (
     <>
       {/* Employee Header */}
@@ -117,13 +165,17 @@ const EmployeeProfilePage: React.FC = () => {
           {/* Avatar with Fallback */}
           <div className="flex items-center flex-wrap gap-4">
             {employee!.image && !imageError ? (
-              <Space size={12} style={{ borderRadius: "50%" }}>
+              <Space size={12} className="rounded">
                 <Image
                   width={100}
                   src={employee!.image}
                   className="rounded-full"
                   onError={() => {
                     setImageError(true);
+                  }}
+                  preview={{
+                    movable: false,
+                    toolbarRender: () => <></>,
                   }}
                 />
               </Space>
@@ -138,14 +190,17 @@ const EmployeeProfilePage: React.FC = () => {
           </div>
 
           {/* Status */}
-          <div className="flex items-center gap-2">
-            <Switch
-              checked={status === "نشط"}
-              onChange={toggleStatus}
-              checkedChildren="نشط"
-              unCheckedChildren="غير نشط"
-            />
-          </div>
+          {isActive !== null && (
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={isActive!}
+                onChange={toggleStatus}
+                checkedChildren="نشط"
+                unCheckedChildren="غير نشط"
+                loading={switching}
+              />
+            </div>
+          )}
         </div>
       </Card>
 
@@ -161,16 +216,31 @@ const EmployeeProfilePage: React.FC = () => {
 
       {/* Action Button */}
       <div className="flex md:justify-end mt-4 flex-wrap gap-4">
-        <Button type="primary" icon={<EditOutlined />}>
+        <Button
+          type="primary"
+          icon={<EditOutlined />}
+          onClick={() => {
+            navigate(`/employees/edit/${emp_id}`);
+          }}
+        >
           تعديل البيانات
         </Button>
-        <Button
-          className="enabled:bg-red-500 enabled:border-red-500 enabled:shadow-[0_2px_0_rgba(0,58,58,0.31)]
-          enabled:hover:border-red-400 enabled:hover:bg-red-400 enabled:text-white"
-          icon={<DeleteOutlined />}
+        <Popconfirm
+          title="هل أنت متأكد من حذف هذا الموظف؟"
+          onConfirm={handleDelete}
+          okText="نعم"
+          cancelText="لا"
         >
-          حذف الموظف
-        </Button>
+          <Button
+            className="enabled:bg-red-500 enabled:border-red-500 enabled:shadow-[0_2px_0_rgba(0,58,58,0.31)]
+          enabled:hover:border-red-400 enabled:hover:bg-red-400 enabled:text-white"
+            icon={<DeleteOutlined />}
+            loading={deleting}
+          >
+            حذف الموظف
+          </Button>
+        </Popconfirm>
+        ,
       </div>
     </>
   );

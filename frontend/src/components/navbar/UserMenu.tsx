@@ -1,18 +1,16 @@
 import { useLogoutMutation } from "@/app/api/endpoints/auth";
 import { Button } from "antd";
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
 import { toast, Bounce } from "react-toastify";
 
 const UserMenu = ({ role }: { role: string }) => {
-  const navigate = useNavigate();
   const [logout, { isLoading, isSuccess, isError }] = useLogoutMutation();
 
   useEffect(() => {
     if (isSuccess) {
-      navigate("/login");
+      location.href = "/login";
     }
-  }, [isSuccess, navigate]);
+  }, [isSuccess]);
 
   useEffect(() => {
     if (isError) {

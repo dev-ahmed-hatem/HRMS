@@ -18,6 +18,7 @@ export type Employee = {
   hire_date: string;
   cv?: string;
   image?: string;
+  is_active: boolean;
   created_at: string;
 
   performance: {

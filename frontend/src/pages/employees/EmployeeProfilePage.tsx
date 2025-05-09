@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Card, Avatar, Tabs, Button, Switch } from "antd";
+import { useEffect, useState } from "react";
+import { Card, Avatar, Tabs, Button, Switch, Image, Space } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getInitials } from "../../utils";
 import { Employee } from "../../types/employee";
@@ -8,9 +8,12 @@ import PersonalInfo from "../../components/employee/PersonalInfo";
 import Performance from "../../components/employee/Performance";
 import Attendance from "../../components/employee/Attendance";
 import SalaryHistory from "../../components/employee/SalaryHistory";
+import { useGetDetailedEmployeeQuery } from "@/app/api/endpoints/employees";
+import { useParams } from "react-router";
+import Loading from "@/components/Loading";
 
 // Sample Employee Data
-const employee: Employee = {
+const employee3: Employee = {
   id: 1,
   url: "http://127.0.0.1:8000/api/employees/employees/1/",
   department: "Social Media",
@@ -20,6 +23,7 @@ const employee: Employee = {
   created_by: "Dev Ahmed Hatem",
   name: "Employee 1",
   email: "e@a.com",
+  is_active: true,
   phone: "123",
   employee_id: "E12",
   address: "16 moharam bek",
@@ -54,7 +58,7 @@ const employee: Employee = {
   ],
 };
 
-const items = [
+const items = (employee: Employee) => [
   {
     label: `التفاصيل الوظيفية`,
     key: "1",
@@ -68,27 +72,43 @@ const items = [
   {
     label: `الأداء الوظيفي`,
     key: "3",
-    children: <Performance performance={employee.performance} />,
+    children: <Performance performance={employee3.performance} />,
   },
   {
     label: `الحضور والانصراف`,
     key: "4",
-    children: <Attendance attendance={employee.attendance} />,
+    children: <Attendance attendance={employee3.attendance} />,
   },
   {
     label: `تاريخ الراتب`,
     key: "5",
-    children: <SalaryHistory salaryHistory={employee.salaryHistory} />,
+    children: <SalaryHistory salaryHistory={employee3.salaryHistory} />,
   },
 ];
 
+const titledAvatar = (name: string) => (
+  <Avatar size={80} className="bg-orange-700 font-semibold">
+    {getInitials(name)}
+  </Avatar>
+);
+
 const EmployeeProfilePage: React.FC = () => {
+  const { emp_id } = useParams();
+  const {
+    data: employee,
+    isFetching,
+    isError,
+  } = useGetDetailedEmployeeQuery(emp_id as string);
+
+  const [imageError, setImageError] = useState(false);
+
   const [status, setStatus] = useState("نشط");
   const toggleStatus = (checked: boolean) => {
     setStatus(checked ? "نشط" : "غير نشط");
     // Optionally: call backend to update status
   };
 
+  if (isFetching) return <Loading />;
   return (
     <>
       {/* Employee Header */}
@@ -96,17 +116,24 @@ const EmployeeProfilePage: React.FC = () => {
         <div className="flex items-center justify-between flex-wrap gap-y-6">
           {/* Avatar with Fallback */}
           <div className="flex items-center flex-wrap gap-4">
-            {employee.image ? (
-              <Avatar size={80} src={employee.image} />
+            {employee!.image && !imageError ? (
+              <Space size={12} style={{ borderRadius: "50%" }}>
+                <Image
+                  width={100}
+                  src={employee!.image}
+                  className="rounded-full"
+                  onError={() => {
+                    setImageError(true);
+                  }}
+                />
+              </Space>
             ) : (
-              <Avatar size={80} className="bg-orange-700 font-semibold">
-                {getInitials(employee.name)}
-              </Avatar>
+              titledAvatar(employee!.name)
             )}
 
             <div>
-              <h2 className="text-xl font-bold">{employee.name}</h2>
-              <p className="text-gray-500">{employee.position}</p>
+              <h2 className="text-xl font-bold">{employee!.name}</h2>
+              <p className="text-gray-500">{employee!.position}</p>
             </div>
           </div>
 
@@ -128,7 +155,7 @@ const EmployeeProfilePage: React.FC = () => {
           <DefaultTabBar {...props} className="md:ps-2" />
         )}
         className="mt-4"
-        items={items}
+        items={items(employee!)}
         direction="rtl"
       />
 

@@ -6,13 +6,13 @@ import Home from "./Home";
 import Footer from "../components/Footer";
 import Breadcrumbs from "../components/BreadCrumbs";
 import ScrollToTop from "../components/ScrollToTop";
-import { Button } from "antd";
 import { ToastContainer } from "react-toastify";
 import Error from "./Error";
 
 const Base = ({ error }: { error?: any }) => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const isHome = useMatch("/");
+
   return (
     <>
       <ScrollToTop />

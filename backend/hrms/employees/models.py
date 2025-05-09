@@ -35,6 +35,7 @@ class Employee(models.Model):
     image = models.ImageField(upload_to='employees/images', null=True, blank=True)
     mode = models.CharField(max_length=100,
                             choices=(("remote", "عن بُعد"), ("on-site", "من المقر"), ("hybrid", "هجين")))
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
 

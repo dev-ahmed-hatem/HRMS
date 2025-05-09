@@ -3,6 +3,7 @@ from rest_framework import viewsets
 from .serializers import DepartmentSerializer, EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer
 from .models import Department, Employee
 from rest_framework.decorators import action
+from django.db.models import Q
 
 
 class DepartmentViewSet(viewsets.ModelViewSet):
@@ -31,6 +32,6 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         queryset = Employee.objects.all()
 
         if search:
-            queryset = queryset.filter(name__icontains=search)
+            queryset = queryset.filter(Q(name__icontains=search) | Q(employee_id__icontains=search))
 
         return queryset

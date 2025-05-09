@@ -29,7 +29,7 @@ class EmployeeListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['id', 'url', 'name', 'position', 'hire_date', 'assignments', 'image', 'department']
+        fields = ['id', 'url', 'name', 'position', 'employee_id', 'assignments', 'image', 'department']
 
     def get_assignments(self, obj):
         return 5

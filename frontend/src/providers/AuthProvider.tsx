@@ -18,7 +18,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   const dispatch = useAppDispatch();
-  const { data, isLoading, isError, error } = useGetAuthUserQuery();
+  const { data, isFetching, isError, error } = useGetAuthUserQuery();
 
   useEffect(() => {
     if (data) {
@@ -26,10 +26,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [data]);
 
-  if (isError) {
-  }
-
-  if (isLoading) return <Loading />;
+  if (isFetching) return <Loading />;
   if (isError) {
     const err = error as axiosBaseQueryError;
     const next =

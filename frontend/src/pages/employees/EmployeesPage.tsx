@@ -7,6 +7,54 @@ import { tablePaginationConfig } from "../../utils/antd";
 import { useGetEmployeesQuery } from "@/app/api/endpoints/employees";
 import Loading from "@/components/Loading";
 import Error from "../Error";
+import { ColumnsType } from "antd/es/table";
+
+const columns: ColumnsType = [
+  {
+    title: "اسم الموظف",
+    dataIndex: "name",
+    key: "name",
+    render: (text: string, record: any) => (
+      <Space>
+        {record.img ? (
+          <Avatar src={record.img} />
+        ) : (
+          <Avatar className="bg-orange-700 text-white font-semibold">
+            {getInitials(record.name)}
+          </Avatar>
+        )}
+        <span className="flex flex-col">
+          <div className="name text-base">{text}</div>
+          <div className="id text-xs text-gray-400">#{record.id}</div>
+        </span>
+      </Space>
+    ),
+  },
+  {
+    title: "الرقم الوظيفي",
+    dataIndex: "employee_id",
+    key: "employee_id",
+  },
+  {
+    title: "الوظيفة",
+    dataIndex: "position",
+    key: "position",
+  },
+  {
+    title: "القسم",
+    dataIndex: "department",
+    key: "department",
+  },
+  {
+    title: "التكليفات الجارية",
+    dataIndex: "assignments",
+    key: "assignments",
+    render: (assignments: number) => {
+      return assignments ? <Badge color="#f3760d" count={assignments} /> : null;
+    },
+    sorter: (a, b) => a.assignments - b.assignments,
+  },
+];
 
 const EmployeesPage = () => {
   const [search, setSearch] = useState("");
@@ -20,60 +68,10 @@ const EmployeesPage = () => {
   };
 
   // handling employees
-  const { data, isFetching, isError, refetch } = useGetEmployeesQuery({
+  const { data, isFetching, isError, error, refetch } = useGetEmployeesQuery({
     page,
     search,
   });
-
-  const columns = [
-    {
-      title: "اسم الموظف",
-      dataIndex: "name",
-      key: "name",
-      render: (text: string, record: any) => (
-        <Space>
-          {record.img ? (
-            <Avatar src={record.img} />
-          ) : (
-            <Avatar className="bg-orange-700 text-white font-semibold">
-              {getInitials(record.name)}
-            </Avatar>
-          )}
-          <span className="flex flex-col">
-            <div className="name text-base">{text}</div>
-            <div className="id text-xs text-gray-400">#{record.id}</div>
-          </span>
-        </Space>
-      ),
-    },
-    {
-      title: "الوظيفة",
-      dataIndex: "position",
-      key: "position",
-    },
-    {
-      title: "القسم",
-      dataIndex: "department",
-      key: "department",
-    },
-    {
-      title: "تاريخ التعيين",
-      dataIndex: "hire_date",
-      key: "hire_date",
-      // sorter: (a, b) => a.hireDate
-    },
-    {
-      title: "التكليفات الجارية",
-      dataIndex: "assignments",
-      key: "assignments",
-      render: (assignments: number) => {
-        return assignments ? (
-          <Badge color="#f3760d" count={assignments} />
-        ) : null;
-      },
-      // sorter: (a, b) => a.assignments - b.assignments,
-    },
-  ];
 
   useEffect(() => {
     refetch();

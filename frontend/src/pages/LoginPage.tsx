@@ -36,7 +36,7 @@ const LoginPage = () => {
   useEffect(() => {
     const next = params.get("next");
     const path = next && next !== "/login" ? next : "/";
-    if (logged || verified) navigate(path);
+    if (logged || verified) window.location.href = path;
   }, [logged, verified]);
 
   if (verifying) return <Loading />;

@@ -87,24 +87,24 @@ const AddEmployee = ({
 
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>
-              <Form.Item name="address" label="العنوان">
-                <Input placeholder="أدخل العنوان" />
+              <Form.Item
+                name="national_id"
+                label="الرقم القومي"
+                rules={[{ required: true, message: "يرجى إدخال الرقم القومي" }]}
+              >
+                <Input placeholder="أدخل الرقم القومي" />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item
-                name="age"
-                label="العمر"
-                rules={[{ required: true, message: "يرجى إدخال العمر" }]}
-              >
-                <Input type="number" placeholder="أدخل العمر" />
+              <Form.Item name="address" label="العنوان">
+                <Input placeholder="أدخل العنوان" />
               </Form.Item>
             </Col>
           </Row>
 
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>
-              <Form.Item name="birthDate" label="تاريخ الميلاد">
+              <Form.Item name="birth_date" label="تاريخ الميلاد">
                 <DatePicker
                   format="YYYY-MM-DD"
                   className="w-full"
@@ -113,12 +113,8 @@ const AddEmployee = ({
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item
-                name="nationalId"
-                label="الرقم القومي"
-                rules={[{ required: true, message: "يرجى إدخال الرقم القومي" }]}
-              >
-                <Input placeholder="أدخل الرقم القومي" />
+              <Form.Item name="age" label="العمر">
+                <Input type="number" disabled />
               </Form.Item>
             </Col>
           </Row>
@@ -126,7 +122,7 @@ const AddEmployee = ({
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>
               <Form.Item
-                name="maritalStatus"
+                name="marital_status"
                 label="الحالة الاجتماعية"
                 rules={[
                   { required: true, message: "يرجى تحديد الحالة الاجتماعية" },
@@ -141,7 +137,7 @@ const AddEmployee = ({
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item name="picture" label="الصورة">
+              <Form.Item name="image" label="الصورة">
                 <UploadImage setFile={setImage} />
               </Form.Item>
             </Col>
@@ -153,11 +149,13 @@ const AddEmployee = ({
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>
               <Form.Item
-                name="employeeID"
-                label="معرف الموظف (الكود)"
-                rules={[{ required: true, message: "يرجى إدخال معرف الموظف" }]}
+                name="employee_id"
+                label="الرقم الوظيفي"
+                rules={[
+                  { required: true, message: "يرجى إدخال الرقم الوظيفي" },
+                ]}
               >
-                <Input placeholder="أدخل معرف الموظف" />
+                <Input placeholder="أدخل الرقم الوظيفي" />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
@@ -184,7 +182,7 @@ const AddEmployee = ({
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item name="hireDate" label="تاريخ التوظيف">
+              <Form.Item name="hire_date" label="تاريخ التوظيف">
                 <DatePicker
                   format="YYYY-MM-DD"
                   className="w-full"
@@ -202,9 +200,9 @@ const AddEmployee = ({
                 rules={[{ required: true, message: "يرجى تحديد وضع العمل" }]}
               >
                 <Select placeholder="اختر وضع العمل">
-                  <Option value="عن بُعد">عن بُعد</Option>
-                  <Option value="من المقر">من المقر</Option>
-                  <Option value="هجين">هجين</Option>
+                  <Option value="remote">عن بُعد</Option>
+                  <Option value="on-site">من المقر</Option>
+                  <Option value="hybrid">هجين</Option>
                 </Select>
               </Form.Item>
             </Col>

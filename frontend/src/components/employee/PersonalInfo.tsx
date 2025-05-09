@@ -13,23 +13,27 @@ const PersonalInfo = ({ employee }: { employee: Employee }) => {
       <Descriptions.Item label="العنوان">{employee.address}</Descriptions.Item>
       <Descriptions.Item label="العمر">{employee.age} سنة</Descriptions.Item>
       <Descriptions.Item label="تاريخ الميلاد">
-        {employee.birthDate}
+        {employee.birth_date}
       </Descriptions.Item>
       <Descriptions.Item label="رقم الهوية">
-        {employee.nationalId}
+        {employee.national_id}
       </Descriptions.Item>
       <Descriptions.Item label="الحالة الاجتماعية">
-        {employee.maritalStatus}
+        {employee.marital_status}
       </Descriptions.Item>
       <Descriptions.Item label="السيرة الذاتية">
-        <a
-          className="underline text-blue-500"
-          href={employee.cv}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Ted.pdf
-        </a>
+        {employee.cv ? (
+          <a
+            className="underline text-blue-500"
+            href={employee.cv}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {employee.cv.split("/").slice(-1)}
+          </a>
+        ) : (
+          <span className="text-red-600">لا يوجد</span>
+        )}
       </Descriptions.Item>
     </Descriptions>
   );

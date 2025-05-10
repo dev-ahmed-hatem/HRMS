@@ -4,7 +4,9 @@ import { useAppDispatch } from "@/app/redux/hooks";
 import { setUser } from "@/app/slices/authSlice";
 import Loading from "@/components/Loading";
 import Base from "@/pages/Base";
+import ErrorPage from "@/pages/Error";
 import { User } from "@/types/user";
+import { AxiosError } from "axios";
 import React, { createContext, useContext, useEffect } from "react";
 import { Navigate, useLocation } from "react-router";
 
@@ -28,7 +30,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   if (isFetching) return <Loading />;
   if (isError) {
-    const err = error as axiosBaseQueryError;
+    const err = error as axiosBaseQueryError & AxiosError;
     const next =
       location.pathname !== "/"
         ? `/login?next=${encodeURIComponent(
@@ -36,7 +38,13 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           )}`
         : `/login`;
 
-    return err?.status == 401 ? <Navigate to={next} /> : <Base error={true} />;
+    return err?.status == 401 ? (
+      <Navigate to={next} />
+    ) : err?.response ? (
+      <Base error={true} />
+    ) : (
+      <ErrorPage />
+    );
   }
   return <AuthContext.Provider value={null}>{children}</AuthContext.Provider>;
 };

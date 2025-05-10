@@ -1,9 +1,10 @@
 from rest_framework.response import Response
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from .serializers import DepartmentSerializer, EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer
 from .models import Department, Employee
 from rest_framework.decorators import action
 from django.db.models import Q
+from rest_framework.generics import get_object_or_404
 
 
 class DepartmentViewSet(viewsets.ModelViewSet):
@@ -21,7 +22,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'])
     def detailed(self, request, pk=None):
-        employee = Employee.objects.filter(id=pk).first()
+        employee = get_object_or_404(Employee, pk=pk)
         if not employee:
             raise Employee.DoesNotExist
         data = EmployeeReadSerializer(employee, context={"request": self.request}).data
@@ -31,7 +32,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     def switch_active(self, request, pk=None):
         employee = Employee.objects.filter(id=pk).first()
         if not employee:
-            raise Employee.DoesNotExist
+            return Response({'error': 'Employee not found'}, status=status.HTTP_404_NOT_FOUND)
         employee.is_active = not employee.is_active
         employee.save()
         return Response({"is_active": employee.is_active})

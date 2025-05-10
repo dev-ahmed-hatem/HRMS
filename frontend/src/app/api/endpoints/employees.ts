@@ -4,7 +4,7 @@ import { Employee } from "@/types/employee";
 import { PaginatedResponse } from "@/types/paginatedResponse";
 import qs from "query-string";
 
-const employees = api.injectEndpoints({
+export const employeesEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
     getEmployees: builder.query<
       PaginatedResponse<Employee>,
@@ -30,12 +30,14 @@ const employees = api.injectEndpoints({
         url: `/employees/employees/${id}/detailed/`,
         method: "GET",
       }),
+      providesTags: (res, error, arg) => [{ type: "Employee", id: arg }],
     }),
     switchEmployeeActive: builder.mutation<{ is_active: boolean }, string>({
       query: (id) => ({
         url: `/employees/employees/${id}/switch_active/`,
         method: "GET",
       }),
+      invalidatesTags: [{ type: "Employee", id: "LIST" }],
     }),
     deleteEmployee: builder.mutation<void, string>({
       query: (id) => ({
@@ -60,6 +62,7 @@ const employees = api.injectEndpoints({
       }),
     }),
   }),
+  overrideExisting: false,
 });
 
 export const {
@@ -69,4 +72,4 @@ export const {
   useDeleteEmployeeMutation,
   useGetAllDepartmentsQuery,
   useGetPaginatedDepartmentsQuery,
-} = employees;
+} = employeesEndpoints;

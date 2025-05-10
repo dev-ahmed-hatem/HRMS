@@ -1,4 +1,4 @@
-import { Card, Button, Tooltip, Typography, Row, Col, Popconfirm } from "antd";
+import { Card, Tooltip, Typography, Row, Col, Popconfirm } from "antd";
 import {
   EditOutlined,
   DeleteOutlined,

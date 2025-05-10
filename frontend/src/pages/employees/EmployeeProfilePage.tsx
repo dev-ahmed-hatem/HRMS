@@ -18,6 +18,7 @@ import Performance from "../../components/employee/Performance";
 import Attendance from "../../components/employee/Attendance";
 import SalaryHistory from "../../components/employee/SalaryHistory";
 import {
+  employeesEndpoints,
   useDeleteEmployeeMutation,
   useGetDetailedEmployeeQuery,
   useSwitchEmployeeActiveMutation,
@@ -27,6 +28,8 @@ import Loading from "@/components/Loading";
 import Error from "../Error";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
+import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
+import { useAppDispatch } from "@/app/redux/hooks";
 
 // Sample Employee Data
 const employee3: Employee = {
@@ -115,6 +118,7 @@ const EmployeeProfilePage: React.FC = () => {
     data: employee,
     isFetching,
     isError,
+    error: employeeError,
   } = useGetDetailedEmployeeQuery(emp_id as string);
   const [
     switchActive,
@@ -122,6 +126,8 @@ const EmployeeProfilePage: React.FC = () => {
   ] = useSwitchEmployeeActiveMutation();
   const [deleteEmployee, { isLoading: deleting, isSuccess: deleted }] =
     useDeleteEmployeeMutation();
+
+  const dispatch = useAppDispatch();
 
   const [imageError, setImageError] = useState(false);
   const [isActive, setIsActive] = useState<boolean | null>(null);
@@ -147,6 +153,15 @@ const EmployeeProfilePage: React.FC = () => {
   useEffect(() => {
     if (switchRes) {
       if (employee) setIsActive(switchRes.is_active);
+      dispatch(
+        employeesEndpoints.util.updateQueryData(
+          "getDetailedEmployee",
+          emp_id as string,
+          (draft: Employee) => {
+            draft.is_active = switchRes.is_active;
+          }
+        )
+      );
       toast.success("تم تغيير الحالة بنجاح");
     }
   }, [switchRes]);
@@ -156,7 +171,14 @@ const EmployeeProfilePage: React.FC = () => {
   }, [deleted]);
 
   if (isFetching) return <Loading />;
-  if (isError) return <Error />;
+  if (isError) {
+    const error_title =
+      (employeeError as axiosBaseQueryError).status === 404
+        ? "موظف غير موجود! تأكد من كود الموظف المدخل."
+        : undefined;
+
+    return <Error subtitle={error_title} reload={error_title === undefined} />;
+  }
   return (
     <>
       {/* Employee Header */}

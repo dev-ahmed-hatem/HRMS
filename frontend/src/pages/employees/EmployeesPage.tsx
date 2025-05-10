@@ -34,6 +34,7 @@ const columns: ColumnsType = [
         </span>
       </Space>
     ),
+    sorter: (a, b) => a.name.localeCompare(b.name),
   },
   {
     title: "الرقم الوظيفي",

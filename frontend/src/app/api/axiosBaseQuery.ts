@@ -8,7 +8,7 @@ interface CustomAxiosConfig extends AxiosRequestConfig {
   _retry: true;
 }
 
-export interface axiosBaseQueryError {
+export type axiosBaseQueryError = {
   status: number | string;
   data: any;
 }

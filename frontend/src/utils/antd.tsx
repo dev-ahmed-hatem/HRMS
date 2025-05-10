@@ -1,18 +1,17 @@
 import { TablePaginationConfig } from "antd";
 import { RightOutlined, LeftOutlined } from "@ant-design/icons";
 
-// default antd table pagination config
-export const tablePaginationConfig: ({
-  pageSize,
-  total,
-  current,
-}: {
+type TablePaginationParams = {
   pageSize?: number;
   total?: number;
   current?: number;
   onChange?: TablePaginationConfig["onChange"];
-}) => TablePaginationConfig = ({ pageSize, total, current, onChange }) => ({
-  pageSize,
+};
+
+// default antd table pagination config
+export const tablePaginationConfig: (
+  params?: TablePaginationParams
+) => TablePaginationConfig = (params?: TablePaginationParams) => ({
   itemRender(page, type, element) {
     if (type === "prev") {
       return (
@@ -30,9 +29,6 @@ export const tablePaginationConfig: ({
     }
     return element;
   },
-  total,
-  current,
-  onChange,
   showTotal: (total, range) => (
     <span className="text-sm text-gray-600 text-wrap">
       عرض <span className="font-semibold text-black mx-1">{range[0]}</span> :{" "}
@@ -40,4 +36,7 @@ export const tablePaginationConfig: ({
       إجمالي <span className="font-semibold text-black mx-1">{total}</span>{" "}
     </span>
   ),
+
+  // dynamic params
+  ...params,
 });

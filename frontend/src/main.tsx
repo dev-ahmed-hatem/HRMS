@@ -9,6 +9,7 @@ import "./styles/tables.css";
 import "./styles/add-form.css";
 import { Provider as ReduxProvider } from "react-redux";
 import store from "./app/redux/store";
+import NotificationProvider from "./providers/NotificationProvider";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -22,7 +23,9 @@ createRoot(document.getElementById("root")!).render(
       locale={arEG}
     >
       <ReduxProvider store={store}>
-        <RouterProvider router={createBrowserRouter(routes)} />
+        <NotificationProvider>
+          <RouterProvider router={createBrowserRouter(routes)} />
+        </NotificationProvider>
       </ReduxProvider>
     </ConfigProvider>
   </StrictMode>

@@ -6,7 +6,6 @@ import Home from "./Home";
 import Footer from "../components/Footer";
 import Breadcrumbs from "../components/BreadCrumbs";
 import ScrollToTop from "../components/ScrollToTop";
-import { Bounce, ToastContainer } from "react-toastify";
 import Error from "./Error";
 
 const Base = ({ error }: { error?: any }) => {
@@ -32,16 +31,6 @@ const Base = ({ error }: { error?: any }) => {
         </div>
       )}
       <Footer />
-      <ToastContainer
-        position="bottom-right"
-        autoClose={3000}
-        hideProgressBar={true}
-        closeOnClick={false}
-        pauseOnHover={true}
-        draggable={true}
-        theme={"dark"}
-        transition={Bounce}
-      />
     </>
   );
 };

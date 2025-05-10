@@ -26,10 +26,10 @@ import {
 import { useParams } from "react-router";
 import Loading from "@/components/Loading";
 import Error from "../Error";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { useAppDispatch } from "@/app/redux/hooks";
+import { useNotification } from "@/providers/NotificationProvider";
 
 // Sample Employee Data
 const employee3: Employee = {
@@ -113,6 +113,7 @@ const titledAvatar = (name: string) => (
 
 const EmployeeProfilePage: React.FC = () => {
   const navigate = useNavigate();
+  const notification = useNotification();
   const { emp_id } = useParams();
   const {
     data: employee,
@@ -146,7 +147,9 @@ const EmployeeProfilePage: React.FC = () => {
 
   useEffect(() => {
     if (switchError) {
-      toast.error("حدث خطأ في تغيير الحالة ! برجاء إعادة المحاولة");
+      notification.error({
+        message: "حدث خطأ في تغيير الحالة ! برجاء إعادة المحاولة",
+      });
     }
   }, [switchError]);
 
@@ -162,7 +165,9 @@ const EmployeeProfilePage: React.FC = () => {
           }
         )
       );
-      toast.success("تم تغيير الحالة بنجاح");
+      notification.success({
+        message: "تم تغيير الحالة بنجاح",
+      });
     }
   }, [switchRes]);
 

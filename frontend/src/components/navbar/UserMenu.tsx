@@ -1,10 +1,11 @@
 import { useLogoutMutation } from "@/app/api/endpoints/auth";
+import { useNotification } from "@/providers/NotificationProvider";
 import { Button } from "antd";
 import { useEffect } from "react";
-import { toast } from "react-toastify";
 
 const UserMenu = ({ role }: { role: string }) => {
   const [logout, { isLoading, isSuccess, isError }] = useLogoutMutation();
+  const notification = useNotification();
 
   useEffect(() => {
     if (isSuccess) {
@@ -14,7 +15,7 @@ const UserMenu = ({ role }: { role: string }) => {
 
   useEffect(() => {
     if (isError) {
-      toast.error("حدث خطأ! برجاء إعادة المحاولة");
+      notification.error({ message: "حدث خطأ! برجاء إعادة المحاولة" });
     }
   }, [isError]);
 

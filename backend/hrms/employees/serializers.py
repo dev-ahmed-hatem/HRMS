@@ -35,12 +35,23 @@ class EmployeeListSerializer(serializers.ModelSerializer):
         return 5
 
 
-class EmployeeWriteSerializer(serializers.ModelSerializer):
+class EmployeeFormSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = '__all__'
 
+
+class EmployeeWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        exclude = ['created_by', 'is_active']
+
+    def create(self, validated_data):
+        auth_user = self.context['request'].user
+        return Employee.objects.create(**validated_data, created_by=auth_user)
+
     def update(self, instance: Employee, validated_data):
+        print(validated_data)
         cv = validated_data.pop('cv', None)
         image = validated_data.pop('image', None)
 

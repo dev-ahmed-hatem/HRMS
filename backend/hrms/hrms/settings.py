@@ -133,7 +133,7 @@ REST_FRAMEWORK = {
         'authentication.authentication.HTTPCookieAuthentication'
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        # 'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_PAGINATION_CLASS': 'hrms.rest_framework_utils.custom_pagination.CustomPageNumberPagination'
 }

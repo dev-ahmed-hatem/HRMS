@@ -1,4 +1,4 @@
-import { useGetDetailedEmployeeQuery } from "@/app/api/endpoints/employees";
+import { useGetEmployeeQuery } from "@/app/api/endpoints/employees";
 import { useParams } from "react-router";
 import Error from "../Error";
 import Loading from "@/components/Loading";
@@ -14,7 +14,7 @@ const EmployeeEdit = () => {
     isFetching,
     isError,
     error: employeeError,
-  } = useGetDetailedEmployeeQuery(emp_id);
+  } = useGetEmployeeQuery({ id: emp_id, format: "form_data" });
 
   if (isFetching) return <Loading />;
   if (isError) {
@@ -25,7 +25,7 @@ const EmployeeEdit = () => {
 
     return <Error subtitle={error_title} reload={error_title === undefined} />;
   }
-  return <EmployeeForm initialValues={employeeData} />;
+  return <EmployeeForm initialValues={employeeData} employeeId={emp_id} />;
 };
 
 export default EmployeeEdit;

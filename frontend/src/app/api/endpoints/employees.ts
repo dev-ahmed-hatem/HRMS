@@ -25,12 +25,15 @@ export const employeesEndpoints = api.injectEndpoints({
             ]
           : [{ type: "Employee", id: "LIST" }],
     }),
-    getDetailedEmployee: builder.query<Employee, string>({
-      query: (id) => ({
-        url: `/employees/employees/${id}/detailed/`,
+    getEmployee: builder.query<
+      Employee,
+      { id: string; format: "detailed" | "form_data" }
+    >({
+      query: ({ id, format }) => ({
+        url: `/employees/employees/${id}/${format}/`,
         method: "GET",
       }),
-      providesTags: (res, error, arg) => [{ type: "Employee", id: arg }],
+      providesTags: (res, error, arg) => [{ type: "Employee", id: arg.id }],
     }),
     switchEmployeeActive: builder.mutation<{ is_active: boolean }, string>({
       query: (id) => ({
@@ -38,6 +41,33 @@ export const employeesEndpoints = api.injectEndpoints({
         method: "GET",
       }),
       invalidatesTags: [{ type: "Employee", id: "LIST" }],
+    }),
+    addEmployee: builder.mutation<
+      Employee,
+      { data: Partial<Employee>; method?: string; url?: string }
+    >({
+      query: ({ data, method, url }) => ({
+        url: url ? url : `employees/employees/`,
+        method: method ? method : "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        data,
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Invalidate the Employee LIST tag on successful POST
+          dispatch(
+            api.util.invalidateTags([
+              { type: "Employee", id: "LIST" },
+              { type: "Employee", id: arg.data.id },
+            ])
+          );
+        } catch {
+          // Do nothing if the request fails
+        }
+      },
     }),
     deleteEmployee: builder.mutation<void, string>({
       query: (id) => ({
@@ -67,8 +97,9 @@ export const employeesEndpoints = api.injectEndpoints({
 
 export const {
   useGetEmployeesQuery,
-  useGetDetailedEmployeeQuery,
+  useGetEmployeeQuery,
   useSwitchEmployeeActiveMutation,
+  useAddEmployeeMutation,
   useDeleteEmployeeMutation,
   useGetAllDepartmentsQuery,
   useGetPaginatedDepartmentsQuery,

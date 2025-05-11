@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import viewsets, status
-from .serializers import DepartmentSerializer, EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer
+from .serializers import DepartmentSerializer, EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer, \
+    EmployeeFormSerializer
 from .models import Department, Employee
 from rest_framework.decorators import action
 from django.db.models import Q
@@ -36,6 +37,14 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         employee.is_active = not employee.is_active
         employee.save()
         return Response({"is_active": employee.is_active})
+
+    @action(detail=True, methods=['get'])
+    def form_data(self, request, pk=None):
+        employee = Employee.objects.filter(id=pk).first()
+        if not employee:
+            return Response({'error': 'Employee not found'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = EmployeeFormSerializer(employee, context={"request": self.request}).data
+        return Response(serializer)
 
     def get_queryset(self):
         search = self.request.query_params.get('search', None)

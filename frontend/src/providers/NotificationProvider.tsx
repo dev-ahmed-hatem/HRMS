@@ -17,7 +17,9 @@ export const useNotification = (): NotificationInstance => {
 const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [api, contextHolder] = notification.useNotification({placement: "bottomRight"});
+  const [api, contextHolder] = notification.useNotification({
+    placement: "bottomRight",
+  });
   const contextValue = useMemo(() => api, [api]);
 
   return (

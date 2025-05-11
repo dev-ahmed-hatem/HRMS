@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Upload } from "antd";
 import type { GetProp, UploadFile, UploadProps } from "antd";
 import ImgCrop from "antd-img-crop";
@@ -10,13 +10,6 @@ const UploadImage: React.FC<{ setFile: Function }> = ({
 }: {
   setFile: Function;
 }) => {
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
-
-  const onChange: UploadProps["onChange"] = ({ fileList }) => {
-    if (setFile) setFile(fileList[0]);
-    setFileList(fileList);
-  };
-
   const onPreview = async (file: UploadFile) => {
     let src = file.url as string;
     if (!src) {
@@ -35,11 +28,13 @@ const UploadImage: React.FC<{ setFile: Function }> = ({
   return (
     <ImgCrop rotationSlider modalTitle="قص الصورة">
       <Upload
+        accept="image/png, image/gif, image/jpeg, image/jpg"
         listType="picture-circle"
-        fileList={fileList}
-        onChange={onChange}
         onPreview={onPreview}
-        beforeUpload={() => false}
+        beforeUpload={(file) => {
+          if (file && setFile) setFile(file);
+          return false;
+        }}
         maxCount={1}
       >
         تحميل صورة

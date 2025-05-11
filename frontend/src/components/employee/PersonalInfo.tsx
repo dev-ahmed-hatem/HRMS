@@ -29,7 +29,7 @@ const PersonalInfo = ({ employee }: { employee: Employee }) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            {employee.cv.split("/").slice(-1)}
+            {decodeURIComponent(employee.cv.split("/").slice(-1)[0])}
           </a>
         ) : (
           <span className="text-red-600">لا يوجد</span>

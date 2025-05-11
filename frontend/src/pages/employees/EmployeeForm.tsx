@@ -10,41 +10,86 @@ import {
   Space,
   Image,
 } from "antd";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { Employee } from "../../types/employee";
-import UploadImage from "../../components/employee/UploadImage";
-import { useState } from "react";
-import { useGetAllDepartmentsQuery } from "@/app/api/endpoints/employees";
+import UploadImage from "@/components/file-handling/UploadImage";
+import { useEffect, useState } from "react";
+import {
+  useAddEmployeeMutation,
+  useGetAllDepartmentsQuery,
+} from "@/app/api/endpoints/employees";
 import Error from "../Error";
 import Loading from "@/components/Loading";
 import { calculateAge } from "@/utils";
+import UploadFile from "@/components/file-handling/UploadFile";
+import { useNotification } from "@/providers/NotificationProvider";
+import { useNavigate } from "react-router";
 
 const { Option } = Select;
 
 type EmployeeFormValues = Omit<Employee, "image" | "cv"> & {
   image?: File | null;
   cv?: File | null;
+  birth_date: Dayjs;
+  hire_date: Dayjs;
 };
 
 const EmployeeForm = ({
   initialValues,
+  employeeId,
   onSubmit,
 }: {
   initialValues?: Employee;
+  employeeId?: string;
   onSubmit?: (values: Employee) => void;
 }) => {
+  const [form] = Form.useForm();
+  const [image, setImage] = useState<File | null>(null);
+  const [cv, setCv] = useState<File | null>(null);
+  const notification = useNotification();
+  const navigate = useNavigate();
+
   const {
     data: departments,
     isFetching,
     isError,
   } = useGetAllDepartmentsQuery();
-  const [form] = Form.useForm();
-  const [image, setImage] = useState<File | null>(null);
+
+  const [
+    addEmployee,
+    { isLoading: adding, isError: notAdded, isSuccess: added },
+  ] = useAddEmployeeMutation();
 
   const handleSubmit = (values: EmployeeFormValues) => {
-    if (image) values.image = image;
-    console.log(dayjs(values.birth_date).format("YYYY-MM-DD"));
+    const data = {
+      ...values,
+      birth_date: values.birth_date.format("YYYY-MM-DD"),
+      hire_date: values.hire_date.format("YYYY-MM-DD"),
+    };
+    if (image) data.image = image;
+    if (cv) data.cv = cv;
+
+    addEmployee({
+      data: data as Employee,
+      method: initialValues ? "PATCH" : "POST",
+      url: employeeId
+        ? `/employees/employees/${employeeId}/`
+        : "/employees/employees/",
+    });
   };
+
+  useEffect(() => {
+    if (notAdded) notification.error({ message: "خطأ في إضافة الموظف!" });
+  }, [notAdded]);
+
+  useEffect(() => {
+    if (added) {
+      notification.success({
+        message: `تم ${initialValues ? "تعديل بيانات" : "إضافة"} الموظف`,
+      });
+      navigate("/employees");
+    }
+  }, [added]);
 
   if (isFetching) return <Loading />;
   if (isError) return <Error />;
@@ -70,7 +115,7 @@ const EmployeeForm = ({
           ...initialValues,
           birth_date: initialValues?.birth_date
             ? dayjs(initialValues.birth_date)
-            : dayjs(1970 - 1 - 1),
+            : dayjs(1980 - 1 - 1),
           hire_date: initialValues?.hire_date
             ? dayjs(initialValues.hire_date)
             : dayjs(),
@@ -110,6 +155,7 @@ const EmployeeForm = ({
                 label="البريد الإلكتروني"
                 rules={[
                   { type: "email", message: "البريد الإلكتروني غير صالح" },
+                  { required: true, message: "يرجى إدخال البريد الالكتروني" },
                 ]}
               >
                 <Input placeholder="example@email.com" />
@@ -119,7 +165,13 @@ const EmployeeForm = ({
               <Form.Item
                 name="phone"
                 label="رقم الهاتف"
-                rules={[{ required: true, message: "يرجى إدخال رقم الهاتف" }]}
+                rules={[
+                  { required: true, message: "يرجى إدخال رقم الهاتف" },
+                  {
+                    pattern: /^\d+$/,
+                    message: "رقم الهاتف يجب أن يحتوي على أرقام فقط",
+                  },
+                ]}
               >
                 <Input placeholder="أدخل رقم الهاتف" />
               </Form.Item>
@@ -131,7 +183,13 @@ const EmployeeForm = ({
               <Form.Item
                 name="national_id"
                 label="الرقم القومي"
-                rules={[{ required: true, message: "يرجى إدخال الرقم القومي" }]}
+                rules={[
+                  { required: true, message: "يرجى إدخال الرقم القومي" },
+                  {
+                    pattern: /^\d+$/,
+                    message: "الرقم القومي يجب أن يحتوي على أرقام فقط",
+                  },
+                ]}
               >
                 <Input placeholder="أدخل الرقم القومي" />
               </Form.Item>
@@ -145,12 +203,19 @@ const EmployeeForm = ({
 
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>
-              <Form.Item name="birth_date" label="تاريخ الميلاد">
+              <Form.Item
+                name="birth_date"
+                label="تاريخ الميلاد"
+                rules={[
+                  { required: true, message: "يرجى إدخال تاريخ الميلاد" },
+                ]}
+              >
                 <DatePicker
                   format="YYYY-MM-DD"
                   className="w-full"
                   placeholder="اختر تاريخ الميلاد"
                   maxDate={dayjs()}
+                  allowClear={false}
                 />
               </Form.Item>
             </Col>
@@ -178,8 +243,11 @@ const EmployeeForm = ({
                 </Select>
               </Form.Item>
             </Col>
+          </Row>
+
+          <Row gutter={[16, 16]}>
             <Col xs={24} md={12} className="flex gap-6 flex-wrap">
-              <Form.Item name="image" label="الصورة">
+              <Form.Item label="الصورة">
                 <UploadImage setFile={setImage} />
               </Form.Item>
               {initialValues && (
@@ -206,6 +274,11 @@ const EmployeeForm = ({
                   )}
                 </>
               )}
+            </Col>
+            <Col xs={24} md={12} className="flex gap-6 flex-wrap">
+              <Form.Item label="السيرة الذاتية">
+                <UploadFile setFile={setCv} />
+              </Form.Item>
             </Col>
           </Row>
         </Card>
@@ -254,12 +327,19 @@ const EmployeeForm = ({
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item name="hire_date" label="تاريخ التوظيف">
+              <Form.Item
+                name="hire_date"
+                label="تاريخ التوظيف"
+                rules={[
+                  { required: true, message: "يرجى إدخال تاريخ الميلاد" },
+                ]}
+              >
                 <DatePicker
                   format="YYYY-MM-DD"
                   className="w-full"
                   placeholder="اختر تاريخ التوظيف"
                   maxDate={dayjs()}
+                  allowClear={false}
                 />
               </Form.Item>
             </Col>
@@ -273,8 +353,8 @@ const EmployeeForm = ({
                 rules={[{ required: true, message: "يرجى تحديد وضع العمل" }]}
               >
                 <Select placeholder="اختر وضع العمل">
-                  <Option value="remote">عن بُعد</Option>
                   <Option value="on-site">من المقر</Option>
+                  <Option value="remote">عن بُعد</Option>
                   <Option value="hybrid">هجين</Option>
                 </Select>
               </Form.Item>
@@ -284,7 +364,12 @@ const EmployeeForm = ({
 
         {/* Submit Button */}
         <Form.Item style={{ textAlign: "center", marginTop: "20px" }}>
-          <Button type="primary" htmlType="submit" size="large">
+          <Button
+            type="primary"
+            htmlType="submit"
+            size="large"
+            loading={adding}
+          >
             {initialValues ? "تحديث البيانات" : "إضافة الموظف"}
           </Button>
         </Form.Item>

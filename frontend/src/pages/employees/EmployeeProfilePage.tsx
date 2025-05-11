@@ -20,7 +20,7 @@ import SalaryHistory from "../../components/employee/SalaryHistory";
 import {
   employeesEndpoints,
   useDeleteEmployeeMutation,
-  useGetDetailedEmployeeQuery,
+  useGetEmployeeQuery,
   useSwitchEmployeeActiveMutation,
 } from "@/app/api/endpoints/employees";
 import { useParams } from "react-router";
@@ -120,7 +120,7 @@ const EmployeeProfilePage: React.FC = () => {
     isFetching,
     isError,
     error: employeeError,
-  } = useGetDetailedEmployeeQuery(emp_id as string);
+  } = useGetEmployeeQuery({ id: emp_id as string, format: "detailed" });
   const [
     switchActive,
     { data: switchRes, isLoading: switching, isError: switchError },
@@ -158,8 +158,8 @@ const EmployeeProfilePage: React.FC = () => {
       if (employee) setIsActive(switchRes.is_active);
       dispatch(
         employeesEndpoints.util.updateQueryData(
-          "getDetailedEmployee",
-          emp_id as string,
+          "getEmployee",
+          { id: emp_id as string, format: "detailed" },
           (draft: Employee) => {
             draft.is_active = switchRes.is_active;
           }

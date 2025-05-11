@@ -18,7 +18,7 @@ SECRET_KEY = 'django-insecure-!9n1vr75qowg1fl3j6te@ukrvd^%)y4_m0vd_sed$olka*mt#3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['kaffohrms.pythonanywhere.com']
+ALLOWED_HOSTS = ['kaffohrms.pythonanywhere.com', '127.0.0.1']
 
 # Application definition
 
@@ -152,10 +152,9 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 ]
 
 # csrf
-CSRF_TRUSTED_ORIGINS = ['http://localhost:5173', ]
-CSRF_COOKIE_NAME = 'csrftoken'
-CSRF_HEADER_NAME = 'X-CSRFToken'
-CSRF_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_SECURE = True
+# CSRF_TRUSTED_ORIGINS = ['http://localhost:5173', 'kaffohrms.pythonanywhere.com']
+# CSRF_COOKIE_NAME = 'csrftoken'
+# CSRF_HEADER_NAME = 'X-CSRFToken'
+# CSRF_COOKIE_SAMESITE = 'Lax'
+# CSRF_COOKIE_SECURE = True
 # CSRF_COOKIE_HTTPONLY = True
-CSRF_COOKIE_DOMAIN = 'localhost'

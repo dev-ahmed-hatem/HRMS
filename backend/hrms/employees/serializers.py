@@ -51,7 +51,6 @@ class EmployeeWriteSerializer(serializers.ModelSerializer):
         return Employee.objects.create(**validated_data, created_by=auth_user)
 
     def update(self, instance: Employee, validated_data):
-        print(validated_data)
         cv = validated_data.pop('cv', None)
         image = validated_data.pop('image', None)
 

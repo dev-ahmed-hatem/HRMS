@@ -77,7 +77,7 @@ class Employee(models.Model):
 
     marital_status = models.CharField(
         max_length=8,
-        choices=(("single", "أعزب"), ("married", "متزوج")),
+        choices=MARITAL_STATUS_CHOICES,
         verbose_name=_("الحالة الاجتماعية")
     )
 
@@ -92,7 +92,7 @@ class Employee(models.Model):
     mode = models.CharField(
         max_length=100,
         choices=(("remote", "عن بُعد"), ("on-site", "من المقر"), ("hybrid", "هجين")),
-        verbose_name=_("نمط العمل")
+        verbose_name=_("وضع العمل")
     )
 
     is_active = models.BooleanField(default=True, verbose_name=_("نشط"))

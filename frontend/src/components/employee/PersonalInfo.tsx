@@ -15,7 +15,7 @@ const PersonalInfo = ({ employee }: { employee: Employee }) => {
       <Descriptions.Item label="تاريخ الميلاد">
         {employee.birth_date}
       </Descriptions.Item>
-      <Descriptions.Item label="رقم الهوية">
+      <Descriptions.Item label="الرقم القومي">
         {employee.national_id}
       </Descriptions.Item>
       <Descriptions.Item label="الحالة الاجتماعية">

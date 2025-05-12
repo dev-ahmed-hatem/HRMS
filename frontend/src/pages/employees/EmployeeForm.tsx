@@ -15,7 +15,7 @@ import { Employee } from "../../types/employee";
 import UploadImage from "@/components/file-handling/UploadImage";
 import { useEffect, useState } from "react";
 import {
-  useAddEmployeeMutation,
+  useEmployeeMutation,
   useGetAllDepartmentsQuery,
 } from "@/app/api/endpoints/employees";
 import Error from "../Error";
@@ -24,6 +24,8 @@ import { calculateAge } from "@/utils";
 import UploadFile from "@/components/file-handling/UploadFile";
 import { useNotification } from "@/providers/NotificationProvider";
 import { useNavigate } from "react-router";
+import { AxiosError } from "axios";
+import { handleServerErrors } from "@/utils/handleForm";
 
 const { Option } = Select;
 
@@ -57,8 +59,13 @@ const EmployeeForm = ({
 
   const [
     addEmployee,
-    { isLoading: adding, isError: notAdded, isSuccess: added },
-  ] = useAddEmployeeMutation();
+    {
+      isLoading: empLoad,
+      isError: empIsError,
+      isSuccess: empDone,
+      error: empError,
+    },
+  ] = useEmployeeMutation();
 
   const handleSubmit = (values: EmployeeFormValues) => {
     const data = {
@@ -79,17 +86,26 @@ const EmployeeForm = ({
   };
 
   useEffect(() => {
-    if (notAdded) notification.error({ message: "خطأ في إضافة الموظف!" });
-  }, [notAdded]);
+    if (empIsError) {
+      const error = empError as AxiosError;
+      if (error.status == 400) {
+        handleServerErrors({
+          errorData: error.response?.data as Record<string, string[]>,
+          form,
+        });
+      }
+      notification.error({ message: "خطأ في إضافة الموظف!" });
+    }
+  }, [empIsError]);
 
   useEffect(() => {
-    if (added) {
+    if (empDone) {
       notification.success({
         message: `تم ${initialValues ? "تعديل بيانات" : "إضافة"} الموظف`,
       });
       navigate("/employees");
     }
-  }, [added]);
+  }, [empDone]);
 
   if (isFetching) return <Loading />;
   if (isError) return <Error />;
@@ -368,7 +384,7 @@ const EmployeeForm = ({
             type="primary"
             htmlType="submit"
             size="large"
-            loading={adding}
+            loading={empLoad}
           >
             {initialValues ? "تحديث البيانات" : "إضافة الموظف"}
           </Button>

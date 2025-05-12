@@ -42,7 +42,7 @@ export const employeesEndpoints = api.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Employee", id: "LIST" }],
     }),
-    addEmployee: builder.mutation<
+    employee: builder.mutation<
       Employee,
       { data: Partial<Employee>; method?: string; url?: string }
     >({
@@ -99,7 +99,7 @@ export const {
   useGetEmployeesQuery,
   useGetEmployeeQuery,
   useSwitchEmployeeActiveMutation,
-  useAddEmployeeMutation,
+  useEmployeeMutation,
   useDeleteEmployeeMutation,
   useGetAllDepartmentsQuery,
   useGetPaginatedDepartmentsQuery,

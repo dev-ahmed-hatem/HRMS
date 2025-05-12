@@ -24,7 +24,7 @@ if not departments:
 # Gender and marital status options
 genders = ["male", "female"]
 gender_display = {"male": "ذكر", "female": "أنثى"}
-marital_statuses = ["أعزب", "متزوج", "مطلق", "أرمل"]
+marital_statuses = ["single", "married", "divorced", "widowed"]
 modes = ["remote", "on-site", "hybrid"]
 
 for i in range(20):

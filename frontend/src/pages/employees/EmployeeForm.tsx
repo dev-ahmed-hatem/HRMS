@@ -24,8 +24,8 @@ import { calculateAge } from "@/utils";
 import UploadFile from "@/components/file-handling/UploadFile";
 import { useNotification } from "@/providers/NotificationProvider";
 import { useNavigate } from "react-router";
-import { AxiosError } from "axios";
 import { handleServerErrors } from "@/utils/handleForm";
+import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 
 const { Option } = Select;
 
@@ -87,13 +87,14 @@ const EmployeeForm = ({
 
   useEffect(() => {
     if (empIsError) {
-      const error = empError as AxiosError;
+      const error = empError as axiosBaseQueryError;
       if (error.status == 400) {
         handleServerErrors({
-          errorData: error.response?.data as Record<string, string[]>,
+          errorData: error.data as Record<string, string[]>,
           form,
         });
       }
+      
       notification.error({ message: "خطأ في إضافة الموظف!" });
     }
   }, [empIsError]);

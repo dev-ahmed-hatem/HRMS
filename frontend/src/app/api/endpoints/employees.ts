@@ -76,6 +76,14 @@ export const employeesEndpoints = api.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Employee", id: "LIST" }],
     }),
+    deleteEmployees: builder.mutation<void, number[]>({
+      query: (data) => ({
+        url: `/employees/multiple-delete/`,
+        method: "DELETE",
+        data,
+      }),
+      invalidatesTags: [{ type: "Employee", id: "LIST" }],
+    }),
     getPaginatedDepartments: builder.query<
       PaginatedResponse<Department>,
       Record<string, any> | void
@@ -101,6 +109,7 @@ export const {
   useSwitchEmployeeActiveMutation,
   useEmployeeMutation,
   useDeleteEmployeeMutation,
+  useDeleteEmployeesMutation,
   useGetAllDepartmentsQuery,
   useGetPaginatedDepartmentsQuery,
 } = employeesEndpoints;

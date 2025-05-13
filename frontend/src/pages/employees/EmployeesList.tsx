@@ -4,10 +4,16 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router";
 import { getInitials } from "../../utils";
 import { tablePaginationConfig } from "../../utils/antd";
-import { useGetEmployeesQuery } from "@/app/api/endpoints/employees";
+import {
+  useDeleteEmployeesMutation,
+  useGetEmployeesQuery,
+} from "@/app/api/endpoints/employees";
 import Loading from "@/components/Loading";
 import Error from "../Error";
 import { ColumnsType } from "antd/es/table";
+import { TableProps } from "antd/lib";
+import SelectedActionsBar from "@/components/SelectedActionBar";
+import { useNotification } from "@/providers/NotificationProvider";
 
 const columns: ColumnsType = [
   {
@@ -63,8 +69,10 @@ const columns: ColumnsType = [
 ];
 
 const EmployeesList = () => {
+  const [selectedList, setSelectedList] = useState<number[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const notification = useNotification();
   const navigate = useNavigate();
 
   // Search Function
@@ -72,15 +80,44 @@ const EmployeesList = () => {
     setSearch(value);
   };
 
+  const [
+    deleteEmployees,
+    { isError: deleteError, isLoading: deleting, isSuccess: deleted },
+  ] = useDeleteEmployeesMutation();
+
   // handling employees
   const { data, isFetching, isError, error, refetch } = useGetEmployeesQuery({
     page,
     search,
   });
 
+  const rowSelection: TableProps["rowSelection"] = {
+    selectedRowKeys: selectedList,
+    onChange(selectedRowKeys, selectedRows, info) {
+      setSelectedList(selectedRows.map((row) => row.id));
+    },
+  };
+
   useEffect(() => {
     refetch();
   }, [search, page]);
+
+  useEffect(() => {
+    if (deleted) {
+      notification.success({
+        message: "تم حذف الموظفين",
+      });
+    }
+    setSelectedList([]);
+  }, [deleted]);
+
+  useEffect(() => {
+    if (deleted) {
+      notification.error({
+        message: "حدث خطأ أثناء حذف الموظفين ! برجاء إعادة المحاولة",
+      });
+    }
+  }, [deleteError]);
 
   if (isFetching) return <Loading />;
   if (isError) return <Error />;
@@ -107,6 +144,18 @@ const EmployeesList = () => {
         </Link>
       </div>
 
+      {/* Selected Action Bar */}
+      <SelectedActionsBar
+        selectedCount={selectedList.length}
+        onConfirmDelete={() => {
+          deleteEmployees(selectedList);
+        }}
+        onClearSelection={() => {
+          setSelectedList([]);
+        }}
+        deleting={deleting}
+      />
+
       {/* Table */}
       <Table
         dataSource={data?.data}
@@ -125,6 +174,7 @@ const EmployeesList = () => {
         bordered
         scroll={{ x: "max-content" }}
         className="clickable-table  calypso-header"
+        rowSelection={rowSelection}
       />
     </>
   );

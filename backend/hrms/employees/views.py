@@ -3,7 +3,7 @@ from rest_framework import viewsets, status
 from .serializers import DepartmentSerializer, EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer, \
     EmployeeFormSerializer
 from .models import Department, Employee
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from django.db.models import Q
 from rest_framework.generics import get_object_or_404
 
@@ -54,3 +54,12 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(Q(name__icontains=search) | Q(employee_id__icontains=search))
 
         return queryset
+
+
+@api_view(["DELETE"])
+def multiple_delete(request):
+    for emp_id in list(request.data):
+        emp = Employee.objects.filter(id=emp_id).first()
+        if emp:
+            emp.delete()
+    return Response()

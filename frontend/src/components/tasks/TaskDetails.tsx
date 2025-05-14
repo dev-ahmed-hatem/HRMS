@@ -30,7 +30,7 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
           {task.dueDate}
         </Descriptions.Item>
         <Descriptions.Item label="فريق العمل">
-          {task.assignedTo}
+          {task.assigned_to}
         </Descriptions.Item>
         <Descriptions.Item label="الحالة">
           <Tag color={statusColors[task.status]}>{task.status}</Tag>

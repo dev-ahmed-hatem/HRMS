@@ -1,4 +1,4 @@
-import { Input, Table, Tag } from "antd";
+import { Input, Space, Table, Tag } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
@@ -17,7 +17,7 @@ const sampleTasks: Task[] = [
     status: "مكتمل",
     priority: "مرتفع",
     dueDate: "2024-02-10",
-    assignedTo: "أحمد علي",
+    assigned_to: "أحمد علي",
     project: { id: "P001", name: "مشروع تطوير الموقع" },
   },
   {
@@ -28,7 +28,7 @@ const sampleTasks: Task[] = [
     status: "متأخر",
     priority: "مرتفع",
     dueDate: "2024-03-15",
-    assignedTo: "خالد إبراهيم",
+    assigned_to: "خالد إبراهيم",
     project: { id: "P001", name: "مشروع تطوير الموقع" },
   },
   {
@@ -39,7 +39,7 @@ const sampleTasks: Task[] = [
     status: "غير مكتمل",
     priority: "متوسط",
     dueDate: "2024-04-20",
-    assignedTo: "سارة محمد",
+    assigned_to: "سارة محمد",
     project: null, // Task is not associated with any project
   },
   {
@@ -50,7 +50,7 @@ const sampleTasks: Task[] = [
     status: "غير مكتمل",
     priority: "منخفض",
     dueDate: "2024-05-30",
-    assignedTo: "ليلى سمير",
+    assigned_to: "ليلى سمير",
     project: { id: "P002", name: "تحليل بيانات السوق" },
   },
 ];
@@ -70,8 +70,8 @@ const TasksPage = () => {
   // Status & Priority Color Mapping
   const statusColors: Record<Task["status"], string> = {
     مكتمل: "green",
-    "غير مكتمل": "red",
-    متأخر: "gold",
+    "غير مكتمل": "gold",
+    متأخر: "red",
   };
 
   const priorityColors: Record<Task["priority"], string> = {
@@ -82,15 +82,17 @@ const TasksPage = () => {
 
   const columns: ColumnsType<Task> = [
     {
-      title: "رقم المهمة",
-      dataIndex: "id",
-      key: "id",
-      width: 100,
-    },
-    {
       title: "اسم المهمة",
       dataIndex: "title",
       key: "title",
+      render: (value, record) => (
+        <Space>
+          <span className="flex flex-col">
+            <div className="name text-base">{value}</div>
+            <div className="id text-xs text-gray-400">#{record.id}</div>
+          </span>
+        </Space>
+      ),
     },
     {
       title: "الحالة",

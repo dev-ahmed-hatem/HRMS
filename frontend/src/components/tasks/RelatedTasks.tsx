@@ -19,7 +19,7 @@ const sampleTasks: Task[] = [
     status: "مكتمل",
     priority: "مرتفع",
     dueDate: "2024-02-10",
-    assignedTo: "أحمد علي",
+    assigned_to: "أحمد علي",
     project: { id: "P001", name: "تطوير نظام إدارة الموارد" },
   },
   {
@@ -30,7 +30,7 @@ const sampleTasks: Task[] = [
     status: "متأخر",
     priority: "مرتفع",
     dueDate: "2024-03-15",
-    assignedTo: "خالد إبراهيم",
+    assigned_to: "خالد إبراهيم",
     project: { id: "P001", name: "تطوير نظام إدارة الموارد" },
   },
   {
@@ -41,7 +41,7 @@ const sampleTasks: Task[] = [
     status: "غير مكتمل",
     priority: "متوسط",
     dueDate: "2024-04-20",
-    assignedTo: "سارة محمد",
+    assigned_to: "سارة محمد",
     project: { id: "P002", name: "نظام تتبع المخزون" },
   },
 ];

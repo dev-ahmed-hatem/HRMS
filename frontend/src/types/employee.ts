@@ -36,3 +36,9 @@ export type Employee = {
 
   salaryHistory: { date: string; baseSalary: number; bonuses: number }[];
 };
+
+export interface AssignedEmployee {
+  id: number | string;
+  name: string;
+  [key: string]: any;
+}

@@ -31,7 +31,7 @@ const tasks: Task[] = [
     status: "مكتمل",
     priority: "مرتفع",
     dueDate: "2024-02-10",
-    assignedTo: "أحمد علي",
+    assigned_to: "أحمد علي",
   },
   {
     id: 2,
@@ -41,7 +41,7 @@ const tasks: Task[] = [
     status: "متأخر",
     priority: "مرتفع",
     dueDate: "2024-03-15",
-    assignedTo: "خالد إبراهيم",
+    assigned_to: "خالد إبراهيم",
   },
   {
     id: 3,
@@ -51,7 +51,7 @@ const tasks: Task[] = [
     status: "غير مكتمل",
     priority: "متوسط",
     dueDate: "2024-04-20",
-    assignedTo: "سارة محمد",
+    assigned_to: "سارة محمد",
   },
   {
     id: 4,
@@ -61,7 +61,7 @@ const tasks: Task[] = [
     status: "غير مكتمل",
     priority: "منخفض",
     dueDate: "2024-05-30",
-    assignedTo: "يوسف عبد الله",
+    assigned_to: "يوسف عبد الله",
   },
 ];
 

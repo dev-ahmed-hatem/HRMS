@@ -3,6 +3,13 @@ from hrms.utils import calculate_age
 from users.models import User
 from django.utils.translation import gettext_lazy as _
 
+MARITAL_STATUS_CHOICES = [
+    ("single", _("أعزب")),
+    ("married", _("متزوج")),
+    ("divorced", _("مطلق")),
+    ("widowed", _("أرمل")),
+]
+
 
 class Department(models.Model):
     name = models.CharField(max_length=100)
@@ -12,13 +19,6 @@ class Department(models.Model):
 
 
 class Employee(models.Model):
-    MARITAL_STATUS_CHOICES = [
-        ("single", "أعزب"),
-        ("married", "متزوج"),
-        ("divorced", "مطلق"),
-        ("widowed", "أرمل"),
-    ]
-
     name = models.CharField(max_length=100, verbose_name=_("الاسم"))
 
     department = models.ForeignKey(
@@ -29,7 +29,7 @@ class Employee(models.Model):
 
     gender = models.CharField(
         max_length=6,
-        choices=(("male", "ذكر"), ("female", "أنثى")),
+        choices=(("male", _("ذكر")), ("female", _("أنثى"))),
         verbose_name=_("الجنس")
     )
 

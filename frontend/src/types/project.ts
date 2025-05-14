@@ -1,13 +1,15 @@
+import { AssignedEmployee } from "./employee";
+
 export type Project = {
-  projectID: string;
+  project_id: string;
   id: string;
   name: string;
   status: "قيد التنفيذ" | "مكتمل" | "قيد الموافقة" | "متوقف";
-  startDate: string;
-  endDate: string;
-  assignedTeam: string;
+  start_date: string;
+  end_date: string;
+  assigned_team: string;
   client: string;
-  teamMembers: string[];
+  team_members: AssignedEmployee[];
   budget: number;
   description: string;
 };

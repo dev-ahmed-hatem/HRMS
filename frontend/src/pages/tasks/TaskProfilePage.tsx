@@ -15,8 +15,8 @@ const task: Task = {
   status: "مكتمل",
   priority: "مرتفع",
   dueDate: "2024-02-10",
-  assignedTo: "أحمد علي",
-  project: { id: "P001", name: "تطوير نظام إدارة الموارد" }, // Task is linked to a project
+  assigned_to: "أحمد علي",
+  project: { id: "P001", name: "تطوير نظام إدارة الموارد" },
 };
 
 const TaskProfilePage: React.FC = () => {

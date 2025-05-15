@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Department, Employee
 from hrms.utils import calculate_age
+from django.conf import settings
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -16,10 +17,14 @@ class EmployeeReadSerializer(serializers.ModelSerializer):
     marital_status = serializers.CharField(read_only=True, source='get_marital_status_display')
     mode = serializers.CharField(read_only=True, source='get_mode_display')
     created_by = serializers.CharField(read_only=True, source='created_by.name')
+    created_at = serializers.SerializerMethodField()
 
     class Meta:
         model = Employee
         fields = '__all__'
+
+    def get_created_at(self, obj: Employee) -> str:
+        return obj.created_at.astimezone(settings.CAIRO_TZ).strftime('%Y-%m-%d')
 
 
 class EmployeeListSerializer(serializers.ModelSerializer):

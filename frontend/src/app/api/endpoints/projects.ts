@@ -20,9 +20,32 @@ const projectsEndpoints = api.injectEndpoints({
         url: `/projects/projects/?${qs.stringify(params || {})}`,
         method: "GET",
       }),
+      providesTags: (result) =>
+        result?.data
+          ? [
+              ...result.data.map((project) => ({
+                type: "Project" as const,
+                id: project.id,
+              })),
+              { type: "Project", id: "LIST" },
+            ]
+          : [{ type: "Project", id: "LIST" }],
+    }),
+    getProject: builder.query<
+      Project,
+      { id: string; format: "detailed" | "form_data" }
+    >({
+      query: ({ id, format }) => ({
+        url: `/projects/projects/${id}/${format}/`,
+        method: "GET",
+      }),
+      providesTags: (res, error, arg) => [{ type: "Project", id: arg.id }],
     }),
   }),
 });
 
-export const { useGetProjectsStatsQuery, useGetProjectsQuery } =
-  projectsEndpoints;
+export const {
+  useGetProjectsStatsQuery,
+  useGetProjectsQuery,
+  useGetProjectQuery,
+} = projectsEndpoints;

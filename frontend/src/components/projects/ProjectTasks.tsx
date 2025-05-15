@@ -17,11 +17,11 @@ const ProjectTasks = ({ tasks }: { tasks: Task[] }) => {
     if (filterStatus) {
       filtered = filtered.filter((task) => task.status === filterStatus);
     }
-    if (filterDepartment) {
-      filtered = filtered.filter(
-        (task) => task.department === filterDepartment
-      );
-    }
+    // if (filterDepartment) {
+    //   filtered = filtered.filter(
+    //     (task) => task.department === filterDepartment
+    //   );
+    // }
     setFilteredTasks(filtered);
   };
 

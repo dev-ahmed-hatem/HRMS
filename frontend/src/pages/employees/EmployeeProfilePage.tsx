@@ -237,37 +237,52 @@ const EmployeeProfilePage: React.FC = () => {
           <DefaultTabBar {...props} className="md:ps-2" />
         )}
         className="mt-4"
-        items={items(employee!)}
         direction="rtl"
+        items={items(employee!)}
       />
 
-      {/* Action Button */}
-      <div className="flex md:justify-end mt-4 flex-wrap gap-4">
-        <Button
-          type="primary"
-          icon={<EditOutlined />}
-          onClick={() => {
-            navigate(`/employees/edit/${emp_id}`);
-          }}
-        >
-          تعديل البيانات
-        </Button>
-        <Popconfirm
-          title="هل أنت متأكد من حذف هذا الموظف؟"
-          onConfirm={handleDelete}
-          okText="نعم"
-          cancelText="لا"
-        >
+      <div className="flex justify-between mt-2 flex-wrap gap-2">
+        {/* Meta Data */}
+        <div className="flex gap-1 flex-col text-sm">
+          <div>
+            <span className="font-medium text-gray-700" dir="rtl">
+              تاريخ الإضافة:{" "}
+            </span>
+            {employee!.created_at}
+          </div>
+          <div>
+            <span className="font-medium text-gray-700">بواسطة: </span>
+            {employee!.created_by || "غير مسجل"}
+          </div>
+        </div>
+
+        {/* Action Button */}
+        <div className="btn-wrapper flex md:justify-end mt-4 flex-wrap gap-4">
           <Button
-            className="enabled:bg-red-500 enabled:border-red-500 enabled:shadow-[0_2px_0_rgba(0,58,58,0.31)]
-          enabled:hover:border-red-400 enabled:hover:bg-red-400 enabled:text-white"
-            icon={<DeleteOutlined />}
-            loading={deleting}
+            type="primary"
+            icon={<EditOutlined />}
+            onClick={() => {
+              navigate(`/employees/edit/${emp_id}`);
+            }}
           >
-            حذف الموظف
+            تعديل البيانات
           </Button>
-        </Popconfirm>
-        ,
+          <Popconfirm
+            title="هل أنت متأكد من حذف هذا الموظف؟"
+            onConfirm={handleDelete}
+            okText="نعم"
+            cancelText="لا"
+          >
+            <Button
+              className="enabled:bg-red-500 enabled:border-red-500 enabled:shadow-[0_2px_0_rgba(0,58,58,0.31)]
+            enabled:hover:border-red-400 enabled:hover:bg-red-400 enabled:text-white"
+              icon={<DeleteOutlined />}
+              loading={deleting}
+            >
+              حذف الموظف
+            </Button>
+          </Popconfirm>
+        </div>
       </div>
     </>
   );

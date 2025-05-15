@@ -1,12 +1,13 @@
 from datetime import datetime
 
 from django.conf import settings
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from .models import Project, Task
-from .serializers import ProjectListSerializer, ProjectWriteSerializer
+from .serializers import ProjectListSerializer, ProjectWriteSerializer, ProjectReadSerializer
 from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -38,6 +39,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 queryset = queryset.filter(normal_status_filter).exclude(overdue_filter)
 
         return queryset
+
+    @action(detail=True, methods=["get"])
+    def detailed(self, request, pk=None):
+        project = Project.objects.filter(pk=pk).first()
+        if not project:
+            return Response({"detail": _("مشروع غير موجود")}, status=status.HTTP_404_NOT_FOUND)
+        serializer = ProjectReadSerializer(project, context={"request": request}).data
+        return Response(serializer, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])

@@ -28,7 +28,6 @@ PRIORITY_CHOICES = [
 
 class AbstractBaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("تاريخ الإنشاء"))
-    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("تاريخ التحديث"))
     created_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,

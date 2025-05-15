@@ -3,7 +3,6 @@ import { AssignedEmployee } from "./employee";
 export type ProjectStatus = "قيد التنفيذ" | "مكتمل" | "قيد الموافقة" | "متوقف";
 
 export type Project = {
-  project_id: string;
   id: string;
   name: string;
   status: ProjectStatus;
@@ -13,6 +12,8 @@ export type Project = {
   supervisors?: AssignedEmployee[];
   budget: number;
   description: string;
+  created_at: string;
+  created_by: string;
 };
 
 export type ProjectStats = {

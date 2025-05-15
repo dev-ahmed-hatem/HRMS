@@ -13,6 +13,6 @@ export interface Task {
   status: TaskStatus;
   priority: TaskPriority;
   dueDate: string;
-  assigned_to: AssignedEmployee;
+  assigned_to: AssignedEmployee[];
   project?: Project | null;
 }

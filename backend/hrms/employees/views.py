@@ -5,7 +5,7 @@ from .serializers import DepartmentSerializer, EmployeeReadSerializer, EmployeeW
 from .models import Department, Employee
 from rest_framework.decorators import action, api_view
 from django.db.models import Q
-from rest_framework.generics import get_object_or_404
+from django.utils.translation import gettext_lazy as _
 
 
 class DepartmentViewSet(viewsets.ModelViewSet):
@@ -21,31 +21,6 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             return EmployeeWriteSerializer
         return EmployeeListSerializer
 
-    @action(detail=True, methods=['get'])
-    def detailed(self, request, pk=None):
-        employee = get_object_or_404(Employee, pk=pk)
-        if not employee:
-            raise Employee.DoesNotExist
-        data = EmployeeReadSerializer(employee, context={"request": self.request}).data
-        return Response(data)
-
-    @action(detail=True, methods=['get'])
-    def switch_active(self, request, pk=None):
-        employee = Employee.objects.filter(id=pk).first()
-        if not employee:
-            return Response({'error': 'Employee not found'}, status=status.HTTP_404_NOT_FOUND)
-        employee.is_active = not employee.is_active
-        employee.save()
-        return Response({"is_active": employee.is_active})
-
-    @action(detail=True, methods=['get'])
-    def form_data(self, request, pk=None):
-        employee = Employee.objects.filter(id=pk).first()
-        if not employee:
-            return Response({'error': 'Employee not found'}, status=status.HTTP_404_NOT_FOUND)
-        serializer = EmployeeFormSerializer(employee, context={"request": self.request}).data
-        return Response(serializer)
-
     def get_queryset(self):
         search = self.request.query_params.get('search', None)
         queryset = Employee.objects.all()
@@ -54,6 +29,31 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(Q(name__icontains=search) | Q(employee_id__icontains=search))
 
         return queryset
+
+    @action(detail=True, methods=['get'])
+    def detailed(self, request, pk=None):
+        employee = Employee.objects.filter(id=pk).first()
+        if not employee:
+            return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
+        data = EmployeeReadSerializer(employee, context={"request": self.request}).data
+        return Response(data)
+
+    @action(detail=True, methods=['get'])
+    def switch_active(self, request, pk=None):
+        employee = Employee.objects.filter(id=pk).first()
+        if not employee:
+            return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
+        employee.is_active = not employee.is_active
+        employee.save()
+        return Response({"is_active": employee.is_active})
+
+    @action(detail=True, methods=['get'])
+    def form_data(self, request, pk=None):
+        employee = Employee.objects.filter(id=pk).first()
+        if not employee:
+            return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
+        serializer = EmployeeFormSerializer(employee, context={"request": self.request}).data
+        return Response(serializer)
 
 
 @api_view(["DELETE"])

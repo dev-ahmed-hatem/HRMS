@@ -1,8 +1,13 @@
+import datetime
+
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from users.models import User
 
 PROJECT_STATUS_CHOICES = [
-    ('in-progress', _('قيد التنفيذ')),
+    ('ongoing', _('قيد التنفيذ')),
     ('completed', _('مكتمل')),
     ('pending-approval', _('قيد الموافقة')),
     ('paused', _('متوقف')),
@@ -21,7 +26,22 @@ PRIORITY_CHOICES = [
 ]
 
 
-class Project(models.Model):
+class AbstractBaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("تاريخ الإنشاء"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("تاريخ التحديث"))
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_("أنشئ بواسطة"),
+    )
+
+    class Meta:
+        abstract = True
+
+
+class Project(AbstractBaseModel):
     name = models.CharField(
         max_length=255,
         verbose_name=_("اسم المشروع"),
@@ -35,6 +55,7 @@ class Project(models.Model):
         choices=PROJECT_STATUS_CHOICES,
         default='pending-approval',
         verbose_name=_("الحالة"),
+        db_index=True,
     )
     start_date = models.DateField(
         verbose_name=_("تاريخ البدء"),
@@ -44,24 +65,17 @@ class Project(models.Model):
         verbose_name=_("تاريخ الانتهاء"),
         error_messages={'invalid': _("يرجى إدخال تاريخ صالح.")},
     )
-    assigned_team = models.ForeignKey(
+    supervisors = models.ManyToManyField(
         'employees.Employee',
-        on_delete=models.SET_NULL,
-        null=True,
+        related_name='supervised_projects',
+        verbose_name=_("المشرفون"),
         blank=True,
-        verbose_name=_("الفريق المسؤول"),
     )
     client = models.CharField(
         max_length=100,
         null=True,
         blank=True,
         verbose_name=_("العميل"),
-    )
-    team_members = models.ManyToManyField(
-        'employees.Employee',
-        related_name='projects',
-        verbose_name=_("أعضاء الفريق"),
-        blank=True,
     )
     budget = models.DecimalField(
         max_digits=12,
@@ -77,6 +91,10 @@ class Project(models.Model):
         null=True,
     )
 
+    def clean(self):
+        if self.end_date and self.start_date and self.end_date < self.start_date:
+            raise ValidationError(_("تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء."))
+
     class Meta:
         verbose_name = _("مشروع")
         verbose_name_plural = _("المشاريع")
@@ -85,7 +103,7 @@ class Project(models.Model):
         return self.name
 
 
-class Task(models.Model):
+class Task(AbstractBaseModel):
     title = models.CharField(
         max_length=255,
         verbose_name=_("عنوان المهمة"),
@@ -99,36 +117,39 @@ class Task(models.Model):
         null=True,
         verbose_name=_("الوصف"),
     )
-    department = models.CharField(
-        max_length=100,
-        verbose_name=_("القسم"),
+    departments = models.ManyToManyField(
+        'employees.Department',
+        verbose_name=_("الأقسام"),
     )
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default="incomplete",
         verbose_name=_("الحالة"),
+        db_index=True
     )
     priority = models.CharField(
         max_length=20,
         choices=PRIORITY_CHOICES,
         default="low",
         verbose_name=_("الأولوية"),
+        db_index=True
     )
     due_date = models.DateField(
         verbose_name=_("تاريخ الاستحقاق"),
         error_messages={
             'invalid': _("يرجى إدخال تاريخ صالح."),
         },
+        validators=[MinValueValidator(datetime.date.today())],
     )
     assigned_to = models.ManyToManyField(
         'employees.Employee',
         related_name="tasks",
-        verbose_name=_("الموظف المكلّف"),
+        verbose_name=_("الموظفين المكلّف"),
     )
     project = models.ForeignKey(
         'projects.Project',
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
         related_name="tasks",

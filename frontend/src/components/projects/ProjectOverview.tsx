@@ -4,25 +4,30 @@ import {
   CheckCircleOutlined,
   HourglassOutlined,
   SyncOutlined,
+  ExclamationCircleOutlined,
+  PauseCircleOutlined,
 } from "@ant-design/icons";
+import { ProjectStats } from "@/types/project";
 
-const ProjectsOverview = () => {
-  const totalProjects = 120;
-  const ongoingProjects = 45;
-  const completedProjects = 60;
-  const pendingApproval = 15;
-
+const ProjectsOverview = ({
+  total,
+  ongoing,
+  completed,
+  pending_approval,
+  paused,
+  overdue,
+}: ProjectStats) => {
   return (
     <Card className="shadow-lg rounded-lg">
-      <Row gutter={[16, 16]}>
+      <Row gutter={[8, 8]}>
         {/* Total Projects Section */}
-        <Col xs={24} md={6}>
+        <Col xs={24} sm={12} md={8}>
           <Card className="bg-calypso-800 text-white">
             <Statistic
               title={
                 <span className="text-white text-base">إجمالي المشاريع</span>
               }
-              value={totalProjects}
+              value={total}
               valueStyle={{ color: "#fff" }}
               prefix={<ProjectOutlined />}
             />
@@ -30,11 +35,11 @@ const ProjectsOverview = () => {
         </Col>
 
         {/* Ongoing Projects */}
-        <Col xs={24} sm={12} md={6}>
+        <Col xs={24} sm={12} md={8}>
           <Card className="border border-gray-200">
             <Statistic
               title="المشاريع الجارية"
-              value={ongoingProjects}
+              value={ongoing}
               valueStyle={{ color: "#1890ff" }}
               prefix={<SyncOutlined />}
             />
@@ -42,11 +47,11 @@ const ProjectsOverview = () => {
         </Col>
 
         {/* Completed Projects */}
-        <Col xs={24} sm={12} md={6}>
+        <Col xs={24} sm={12} md={8}>
           <Card className="border border-gray-200">
             <Statistic
               title="المشاريع المكتملة"
-              value={completedProjects}
+              value={completed}
               valueStyle={{ color: "#52c41a" }}
               prefix={<CheckCircleOutlined />}
             />
@@ -54,13 +59,37 @@ const ProjectsOverview = () => {
         </Col>
 
         {/* Pending Approval */}
-        <Col xs={24} sm={12} md={6}>
+        <Col xs={24} sm={12} md={8}>
           <Card className="border border-gray-200">
             <Statistic
               title="قيد الموافقة"
-              value={pendingApproval}
+              value={pending_approval}
               valueStyle={{ color: "#faad14" }}
               prefix={<HourglassOutlined />}
+            />
+          </Card>
+        </Col>
+
+        {/* Paused Projects */}
+        <Col xs={24} sm={12} md={8}>
+          <Card className="border border-gray-200">
+            <Statistic
+              title="المشاريع الموقوفة"
+              value={paused}
+              valueStyle={{ color: "#8c8c8c" }}
+              prefix={<PauseCircleOutlined />}
+            />
+          </Card>
+        </Col>
+
+        {/* Overdue Projects */}
+        <Col xs={24} sm={12} md={8}>
+          <Card className="border border-gray-200">
+            <Statistic
+              title="المشاريع المتأخرة"
+              value={overdue}
+              valueStyle={{ color: "#f5222d" }}
+              prefix={<ExclamationCircleOutlined />}
             />
           </Card>
         </Col>

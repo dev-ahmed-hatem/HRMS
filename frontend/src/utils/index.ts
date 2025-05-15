@@ -14,7 +14,18 @@ export const calculateAge = (dateString: string) => {
   var age = today.getFullYear() - birthDate.getFullYear();
   var m = today.getMonth() - birthDate.getMonth();
   if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
+    age--;
   }
   return age;
-}
+};
+
+// check date
+export const isOverdue = (date: string) => {
+  const dueDate = new Date(date);
+  const today = new Date();
+
+  dueDate.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+
+  return today > dueDate;
+};

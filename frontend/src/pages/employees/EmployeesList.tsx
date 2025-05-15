@@ -86,14 +86,14 @@ const EmployeesList = () => {
   ] = useDeleteEmployeesMutation();
 
   // handling employees
-  const { data, isFetching, isError, error, refetch } = useGetEmployeesQuery({
+  const { data, isFetching, isError, refetch } = useGetEmployeesQuery({
     page,
     search,
   });
 
   const rowSelection: TableProps["rowSelection"] = {
     selectedRowKeys: selectedList,
-    onChange(selectedRowKeys, selectedRows, info) {
+    onChange(selectedRowKeys, selectedRows) {
       setSelectedList(selectedRows.map((row) => row.id));
     },
   };

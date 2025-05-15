@@ -1,13 +1,14 @@
 import Base from "@/pages/Base";
-import EmployeesPage from "@/pages/employees/EmployeesPage";
 import Error from "@/pages/Error";
+import SectionView from "@/pages/SectionView";
+import EmployeesList from "@/pages/employees/EmployeesList";
+import ProjectsList from "@/pages/projects/ProjectsList";
 import { FaUser, FaCalendarCheck, FaMoneyBill, FaFile } from "react-icons/fa";
 import { FaDiagramProject, FaCalendarDays } from "react-icons/fa6";
 import { GiReceiveMoney, GiPayMoney, GiMoneyStack } from "react-icons/gi";
 import { LuNotebookPen } from "react-icons/lu";
 import { MdAssignment } from "react-icons/md";
 import { RouteObject } from "react-router";
-import ProjectsPage from "@/pages/projects/ProjectsPage";
 import TasksPage from "@/pages/tasks/TasksPage";
 import AttendancePage from "@/pages/AttendancePage";
 import FinancialsPage from "@/pages/financials/FinancialsPage";
@@ -38,13 +39,22 @@ export const appRoutes: AppRoute[] = [
     children: [
       {
         path: "employees",
-        element: <EmployeesPage />,
+        element: (
+          <SectionView
+            parentComponent={<EmployeesList />}
+            parentUrl="/employees"
+          />
+        ),
         icon: <FaUser />,
         label: "الموظفين",
       },
       {
         path: "projects",
-        element: <ProjectsPage />,
+        element: (
+          <SectionView
+            parentComponent={<ProjectsList />}
+            parentUrl="/projects"
+          />),
         icon: <FaDiagramProject />,
         label: "المشاريع",
       },

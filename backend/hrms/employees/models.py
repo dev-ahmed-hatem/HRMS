@@ -14,6 +14,10 @@ MARITAL_STATUS_CHOICES = [
 class Department(models.Model):
     name = models.CharField(max_length=100)
 
+    class Meta:
+        verbose_name = _("القسم")
+        verbose_name_plural = _("الأقسام")
+
     def __str__(self):
         return self.name
 

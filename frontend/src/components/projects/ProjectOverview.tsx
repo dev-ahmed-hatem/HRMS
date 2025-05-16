@@ -84,11 +84,17 @@ const ProjectsOverview = ({
 
         {/* Overdue Projects */}
         <Col xs={24} sm={12} md={8}>
-          <Card className="border border-gray-200">
+          <Card
+            className={`border border-gray-200 ${overdue > 0 && "bg-red-600"}`}
+          >
             <Statistic
-              title="المشاريع المتأخرة"
+              title={
+                <span className={`${overdue > 0 && "text-white"}`}>
+                  المشاريع المتأخرة
+                </span>
+              }
               value={overdue}
-              valueStyle={{ color: "#f5222d" }}
+              valueStyle={{ color: overdue > 0 ? "#fff" : "#f5222d" }}
               prefix={<ExclamationCircleOutlined />}
             />
           </Card>

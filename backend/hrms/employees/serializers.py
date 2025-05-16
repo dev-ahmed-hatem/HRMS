@@ -40,12 +40,6 @@ class EmployeeListSerializer(serializers.ModelSerializer):
         return 5
 
 
-class EmployeeFormSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Employee
-        fields = '__all__'
-
-
 class EmployeeWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee

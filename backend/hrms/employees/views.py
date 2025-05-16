@@ -1,7 +1,6 @@
 from rest_framework.response import Response
 from rest_framework import viewsets, status
-from .serializers import DepartmentSerializer, EmployeeReadSerializer, EmployeeWriteSerializer, \
-    EmployeeListSerializer, EmployeeFormSerializer
+from .serializers import DepartmentSerializer, EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer
 from .models import Department, Employee
 from rest_framework.decorators import action, api_view
 from django.db.models import Q
@@ -52,7 +51,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         employee = Employee.objects.filter(id=pk).first()
         if not employee:
             return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
-        serializer = EmployeeFormSerializer(employee, context={"request": self.request}).data
+        serializer = EmployeeWriteSerializer(employee, context={"request": self.request}).data
         return Response(serializer)
 
 

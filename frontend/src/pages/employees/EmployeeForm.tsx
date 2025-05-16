@@ -60,6 +60,7 @@ const EmployeeForm = ({
   const [
     addEmployee,
     {
+      data: empData,
       isLoading: empLoad,
       isError: empIsError,
       isSuccess: empDone,
@@ -94,7 +95,7 @@ const EmployeeForm = ({
           form,
         });
       }
-      
+
       notification.error({ message: "خطأ في إضافة الموظف!" });
     }
   }, [empIsError]);
@@ -104,7 +105,11 @@ const EmployeeForm = ({
       notification.success({
         message: `تم ${initialValues ? "تعديل بيانات" : "إضافة"} الموظف`,
       });
-      navigate("/employees");
+      navigate(
+        `/employees/employee-profile/${
+          initialValues ? initialValues.id : empData.id
+        }`
+      );
     }
   }, [empDone]);
 

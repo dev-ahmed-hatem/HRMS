@@ -27,7 +27,7 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
         <Descriptions.Item label="الوصف">{task.description}</Descriptions.Item>
         <Descriptions.Item label="القسم">{task.department}</Descriptions.Item>
         <Descriptions.Item label="الموعد النهائي">
-          {task.dueDate}
+          {task.due_date}
         </Descriptions.Item>
         <Descriptions.Item label="فريق العمل">
           {task.assigned_to}

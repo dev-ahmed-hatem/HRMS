@@ -14,7 +14,7 @@ const task: Task = {
   department: "تحليل",
   status: "مكتمل",
   priority: "مرتفع",
-  dueDate: "2024-02-10",
+  due_date: "2024-02-10",
   assigned_to: "أحمد علي",
   project: { id: "P001", name: "تطوير نظام إدارة الموارد" },
 };
@@ -72,7 +72,7 @@ const TaskProfilePage: React.FC = () => {
             {task.project ? (
               <Link
                 to={`/projects/project/${task.project.id}`}
-                className="text-blue-600 hover:underline hover:text-blue-700"
+                className="text-blue-700 hover:underline hover:text-blue-500"
               >
                 مرتبط بـ {task.project.name}
               </Link>

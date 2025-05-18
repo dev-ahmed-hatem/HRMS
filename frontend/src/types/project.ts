@@ -16,11 +16,17 @@ export type Project = {
   created_by: string;
 };
 
-export type ProjectStats = {
+export type ProjectsStats = {
   total: number;
   ongoing: number;
   completed: number;
   pending_approval: number;
   overdue: number;
   paused: number;
+};
+
+export type AssignedProject = {
+  name: string;
+  id: number | string;
+  [key: string]: any;
 };

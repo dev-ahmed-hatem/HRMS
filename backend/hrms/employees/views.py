@@ -31,20 +31,22 @@ class EmployeeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'])
     def detailed(self, request, pk=None):
-        employee = Employee.objects.filter(id=pk).first()
-        if not employee:
+        try:
+            employee = Employee.objects.get(pk=pk)
+            data = EmployeeReadSerializer(employee, context={"request": self.request}).data
+            return Response(data)
+        except Exception:
             return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
-        data = EmployeeReadSerializer(employee, context={"request": self.request}).data
-        return Response(data)
 
     @action(detail=True, methods=['get'])
     def switch_active(self, request, pk=None):
-        employee = Employee.objects.filter(id=pk).first()
-        if not employee:
+        try:
+            employee = Employee.objects.get(pk=pk)
+            employee.is_active = not employee.is_active
+            employee.save()
+            return Response({"is_active": employee.is_active})
+        except Exception:
             return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
-        employee.is_active = not employee.is_active
-        employee.save()
-        return Response({"is_active": employee.is_active})
 
     @action(detail=True, methods=['get'])
     def form_data(self, request, pk=None):

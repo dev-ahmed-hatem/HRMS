@@ -39,7 +39,7 @@ const tasks: Task[] = [
     departments: [{ name: "تحليل", id: 1 }],
     status: "مكتمل",
     priority: "مرتفع",
-    dueDate: "2024-02-10",
+    due_date: "2024-02-10",
     assigned_to: [{ name: "أحمد علي", id: 1 }],
   },
   {
@@ -48,7 +48,7 @@ const tasks: Task[] = [
     description: "تصميم قاعدة البيانات بما يتناسب مع احتياجات المشروع.",
     status: "متأخر",
     priority: "مرتفع",
-    dueDate: "2024-03-15",
+    due_date: "2024-03-15",
     departments: [{ name: "تحليل", id: 1 }],
     assigned_to: [{ name: "أحمد علي", id: 1 }],
   },
@@ -58,7 +58,7 @@ const tasks: Task[] = [
     description: "تنفيذ التصميمات وبناء الواجهة الأمامية للموقع.",
     status: "غير مكتمل",
     priority: "متوسط",
-    dueDate: "2024-04-20",
+    due_date: "2024-04-20",
     departments: [{ name: "تحليل", id: 1 }],
     assigned_to: [{ name: "أحمد علي", id: 1 }],
   },
@@ -68,7 +68,7 @@ const tasks: Task[] = [
     description: "إجراء اختبارات على النظام والتأكد من جودته.",
     status: "غير مكتمل",
     priority: "منخفض",
-    dueDate: "2024-05-30",
+    due_date: "2024-05-30",
     departments: [{ name: "تحليل", id: 1 }],
     assigned_to: [{ name: "أحمد علي", id: 1 }],
   },
@@ -78,7 +78,7 @@ const items = (project: Project) => [
   {
     label: "نظرة عامة على المهام",
     key: "1",
-    children: <TasksOverview tasks={tasks} />,
+    // children: <TasksOverview tasks={tasks} />,
   },
   {
     label: "تفاصيل المشروع",
@@ -123,7 +123,7 @@ const ProjectProfilePage: React.FC = () => {
   if (isError) {
     const error_title =
       (projectError as axiosBaseQueryError).status === 404
-        ? "موظف غير موجود! تأكد من كود الموظف المدخل."
+        ? "مشروع غير موجود! تأكد من كود الموظف المدخل."
         : undefined;
 
     return <Error subtitle={error_title} reload={error_title === undefined} />;

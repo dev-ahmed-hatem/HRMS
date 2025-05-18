@@ -21,12 +21,12 @@ const statusColors: Record<Project["status"], string> = {
   "قيد التنفيذ": "blue",
   مكتمل: "green",
   "قيد الموافقة": "gold",
-  متوقف: "volcano",
+  متوقف: "gray",
 };
 
 // Define table columns
-const columns: (statusFilter: string[]) => ColumnsType<Project> = (
-  statusFilter: string[]
+const columns: (statusFilter: string[] | null) => ColumnsType<Project> = (
+  statusFilter = []
 ) => [
   {
     title: "اسم المشروع",
@@ -107,8 +107,6 @@ const ProjectsList = () => {
   );
 
   useEffect(() => {
-    console.log(statusFilters);
-
     refetch();
   }, [search, page, statusFilters]);
 
@@ -117,14 +115,14 @@ const ProjectsList = () => {
   return (
     <div>
       <ProjectsOverview {...stats!} />
+      <h1 className="my-6 text-2xl md:text-3xl text-centr font-bold">
+        المشاريع
+      </h1>
+
       {isFetching ? (
         <Loading />
       ) : (
         <>
-          <h1 className="my-6 text-2xl md:text-3xl text-centr font-bold">
-            المشاريع
-          </h1>
-
           <div className="flex justify-between flex-wrap mb-4">
             <Input.Search
               placeholder="ابحث عن مشروع..."
@@ -146,7 +144,7 @@ const ProjectsList = () => {
 
           <Table
             dataSource={data?.data}
-            columns={columns(statusFilters || [])}
+            columns={columns(statusFilters)}
             onRow={(record) => ({
               onClick: () => navigate(`project/${record.id}`),
             })}

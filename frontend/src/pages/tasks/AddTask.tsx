@@ -29,7 +29,7 @@ const AddTask = ({
         onFinish={onSubmit}
         initialValues={{
           ...initialValues,
-          dueDate: initialValues?.dueDate ? dayjs(initialValues.dueDate) : null,
+          dueDate: initialValues?.due_date ? dayjs(initialValues.due_date) : null,
           projectId: project?.id, // Pre-fill project if provided
         }}
         className="add-form"

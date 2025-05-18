@@ -1,8 +1,8 @@
 import { Department } from "./department";
 import { AssignedEmployee } from "./employee";
-import { Project } from "./project";
+import { AssignedProject } from "./project";
 
-export type TaskStatus = "مكتمل" | "غير مكتمل" | "متأخر";
+export type TaskStatus = "مكتمل" | "غير مكتمل";
 export type TaskPriority = "منخفض" | "متوسط" | "مرتفع";
 
 export interface Task {
@@ -12,7 +12,15 @@ export interface Task {
   departments: Department[];
   status: TaskStatus;
   priority: TaskPriority;
-  dueDate: string;
+  due_date: string;
   assigned_to: AssignedEmployee[];
-  project?: Project | null;
+  project?: AssignedProject | null;
 }
+
+export type TasksStats = {
+  total: number;
+  completed: number;
+  incomplete?: number;
+  overdue: number;
+  rate: number;
+};

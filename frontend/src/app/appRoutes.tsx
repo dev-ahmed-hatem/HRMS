@@ -9,7 +9,7 @@ import { GiReceiveMoney, GiPayMoney, GiMoneyStack } from "react-icons/gi";
 import { LuNotebookPen } from "react-icons/lu";
 import { MdAssignment } from "react-icons/md";
 import { RouteObject } from "react-router";
-import TasksPage from "@/pages/tasks/TasksPage";
+import TasksList from "@/pages/tasks/TasksList";
 import AttendancePage from "@/pages/AttendancePage";
 import FinancialsPage from "@/pages/financials/FinancialsPage";
 import FilesPage from "@/pages/files/FilesPage";
@@ -54,13 +54,16 @@ export const appRoutes: AppRoute[] = [
           <SectionView
             parentComponent={<ProjectsList />}
             parentUrl="/projects"
-          />),
+          />
+        ),
         icon: <FaDiagramProject />,
         label: "المشاريع",
       },
       {
         path: "tasks",
-        element: <TasksPage />,
+        element: (
+          <SectionView parentComponent={<TasksList />} parentUrl="/tasks" />
+        ),
         icon: <MdAssignment />,
         label: "المهام",
       },

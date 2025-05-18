@@ -7,7 +7,7 @@ import {
   ExclamationCircleOutlined,
   PauseCircleOutlined,
 } from "@ant-design/icons";
-import { ProjectStats } from "@/types/project";
+import { ProjectsStats } from "@/types/project";
 
 const ProjectsOverview = ({
   total,
@@ -16,7 +16,7 @@ const ProjectsOverview = ({
   pending_approval,
   paused,
   overdue,
-}: ProjectStats) => {
+}: ProjectsStats) => {
   return (
     <Card className="shadow-lg rounded-lg">
       <Row gutter={[8, 8]}>

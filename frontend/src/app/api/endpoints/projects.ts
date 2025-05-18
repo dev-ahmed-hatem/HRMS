@@ -2,13 +2,13 @@ import { PaginatedResponse } from "@/types/paginatedResponse";
 import api from "../apiSlice";
 import { Project } from "@/types/project";
 import qs from "query-string";
-import { ProjectStats } from "@/types/project";
+import { ProjectsStats } from "@/types/project";
 
 const projectsEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
-    getProjectsStats: builder.query<ProjectStats, void>({
+    getProjectsStats: builder.query<ProjectsStats, void>({
       query: () => ({
-        url: "/projects/stats/",
+        url: "/projects/projects-stats/",
         method: "GET",
       }),
     }),

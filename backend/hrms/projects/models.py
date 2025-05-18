@@ -13,10 +13,9 @@ PROJECT_STATUS_CHOICES = [
     ('paused', _('متوقف')),
 ]
 
-STATUS_CHOICES = [
+TASK_STATUS_CHOICES = [
     ('completed', _('مكتمل')),
     ('incomplete', _('غير مكتمل')),
-    ('overdue', _('متأخر')),
 ]
 
 PRIORITY_CHOICES = [
@@ -122,7 +121,7 @@ class Task(AbstractBaseModel):
     )
     status = models.CharField(
         max_length=20,
-        choices=STATUS_CHOICES,
+        choices=TASK_STATUS_CHOICES,
         default="incomplete",
         verbose_name=_("الحالة"),
         db_index=True

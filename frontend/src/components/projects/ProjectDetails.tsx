@@ -10,9 +10,7 @@ const ProjectDetails = ({ project }: { project: Project }) => {
         <Descriptions.Item label="اسم المشروع">
           {project.name}
         </Descriptions.Item>
-        <Descriptions.Item label="العميل">
-          {project.client}
-        </Descriptions.Item>
+        <Descriptions.Item label="العميل">{project.client}</Descriptions.Item>
         <Descriptions.Item label="الوصف">
           {project.description}
         </Descriptions.Item>
@@ -28,7 +26,10 @@ const ProjectDetails = ({ project }: { project: Project }) => {
         <Descriptions.Item label="المشرفون">
           <div className="flex gap-2">
             {project.supervisors?.map((sup, index, array) => (
-              <Link to={`/employees/employee-profile/${sup.id}`} className="underline">
+              <Link
+                to={`/employees/employee-profile/${sup.id}`}
+                className="text-blue-700 hover:underline hover:text-blue-500"
+              >
                 {sup.name}
                 {index + 1 !== array.length && "،"}
               </Link>

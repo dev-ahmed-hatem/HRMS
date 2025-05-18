@@ -11,11 +11,11 @@ const task: Task = {
   id: 1,
   title: "تحليل المتطلبات",
   description: "جمع وتحليل متطلبات المشروع وتوثيقها.",
-  department: "تحليل",
+  departments: [{ name: "تحليل", id: 32 }],
   status: "مكتمل",
   priority: "مرتفع",
   due_date: "2024-02-10",
-  assigned_to: "أحمد علي",
+  assigned_to: [{ name: "أحمد علي", id: 2 }],
   project: { id: "P001", name: "تطوير نظام إدارة الموارد" },
 };
 
@@ -23,7 +23,6 @@ const TaskProfilePage: React.FC = () => {
   const statusColors: Record<Task["status"], string> = {
     مكتمل: "green",
     "غير مكتمل": "red",
-    متأخر: "gold",
   };
 
   const priorityColors: Record<Task["priority"], string> = {
@@ -57,7 +56,7 @@ const TaskProfilePage: React.FC = () => {
             </Avatar>
             <div>
               <h2 className="text-xl font-bold">{task.title}</h2>
-              <p className="text-gray-500">{task.department}</p>
+              <p className="text-gray-500">{task.departments.join()}</p>
             </div>
           </div>
 

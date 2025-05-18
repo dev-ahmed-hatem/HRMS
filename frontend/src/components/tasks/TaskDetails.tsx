@@ -10,7 +10,6 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
   const statusColors: Record<Task["status"], string> = {
     مكتمل: "green",
     "غير مكتمل": "red",
-    متأخر: "gold",
   };
 
   const priorityColors: Record<Task["priority"], string> = {
@@ -25,12 +24,14 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
         <Descriptions.Item label="الكود">{task.id}</Descriptions.Item>
         <Descriptions.Item label="الاسم">{task.title}</Descriptions.Item>
         <Descriptions.Item label="الوصف">{task.description}</Descriptions.Item>
-        <Descriptions.Item label="القسم">{task.department}</Descriptions.Item>
+        <Descriptions.Item label="القسم">
+          {task.departments.join()}
+        </Descriptions.Item>
         <Descriptions.Item label="الموعد النهائي">
           {task.due_date}
         </Descriptions.Item>
         <Descriptions.Item label="فريق العمل">
-          {task.assigned_to}
+          {task.assigned_to[0].name}
         </Descriptions.Item>
         <Descriptions.Item label="الحالة">
           <Tag color={statusColors[task.status]}>{task.status}</Tag>

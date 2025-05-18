@@ -10,41 +10,7 @@ interface RelatedTasksProps {
   taskId: number | string;
 }
 
-const sampleTasks: Task[] = [
-  {
-    id: 1,
-    title: "تحليل المتطلبات",
-    description: "جمع وتحليل متطلبات المشروع وتوثيقها.",
-    department: "تحليل",
-    status: "مكتمل",
-    priority: "مرتفع",
-    due_date: "2024-02-10",
-    assigned_to: "أحمد علي",
-    project: { id: "P001", name: "تطوير نظام إدارة الموارد" },
-  },
-  {
-    id: 2,
-    title: "تصميم قاعدة البيانات",
-    description: "تصميم قاعدة البيانات بما يتناسب مع احتياجات المشروع.",
-    department: "تطوير",
-    status: "متأخر",
-    priority: "مرتفع",
-    due_date: "2024-03-15",
-    assigned_to: "خالد إبراهيم",
-    project: { id: "P001", name: "تطوير نظام إدارة الموارد" },
-  },
-  {
-    id: 3,
-    title: "تطوير الواجهة الأمامية",
-    description: "تنفيذ التصميمات وبناء الواجهة الأمامية للموقع.",
-    department: "تطوير",
-    status: "غير مكتمل",
-    priority: "متوسط",
-    due_date: "2024-04-20",
-    assigned_to: "سارة محمد",
-    project: { id: "P002", name: "نظام تتبع المخزون" },
-  },
-];
+const sampleTasks: Task[] = [];
 
 const RelatedTasks: React.FC<RelatedTasksProps> = ({ taskId }) => {
   const navigate = useNavigate();
@@ -89,7 +55,6 @@ const RelatedTasks: React.FC<RelatedTasksProps> = ({ taskId }) => {
         const colorMap: Record<Task["status"], string> = {
           مكتمل: "green",
           "غير مكتمل": "red",
-          متأخر: "gold",
         };
         return <Tag color={colorMap[status]}>{status}</Tag>;
       },

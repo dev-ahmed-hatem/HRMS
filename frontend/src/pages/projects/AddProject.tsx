@@ -24,10 +24,12 @@ const AddProject = ({
         onFinish={onSubmit}
         initialValues={{
           ...initialValues,
-          startDate: initialValues?.startDate
-            ? dayjs(initialValues.startDate)
+          start_date: initialValues?.start_date
+            ? dayjs(initialValues.start_date)
             : dayjs(),
-          endDate: initialValues?.endDate ? dayjs(initialValues.endDate) : null,
+          end_date: initialValues?.end_date
+            ? dayjs(initialValues.end_date)
+            : null,
         }}
         className="add-form"
       >
@@ -84,7 +86,7 @@ const AddProject = ({
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>
               <Form.Item
-                name="startDate"
+                name="start_date"
                 label="تاريخ البدء"
                 rules={[{ required: true, message: "يرجى اختيار تاريخ البدء" }]}
               >
@@ -92,7 +94,7 @@ const AddProject = ({
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item name="endDate" label="تاريخ الانتهاء">
+              <Form.Item name="end_date" label="تاريخ الانتهاء">
                 <DatePicker format="YYYY-MM-DD" className="w-full" />
               </Form.Item>
             </Col>

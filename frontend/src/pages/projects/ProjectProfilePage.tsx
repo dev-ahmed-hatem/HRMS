@@ -46,7 +46,7 @@ const tasks: Task[] = [
     id: 2,
     title: "تصميم قاعدة البيانات",
     description: "تصميم قاعدة البيانات بما يتناسب مع احتياجات المشروع.",
-    status: "متأخر",
+    status: "غير مكتمل",
     priority: "مرتفع",
     due_date: "2024-03-15",
     departments: [{ name: "تحليل", id: 1 }],

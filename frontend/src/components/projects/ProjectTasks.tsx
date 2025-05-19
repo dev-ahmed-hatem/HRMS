@@ -1,57 +1,73 @@
-import { Select, Button, Tag, Table } from "antd";
-import { useState } from "react";
-import { Task } from "../../types/task";
+import { Tag, Table, Space } from "antd";
+import { priorityColors, statusColors, Task } from "../../types/task";
 import { tablePaginationConfig } from "../../utils/antd";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { ColumnsType } from "antd/lib/table";
+import { isOverdue } from "@/utils";
+import { dayjs } from "@/utils/locale";
 
-const { Option } = Select;
+const columns: ColumnsType<Task> = [
+  {
+    title: "اسم المهمة",
+    dataIndex: "title",
+    key: "title",
+    render: (value, record) => (
+      <Space>
+        <span className="flex flex-col">
+          <div className="name text-base">{value}</div>
+          <div className="id text-xs text-gray-400">#{record.id}</div>
+        </span>
+      </Space>
+    ),
+  },
+  {
+    title: "الحالة",
+    dataIndex: "status",
+    key: "status",
+    filters: [
+      { text: "مكتمل", value: "completed" },
+      { text: "غير مكتمل", value: "incomplete" },
+      { text: "متأخر", value: "overdue" },
+    ],
+    filterOnClose: false,
+    render: (status: Task["status"], record) => (
+      <div className="flex gap-2">
+        <Tag color={statusColors[status]}>{status}</Tag>
+        {isOverdue(record.due_date) && record.status === "غير مكتمل" && (
+          <Tag color="red">متأخر</Tag>
+        )}
+      </div>
+    ),
+  },
+  {
+    title: "الأولوية",
+    dataIndex: "priority",
+    key: "priority",
+    filters: [
+      { text: "منخفض", value: "low" },
+      { text: "متوسط", value: "medium" },
+      { text: "مرتفع", value: "high" },
+    ],
+    filterOnClose: false,
+    onFilter: (value) => (),
+    render: (priority: Task["priority"]) => (
+      <Tag color={priorityColors[priority]}>{priority}</Tag>
+    ),
+  },
+  {
+    title: "تاريخ الاستحقاق",
+    dataIndex: "due_date",
+    key: "due_date",
+    sorter: (a, b) => dayjs(a.due_date).unix() - dayjs(b.due_date).unix(),
+    render: (date) => dayjs(date).format("YYYY-MM-DD"),
+  },
+];
 
 const ProjectTasks = ({ tasks }: { tasks: Task[] }) => {
   const navigate = useNavigate();
-  const [filteredTasks, setFilteredTasks] = useState(tasks);
-  const [filterStatus, setFilterStatus] = useState<string | null>(null);
-  const [filterDepartment, setFilterDepartment] = useState<string | null>(null);
-
-  const handleFilter = () => {
-    let filtered = tasks;
-    if (filterStatus) {
-      filtered = filtered.filter((task) => task.status === filterStatus);
-    }
-    // if (filterDepartment) {
-    //   filtered = filtered.filter(
-    //     (task) => task.department === filterDepartment
-    //   );
-    // }
-    setFilteredTasks(filtered);
-  };
-
-  const columns = [
-    { title: "المهمة", dataIndex: "title", key: "title" },
-    { title: "القسم", dataIndex: "department", key: "department" },
-    {
-      title: "تاريخ التسليم",
-      dataIndex: "dueDate",
-      key: "dueDate",
-      //   sorter: (a, b) => a.dueDate.localeCompare(b.dueDate),
-    },
-    {
-      title: "الحالة",
-      dataIndex: "status",
-      key: "status",
-      render: (status: string) => (
-        <Tag
-          color={
-            status === "مكتمل" ? "green" : status === "متأخر" ? "red" : "gold"
-          }
-        >
-          {status}
-        </Tag>
-      ),
-    },
-  ];
   return (
     <>
-      <div className="flex gap-4 mb-4 flex-wrap">
+      {/* <div className="flex gap-4 mb-4 flex-wrap">
         <Select
           placeholder="تصفية حسب القسم"
           onChange={setFilterDepartment}
@@ -74,13 +90,13 @@ const ProjectTasks = ({ tasks }: { tasks: Task[] }) => {
         <Button type="primary" onClick={handleFilter}>
           تطبيق التصفية
         </Button>
-      </div>
+      </div> */}
       <Table
         columns={columns}
         onRow={(record) => ({
           onClick: () => navigate(`/tasks/task/${record.id}`),
         })}
-        dataSource={filteredTasks}
+        dataSource={tasks}
         rowKey="id"
         pagination={tablePaginationConfig()}
         className="clickable-table calypso-header"

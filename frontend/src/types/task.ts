@@ -24,3 +24,15 @@ export type TasksStats = {
   overdue: number;
   rate: number;
 };
+
+// Status & Priority Color Mapping
+export const statusColors: Record<TaskStatus, string> = {
+  مكتمل: "green",
+  "غير مكتمل": "gold",
+};
+
+export const priorityColors: Record<TaskPriority, string> = {
+  منخفض: "blue",
+  متوسط: "orange",
+  مرتفع: "red",
+};

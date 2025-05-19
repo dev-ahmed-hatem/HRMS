@@ -23,12 +23,13 @@ class ProjectReadSerializer(serializers.ModelSerializer):
 
 
 class ProjectListSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='project-detail')
     supervisors = serializers.SerializerMethodField()
     status = serializers.StringRelatedField(source="get_status_display")
 
     class Meta:
         model = Project
-        fields = ['id', 'name', 'status', 'start_date', 'end_date', 'supervisors']
+        fields = ['id', 'url', 'name', 'status', 'start_date', 'end_date', 'supervisors']
 
     def get_supervisors(self, obj: Project):
         return [{"id": s.id, "name": s.name} for s in obj.supervisors.all()]
@@ -60,6 +61,7 @@ class TaskReadSerializer(serializers.ModelSerializer):
     def get_project(self, obj: Task):
         if obj.project:
             return {"name": obj.project.name, "id": obj.project.id}
+        return None
 
     def get_created_at(self, obj: Project) -> str:
         return obj.created_at.astimezone(settings.CAIRO_TZ).strftime('%Y-%m-%d %H:%M:%S')

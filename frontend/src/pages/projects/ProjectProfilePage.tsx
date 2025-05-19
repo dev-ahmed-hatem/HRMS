@@ -14,23 +14,6 @@ import Loading from "@/components/Loading";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import Error from "../Error";
 
-const project3: Project = {
-  id: "P001",
-  status: "قيد التنفيذ",
-  start_date: "2024-03-01",
-  end_date: "2024-06-01",
-  supervisors: [
-    { name: "روان محمود", id: 2 },
-    { name: "محمد أحمد", id: 1 },
-  ],
-  name: "تطوير نظام إدارة الموارد",
-  client: "شركة التقنية الحديثة",
-  budget: 50000,
-  description: "مشروع تطوير نظام متكامل لإدارة الموارد البشرية.",
-  created_at: "2023-1-1",
-  created_by: "Dev Ahmed Helal",
-};
-
 const tasks: Task[] = [
   {
     id: 1,
@@ -78,7 +61,7 @@ const items = (project: Project) => [
   {
     label: "نظرة عامة على المهام",
     key: "1",
-    // children: <TasksOverview tasks={tasks} />,
+    children: <TasksOverview stats={project.stats} />,
   },
   {
     label: "تفاصيل المشروع",
@@ -88,7 +71,7 @@ const items = (project: Project) => [
   {
     label: "المهام",
     key: "3",
-    children: <ProjectTasks tasks={tasks} />,
+    children: <ProjectTasks tasks={project.tasks} />,
   },
 ];
 

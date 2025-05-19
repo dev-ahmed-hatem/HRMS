@@ -1,4 +1,5 @@
 import { AssignedEmployee } from "./employee";
+import { Task, TasksStats } from "./task";
 
 export type ProjectStatus = "قيد التنفيذ" | "مكتمل" | "قيد الموافقة" | "متوقف";
 
@@ -14,6 +15,8 @@ export type Project = {
   description: string;
   created_at: string;
   created_by: string;
+  tasks: Task[];
+  stats: TasksStats;
 };
 
 export type ProjectsStats = {

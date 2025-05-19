@@ -3,7 +3,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import { Task, TaskPriority, TaskStatus } from "../../types/task";
+import { priorityColors, statusColors, Task } from "../../types/task";
 import { tablePaginationConfig } from "../../utils/antd";
 import { Link, useNavigate } from "react-router";
 import TasksOverview from "../../components/tasks/TasksOverview";
@@ -14,18 +14,6 @@ import {
 import Loading from "@/components/Loading";
 import Error from "../Error";
 import { isOverdue } from "@/utils";
-
-// Status & Priority Color Mapping
-const statusColors: Record<TaskStatus, string> = {
-  مكتمل: "green",
-  "غير مكتمل": "gold",
-};
-
-const priorityColors: Record<TaskPriority, string> = {
-  منخفض: "blue",
-  متوسط: "orange",
-  مرتفع: "red",
-};
 
 const columns: (
   statusFilter?: string[] | null,

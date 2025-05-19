@@ -45,11 +45,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["get"])
     def detailed(self, request, pk=None):
         try:
-            project = Project.objects.filter(pk=pk).first()
-            serializer = ProjectReadSerializer(project, context={"request": request}).data
-            return Response(serializer, status=status.HTTP_200_OK)
-        except Exception:
+            project = Project.objects.get(pk=pk)
+        except Project.DoesNotExist:
             return Response({"detail": _("مشروع غير موجود")}, status=status.HTTP_404_NOT_FOUND)
+        tasks = Task.objects.filter(project=project)
+        serialized_tasks = TaskListSerializer(tasks, many=True, context={'request': request}).data
+        serializer = ProjectReadSerializer(project, context={"request": request}).data
+        stats = get_stats(project.id)
+        return Response({**serializer, "tasks": serialized_tasks, "stats": stats}, status=status.HTTP_200_OK)
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -64,7 +67,11 @@ class TaskViewSet(viewsets.ModelViewSet):
         search = self.request.query_params.get('search', None)
         status_filters = self.request.query_params.get('status_filters', None)
         priority_filters = self.request.query_params.get('priority_filters', None)
+        project_id = self.request.query_params.get("project_id", None)
         queryset = Task.objects.all()
+
+        if project_id is not None:
+            queryset = queryset.filter(project__id=project_id)
 
         if search is not None:
             queryset = queryset.filter(title__icontains=search)
@@ -91,10 +98,10 @@ class TaskViewSet(viewsets.ModelViewSet):
     def detailed(self, request, pk=None):
         try:
             task = Task.objects.get(pk=pk)
-            serializer = TaskReadSerializer(task, context={"request": request}).data
-            return Response(serializer, status=status.HTTP_200_OK)
-        except Exception:
+        except Task.DoesNotExist:
             return Response({"detail": _("مهمة غير موجود")}, status=status.HTTP_404_NOT_FOUND)
+        serializer = TaskReadSerializer(task, context={"request": request}).data
+        return Response(serializer, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
@@ -116,19 +123,28 @@ def projects_stats(request):
     }, status=status.HTTP_200_OK)
 
 
-@api_view(["GET"])
-def tasks_stats(request):
+def get_stats(project_id=None):
     today = datetime.today().astimezone(settings.CAIRO_TZ).date()
-    total = Task.objects.count()
-    completed = Task.objects.filter(status="completed").count()
-    overdue = Task.objects.filter(Q(status="incomplete") & Q(due_date__lt=today)).count()
+    if project_id is not None:
+        tasks = Task.objects.filter(project__id=project_id)
+    else:
+        tasks = Task.objects.all()
+    total = tasks.count()
+    completed = tasks.filter(status="completed").count()
+    overdue = tasks.filter(Q(status="incomplete") & Q(due_date__lt=today)).count()
     incomplete = total - completed
-    rate = floor((completed / total) * 100)
+    rate = 0 if total == 0 else floor((completed / total) * 100)
 
-    return Response({
+    return {
         'total': total,
         'completed': completed,
         'incomplete': incomplete,
         'overdue': overdue,
         'rate': rate
-    }, status=status.HTTP_200_OK)
+    }
+
+
+@api_view(["GET"])
+def tasks_stats(request):
+    stats = get_stats()
+    return Response(stats, status=status.HTTP_200_OK)

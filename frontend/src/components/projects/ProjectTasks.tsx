@@ -25,11 +25,16 @@ const columns: ColumnsType<Task> = [
     dataIndex: "status",
     key: "status",
     filters: [
-      { text: "مكتمل", value: "completed" },
-      { text: "غير مكتمل", value: "incomplete" },
-      { text: "متأخر", value: "overdue" },
+      { text: "مكتمل", value: "مكتمل" },
+      { text: "غير مكتمل", value: "غير مكتمل" },
+      { text: "متأخر", value: "متأخر" },
     ],
     filterOnClose: false,
+    onFilter: (value, record) => {
+      return value === "متأخر"
+        ? isOverdue(record.due_date)
+        : record.status === value;
+    },
     render: (status: Task["status"], record) => (
       <div className="flex gap-2">
         <Tag color={statusColors[status]}>{status}</Tag>
@@ -44,12 +49,12 @@ const columns: ColumnsType<Task> = [
     dataIndex: "priority",
     key: "priority",
     filters: [
-      { text: "منخفض", value: "low" },
-      { text: "متوسط", value: "medium" },
-      { text: "مرتفع", value: "high" },
+      { text: "منخفض", value: "منخفض" },
+      { text: "متوسط", value: "متوسط" },
+      { text: "مرتفع", value: "مرتفع" },
     ],
     filterOnClose: false,
-    onFilter: (value) => (),
+    onFilter: (value, record) => record.priority === value,
     render: (priority: Task["priority"]) => (
       <Tag color={priorityColors[priority]}>{priority}</Tag>
     ),

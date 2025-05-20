@@ -1,7 +1,7 @@
 import { Tag, Table, Space } from "antd";
-import { priorityColors, statusColors, Task } from "../../types/task";
+import { priorityColors, statusColors, Task } from "@/types/task";
 import { tablePaginationConfig } from "../../utils/antd";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { ColumnsType } from "antd/lib/table";
 import { isOverdue } from "@/utils";
 import { dayjs } from "@/utils/locale";

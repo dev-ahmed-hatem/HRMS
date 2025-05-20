@@ -1,10 +1,10 @@
 import { PaginatedResponse } from "@/types/paginatedResponse";
 import api from "../apiSlice";
-import { Project } from "@/types/project";
+import { Project, ProjectStatus } from "@/types/project";
 import qs from "query-string";
 import { ProjectsStats } from "@/types/project";
 
-const projectsEndpoints = api.injectEndpoints({
+export const projectsEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
     getProjectsStats: builder.query<ProjectsStats, void>({
       query: () => ({
@@ -41,6 +41,17 @@ const projectsEndpoints = api.injectEndpoints({
       }),
       providesTags: (res, error, arg) => [{ type: "Project", id: arg.id }],
     }),
+    switchProjectStatus: builder.mutation<
+      { status: ProjectStatus },
+      { id: string; status: string }
+    >({
+      query: ({ id, status }) => ({
+        url: `/projects/projects/${id}/change_status/`,
+        method: "POST",
+        data: { status },
+      }),
+      invalidatesTags: [{ type: "Task", id: "LIST" }],
+    }),
   }),
 });
 
@@ -48,4 +59,5 @@ export const {
   useGetProjectsStatsQuery,
   useGetProjectsQuery,
   useGetProjectQuery,
+  useSwitchProjectStatusMutation,
 } = projectsEndpoints;

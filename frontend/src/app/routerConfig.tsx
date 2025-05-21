@@ -2,7 +2,7 @@ import { RouteObject } from "react-router";
 import appRoutes, { AppRoute } from "./appRoutes";
 import EmployeeProfilePage from "@/pages/employees/EmployeeProfilePage";
 import EmployeeForm from "@/pages/employees/EmployeeForm";
-import AddProject from "@/pages/projects/AddProject";
+import AddProject from "@/pages/projects/ProjectForm";
 import ProjectProfilePage from "@/pages/projects/ProjectProfilePage";
 import TaskProfilePage from "@/pages/tasks/TaskProfilePage";
 import AddTask from "@/pages/tasks/AddTask";

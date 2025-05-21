@@ -110,12 +110,7 @@ const ProjectProfilePage: React.FC = () => {
 
   const [
     changeState,
-    {
-      data: switchRes,
-      isLoading: switchingState,
-      isError: isSwitchError,
-      error: switchError,
-    },
+    { data: switchRes, isLoading: switchingState, isError: switchError },
   ] = useSwitchProjectStatusMutation();
 
   const isProjectOverdue =

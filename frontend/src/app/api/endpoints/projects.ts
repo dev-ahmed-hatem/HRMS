@@ -52,6 +52,30 @@ export const projectsEndpoints = api.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Task", id: "LIST" }],
     }),
+    project: builder.mutation<
+      Project,
+      { data: Partial<Project>; method?: string; url?: string }
+    >({
+      query: ({ data, method, url }) => ({
+        url: url ? url : `projects/projects/`,
+        method: method ? method : "POST",
+        data,
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Invalidate the Employee LIST tag on successful POST
+          dispatch(
+            api.util.invalidateTags([
+              { type: "Project", id: "LIST" },
+              { type: "Project", id: arg.data.id },
+            ])
+          );
+        } catch {
+          // Do nothing if the request fails
+        }
+      },
+    }),
   }),
 });
 
@@ -59,5 +83,6 @@ export const {
   useGetProjectsStatsQuery,
   useGetProjectsQuery,
   useGetProjectQuery,
+  useProjectMutation,
   useSwitchProjectStatusMutation,
 } = projectsEndpoints;

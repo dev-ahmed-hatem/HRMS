@@ -11,8 +11,6 @@ import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { useNotification } from "@/providers/NotificationProvider";
 import { useNavigate } from "react-router";
 
-const { Option } = Select;
-
 type ProjectFormValues = Omit<Project, "status"> & {
   start_date: Dayjs;
   end_date: Dayjs;

@@ -125,8 +125,10 @@ const EmployeeProfilePage: React.FC = () => {
     switchActive,
     { data: switchRes, isLoading: switching, isError: switchError },
   ] = useSwitchEmployeeActiveMutation();
-  const [deleteEmployee, { isLoading: deleting, isSuccess: deleted }] =
-    useDeleteEmployeeMutation();
+  const [
+    deleteEmployee,
+    { isError: deleteError, isLoading: deleting, isSuccess: deleted },
+  ] = useDeleteEmployeeMutation();
 
   const dispatch = useAppDispatch();
 
@@ -170,6 +172,14 @@ const EmployeeProfilePage: React.FC = () => {
       });
     }
   }, [switchRes]);
+
+  useEffect(() => {
+    if (deleteError) {
+      notification.error({
+        message: "حدث خطأ أثناء حذف الموظف ! برجاء إعادة المحاولة",
+      });
+    }
+  }, [deleteError]);
 
   useEffect(() => {
     if (deleted) navigate("/employees");

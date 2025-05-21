@@ -11,6 +11,7 @@ import { useNavigate, useParams } from "react-router";
 import { useNotification } from "@/providers/NotificationProvider";
 import {
   projectsEndpoints,
+  useDeleteProjectMutation,
   useGetProjectQuery,
   useSwitchProjectStatusMutation,
 } from "@/app/api/endpoints/projects";
@@ -113,12 +114,21 @@ const ProjectProfilePage: React.FC = () => {
     { data: switchRes, isLoading: switchingState, isError: switchError },
   ] = useSwitchProjectStatusMutation();
 
+  const [
+    deleteProject,
+    { isError: deleteError, isLoading: deleting, isSuccess: deleted },
+  ] = useDeleteProjectMutation();
+
   const isProjectOverdue =
     isOverdue(project?.end_date!) &&
     !["مكتمل", "قيد الموافقة"].includes(project?.status as string);
 
   const handleStatusChange = (value: string) => {
     changeState({ id: project_id!, status: value });
+  };
+
+  const handleDelete = () => {
+    deleteProject(project_id as string);
   };
 
   useEffect(() => {
@@ -146,11 +156,23 @@ const ProjectProfilePage: React.FC = () => {
     }
   }, [switchRes]);
 
+  useEffect(() => {
+    if (deleteError) {
+      notification.error({
+        message: "حدث خطأ أثناء حذف المشروع ! برجاء إعادة المحاولة",
+      });
+    }
+  }, [deleteError]);
+
+  useEffect(() => {
+    if (deleted) navigate("/projects");
+  }, [deleted]);
+
   if (isFetching) return <Loading />;
   if (isError) {
     const error_title =
       (projectError as axiosBaseQueryError).status === 404
-        ? "مشروع غير موجود! تأكد من كود الموظف المدخل."
+        ? "مشروع غير موجود! تأكد من كود المشروع المدخل."
         : undefined;
 
     return <Error subtitle={error_title} reload={error_title === undefined} />;
@@ -247,8 +269,8 @@ const ProjectProfilePage: React.FC = () => {
             تعديل البيانات
           </Button>
           <Popconfirm
-            title="هل أنت متأكد من حذف هذا الموظف؟"
-            // onConfirm={handleDelete}
+            title="هل أنت متأكد من حذف هذا المشروع؟"
+            onConfirm={handleDelete}
             okText="نعم"
             cancelText="لا"
           >
@@ -256,7 +278,7 @@ const ProjectProfilePage: React.FC = () => {
               className="enabled:bg-red-500 enabled:border-red-500 enabled:shadow-[0_2px_0_rgba(0,58,58,0.31)]
             enabled:hover:border-red-400 enabled:hover:bg-red-400 enabled:text-white"
               icon={<DeleteOutlined />}
-              // loading={deleting}
+              loading={deleting}
             >
               حذف المشروع
             </Button>

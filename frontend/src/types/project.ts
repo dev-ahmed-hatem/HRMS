@@ -8,7 +8,7 @@ export type Project = {
   name: string;
   status: ProjectStatus;
   start_date: string;
-  end_date: string;
+  end_date?: string;
   client: string;
   supervisors?: AssignedEmployee[];
   budget: number;

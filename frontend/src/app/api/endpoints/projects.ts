@@ -1,10 +1,10 @@
 import { PaginatedResponse } from "@/types/paginatedResponse";
 import api from "../apiSlice";
-import { Project } from "@/types/project";
+import { Project, ProjectStatus } from "@/types/project";
 import qs from "query-string";
 import { ProjectsStats } from "@/types/project";
 
-const projectsEndpoints = api.injectEndpoints({
+export const projectsEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
     getProjectsStats: builder.query<ProjectsStats, void>({
       query: () => ({
@@ -41,6 +41,48 @@ const projectsEndpoints = api.injectEndpoints({
       }),
       providesTags: (res, error, arg) => [{ type: "Project", id: arg.id }],
     }),
+    switchProjectStatus: builder.mutation<
+      { status: ProjectStatus },
+      { id: string; status: string }
+    >({
+      query: ({ id, status }) => ({
+        url: `/projects/projects/${id}/change_status/`,
+        method: "POST",
+        data: { status },
+      }),
+      invalidatesTags: [{ type: "Task", id: "LIST" }],
+    }),
+    project: builder.mutation<
+      Project,
+      { data: Partial<Project>; method?: string; url?: string }
+    >({
+      query: ({ data, method, url }) => ({
+        url: url ? url : `projects/projects/`,
+        method: method ? method : "POST",
+        data,
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Invalidate the Employee LIST tag on successful POST
+          dispatch(
+            api.util.invalidateTags([
+              { type: "Project", id: "LIST" },
+              { type: "Project", id: arg.data.id },
+            ])
+          );
+        } catch {
+          // Do nothing if the request fails
+        }
+      },
+    }),
+    deleteProject: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/projects/projects/${id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "Project", id: "LIST" }],
+    }),
   }),
 });
 
@@ -48,4 +90,7 @@ export const {
   useGetProjectsStatsQuery,
   useGetProjectsQuery,
   useGetProjectQuery,
+  useProjectMutation,
+  useSwitchProjectStatusMutation,
+  useDeleteProjectMutation,
 } = projectsEndpoints;

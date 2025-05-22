@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Card, Avatar, Tabs, Button, Popconfirm, Tag, Select } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { getInitials } from "../../utils";
+import { getInitials, isOverdue } from "../../utils";
 import ProjectDetails from "../../components/projects/ProjectDetails";
 import TasksOverview from "../../components/tasks/TasksOverview";
 import { Project, ProjectStatus } from "../../types/project";
@@ -9,10 +9,16 @@ import { Task } from "../../types/task";
 import ProjectTasks from "../../components/projects/ProjectTasks";
 import { useNavigate, useParams } from "react-router";
 import { useNotification } from "@/providers/NotificationProvider";
-import { useGetProjectQuery } from "@/app/api/endpoints/projects";
+import {
+  projectsEndpoints,
+  useDeleteProjectMutation,
+  useGetProjectQuery,
+  useSwitchProjectStatusMutation,
+} from "@/app/api/endpoints/projects";
 import Loading from "@/components/Loading";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import Error from "../Error";
+import { useAppDispatch } from "@/app/redux/hooks";
 
 const tasks: Task[] = [
   {
@@ -76,21 +82,22 @@ const items = (project: Project) => [
 ];
 
 type StatusOption = {
-  value: ProjectStatus;
+  text: ProjectStatus;
+  value: string;
   color: string;
 };
 
 const statusOptions: StatusOption[] = [
-  { value: "مكتمل", color: "green" },
-  { value: "قيد التنفيذ", color: "blue" },
-  { value: "قيد الموافقة", color: "orange" },
-  { value: "متوقف", color: "red" },
+  { value: "ongoing", text: "قيد التنفيذ", color: "blue" },
+  { value: "pending-approval", text: "قيد الموافقة", color: "orange" },
+  { value: "paused", text: "متوقف", color: "red" },
 ];
 
 const ProjectProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const notification = useNotification();
   const { project_id } = useParams();
+  const dispatch = useAppDispatch();
 
   const {
     data: project,
@@ -102,11 +109,70 @@ const ProjectProfilePage: React.FC = () => {
     format: "detailed",
   });
 
+  const [
+    changeState,
+    { data: switchRes, isLoading: switchingState, isError: switchError },
+  ] = useSwitchProjectStatusMutation();
+
+  const [
+    deleteProject,
+    { isError: deleteError, isLoading: deleting, isSuccess: deleted },
+  ] = useDeleteProjectMutation();
+
+  const isProjectOverdue =
+    isOverdue(project?.end_date!) &&
+    !["مكتمل", "قيد الموافقة"].includes(project?.status as string);
+
+  const handleStatusChange = (value: string) => {
+    changeState({ id: project_id!, status: value });
+  };
+
+  const handleDelete = () => {
+    deleteProject(project_id as string);
+  };
+
+  useEffect(() => {
+    if (switchError) {
+      notification.error({
+        message: "حدث خطأ في تغيير الحالة ! برجاء إعادة المحاولة",
+      });
+    }
+  }, [switchError]);
+
+  useEffect(() => {
+    if (switchRes) {
+      dispatch(
+        projectsEndpoints.util.updateQueryData(
+          "getProject",
+          { id: project_id as string, format: "detailed" },
+          (draft: Project) => {
+            draft.status = switchRes.status;
+          }
+        )
+      );
+      notification.success({
+        message: "تم تغيير الحالة بنجاح",
+      });
+    }
+  }, [switchRes]);
+
+  useEffect(() => {
+    if (deleteError) {
+      notification.error({
+        message: "حدث خطأ أثناء حذف المشروع ! برجاء إعادة المحاولة",
+      });
+    }
+  }, [deleteError]);
+
+  useEffect(() => {
+    if (deleted) navigate("/projects");
+  }, [deleted]);
+
   if (isFetching) return <Loading />;
   if (isError) {
     const error_title =
       (projectError as axiosBaseQueryError).status === 404
-        ? "مشروع غير موجود! تأكد من كود الموظف المدخل."
+        ? "مشروع غير موجود! تأكد من كود المشروع المدخل."
         : undefined;
 
     return <Error subtitle={error_title} reload={error_title === undefined} />;
@@ -114,7 +180,11 @@ const ProjectProfilePage: React.FC = () => {
   return (
     <>
       {/* Project Header */}
-      <Card className="shadow-lg rounded-xl">
+      <Card
+        className={`shadow-lg rounded-xl ${
+          isProjectOverdue && "border-red-500"
+        }`}
+      >
         <div className="flex items-center justify-between flex-wrap gap-y-6">
           {/* Avatar with Fallback */}
           <div className="flex items-center flex-wrap gap-4">
@@ -129,26 +199,37 @@ const ProjectProfilePage: React.FC = () => {
 
           {/* Status Selector */}
           <div>
-            <Select
-              value={project!.status}
-              onChange={(value) => {
-                // handleStatusChange(value);
-              }}
-              style={{ minWidth: 150 }}
-              optionLabelProp="label"
-            >
-              {statusOptions.map((opt) => (
-                <Select.Option
-                  key={opt.value}
-                  value={opt.value}
-                  label={opt.value}
-                >
-                  <Tag color={opt.color} className="w-full text-center">
-                    {opt.value}
-                  </Tag>
-                </Select.Option>
-              ))}
-            </Select>
+            {isProjectOverdue && (
+              <Tag color="red" className="w-[80px] text-center p-1">
+                متأخر
+              </Tag>
+            )}
+            {project?.status === "مكتمل" ? (
+              <Tag color="green">مكتمل</Tag>
+            ) : (
+              <Select
+                value={project!.status}
+                onChange={(value) => {
+                  handleStatusChange(value);
+                }}
+                style={{ minWidth: 150 }}
+                optionLabelProp="label"
+                loading={switchingState}
+                disabled={switchingState}
+              >
+                {statusOptions.map((opt) => (
+                  <Select.Option
+                    key={opt.value}
+                    value={opt.value}
+                    label={opt.text}
+                  >
+                    <Tag color={opt.color} className="w-full text-center">
+                      {opt.text}
+                    </Tag>
+                  </Select.Option>
+                ))}
+              </Select>
+            )}
           </div>
         </div>
       </Card>
@@ -188,8 +269,8 @@ const ProjectProfilePage: React.FC = () => {
             تعديل البيانات
           </Button>
           <Popconfirm
-            title="هل أنت متأكد من حذف هذا الموظف؟"
-            // onConfirm={handleDelete}
+            title="هل أنت متأكد من حذف هذا المشروع؟"
+            onConfirm={handleDelete}
             okText="نعم"
             cancelText="لا"
           >
@@ -197,7 +278,7 @@ const ProjectProfilePage: React.FC = () => {
               className="enabled:bg-red-500 enabled:border-red-500 enabled:shadow-[0_2px_0_rgba(0,58,58,0.31)]
             enabled:hover:border-red-400 enabled:hover:bg-red-400 enabled:text-white"
               icon={<DeleteOutlined />}
-              // loading={deleting}
+              loading={deleting}
             >
               حذف المشروع
             </Button>

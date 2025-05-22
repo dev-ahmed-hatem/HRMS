@@ -42,6 +42,17 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+    @action(detail=True, methods=['post'])
+    def change_status(self, request, pk=None):
+        try:
+            project = Project.objects.get(pk=pk)
+        except Project.DoesNotExist:
+            return Response({'detail': _('مشروع غير موجود')}, status=status.HTTP_404_NOT_FOUND)
+        new_status = request.data.get('status')
+        project.status = new_status
+        project.save()
+        return Response({'status': project.get_status_display()}, status=status.HTTP_200_OK)
+
     @action(detail=True, methods=["get"])
     def detailed(self, request, pk=None):
         try:

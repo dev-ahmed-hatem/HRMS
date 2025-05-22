@@ -2,7 +2,7 @@ import { RouteObject } from "react-router";
 import appRoutes, { AppRoute } from "./appRoutes";
 import EmployeeProfilePage from "@/pages/employees/EmployeeProfilePage";
 import EmployeeForm from "@/pages/employees/EmployeeForm";
-import AddProject from "@/pages/projects/AddProject";
+import ProjectForm from "@/pages/projects/ProjectForm";
 import ProjectProfilePage from "@/pages/projects/ProjectProfilePage";
 import TaskProfilePage from "@/pages/tasks/TaskProfilePage";
 import AddTask from "@/pages/tasks/AddTask";
@@ -13,6 +13,7 @@ import AddSchedule from "@/pages/schedules/AddSchedule";
 import NotePreview from "@/pages/notes/NotePreview";
 import AddNote from "@/pages/notes/AddNote";
 import EmployeeEdit from "@/pages/employees/EmployeeEdit";
+import ProjectEdit from "@/pages/projects/ProjectEdit";
 
 const alterRoute = function (
   appRoutes: AppRoute[],
@@ -77,7 +78,8 @@ let routes: RouteObject[] = addSubRoutes(appRoutes, {
   ],
   projects: [
     { path: "project/:project_id", element: <ProjectProfilePage /> },
-    { path: "add", element: <AddProject /> },
+    { path: "add", element: <ProjectForm /> },
+    { path: "edit/:project_id", element: <ProjectEdit /> },
   ],
   tasks: [
     { path: "task/:task_id", element: <TaskProfilePage /> },

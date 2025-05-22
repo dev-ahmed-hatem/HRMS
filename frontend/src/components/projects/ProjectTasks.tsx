@@ -1,5 +1,5 @@
-import { Tag, Table, Space, Input } from "antd";
-import { priorityColors, statusColors, Task } from "../../types/task";
+import { Tag, Table, Space } from "antd";
+import { priorityColors, statusColors, Task } from "@/types/task";
 import { tablePaginationConfig } from "../../utils/antd";
 import { useNavigate } from "react-router";
 import { ColumnsType } from "antd/lib/table";

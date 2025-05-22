@@ -1,10 +1,11 @@
-import { Tag, Table, Space } from "antd";
+import { Tag, Table, Space, Input } from "antd";
 import { priorityColors, statusColors, Task } from "../../types/task";
 import { tablePaginationConfig } from "../../utils/antd";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { ColumnsType } from "antd/lib/table";
 import { isOverdue } from "@/utils";
 import { dayjs } from "@/utils/locale";
+import { useState } from "react";
 
 const columns: ColumnsType<Task> = [
   {
@@ -69,39 +70,29 @@ const columns: ColumnsType<Task> = [
 ];
 
 const ProjectTasks = ({ tasks }: { tasks: Task[] }) => {
+  const [search, setSearch] = useState<string>("");
+
   const navigate = useNavigate();
   return (
     <>
-      {/* <div className="flex gap-4 mb-4 flex-wrap">
-        <Select
-          placeholder="تصفية حسب القسم"
-          onChange={setFilterDepartment}
-          allowClear
-        >
-          <Option value="تحليل">تحليل</Option>
-          <Option value="تطوير">تطوير</Option>
-          <Option value="اختبار">اختبار</Option>
-        </Select>
-        <Select
-          placeholder="تصفية حسب الحالة"
-          onChange={setFilterStatus}
-          allowClear
-        >
-          <Option value="مكتمل">مكتمل</Option>
-          <Option value="قيد التنفيذ">قيد التنفيذ</Option>
-          <Option value="غير مكتمل">غير مكتمل</Option>
-          <Option value="متأخر">متأخر</Option>
-        </Select>
-        <Button type="primary" onClick={handleFilter}>
-          تطبيق التصفية
-        </Button>
-      </div> */}
+      <div className="flex justify-between flex-wrap mt-4">
+        <Input.Search
+          placeholder="ابحث عن مهمة..."
+          onSearch={(value) => {
+            setSearch(value);
+          }}
+          className="mb-4 w-full max-w-md h-10"
+          defaultValue={search}
+          allowClear={true}
+          onClear={() => setSearch("")}
+        />
+      </div>
       <Table
         columns={columns}
         onRow={(record) => ({
           onClick: () => navigate(`/tasks/task/${record.id}`),
         })}
-        dataSource={tasks}
+        dataSource={tasks.filter((tasks) => tasks.title.includes(search))}
         rowKey="id"
         pagination={tablePaginationConfig()}
         className="clickable-table calypso-header"

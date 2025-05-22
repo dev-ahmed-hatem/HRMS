@@ -129,6 +129,8 @@ const ProjectsList = () => {
               onSearch={onSearch}
               className="mb-4 w-full max-w-md h-10"
               defaultValue={search}
+              allowClear={true}
+              onClear={() => setSearch("")}
             />
 
             {/* Add Button */}

@@ -61,7 +61,14 @@ class Project(AbstractBaseModel):
     )
     end_date = models.DateField(
         verbose_name=_("تاريخ الانتهاء"),
+        null=True,
+        blank=True,
         error_messages={'invalid': _("يرجى إدخال تاريخ صالح.")},
+    )
+    progress_started = models.DateTimeField(
+        verbose_name=_("تاريخ بدء التنفيذ"),
+        null=True,
+        blank=True,
     )
     supervisors = models.ManyToManyField(
         'employees.Employee',

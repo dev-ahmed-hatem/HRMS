@@ -17,6 +17,7 @@ export type Project = {
   status: ProjectStatus;
   start_date: string;
   end_date?: string;
+  progress_started?: string;
   client: string;
   supervisors?: AssignedEmployee[];
   budget: number;

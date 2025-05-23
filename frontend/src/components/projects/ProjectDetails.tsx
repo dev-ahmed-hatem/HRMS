@@ -17,12 +17,17 @@ const ProjectDetails = ({ project }: { project: Project }) => {
         <Descriptions.Item label="الميزانية">
           {project.budget}
         </Descriptions.Item>
-        <Descriptions.Item label="تاريخ البدء">
+        <Descriptions.Item label="تاريخ الاستلام">
           {project.start_date}
         </Descriptions.Item>
         <Descriptions.Item label="تاريخ الانتهاء">
-          {project.end_date}
+          {project.end_date || "-"}
         </Descriptions.Item>
+        {project.progress_started && (
+          <Descriptions.Item label="تاريخ بدء التنفيذ">
+            {project.progress_started}
+          </Descriptions.Item>
+        )}
         <Descriptions.Item label="المشرفون">
           <div className="flex gap-2">
             {project.supervisors?.map((sup, index, array) => (

@@ -41,7 +41,8 @@ const columns: (statusFilter: string[] | null) => ColumnsType<Project> = (
     render: (status: Project["status"], record) => (
       <div className="flex gap-2">
         <Tag color={statusColors[status]}>{status}</Tag>
-        {record.end_date && isOverdue(record.end_date) &&
+        {record.end_date &&
+          isOverdue(record.end_date) &&
           !["مكتمل", "قيد الموافقة"].includes(record.status) && (
             <Tag color="red">متأخر</Tag>
           )}
@@ -60,7 +61,7 @@ const columns: (statusFilter: string[] | null) => ColumnsType<Project> = (
     dataIndex: "end_date",
     key: "end_date",
     sorter: (a, b) => dayjs(a.end_date).unix() - dayjs(b.end_date).unix(),
-    render: (date) => dayjs(date).format("YYYY-MM-DD"),
+    render: (date) => (date ? dayjs(date).format("YYYY-MM-DD") : "-"),
   },
   {
     title: "المشرفون",

@@ -11,6 +11,7 @@ export const projectsEndpoints = api.injectEndpoints({
         url: "/projects/projects-stats/",
         method: "GET",
       }),
+      providesTags: [{ type: "Project", id: "LIST" }],
     }),
     getProjects: builder.query<
       PaginatedResponse<Project>,

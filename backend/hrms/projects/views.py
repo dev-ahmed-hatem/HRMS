@@ -49,6 +49,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
         except Project.DoesNotExist:
             return Response({'detail': _('مشروع غير موجود')}, status=status.HTTP_404_NOT_FOUND)
         new_status = request.data.get('status')
+
+        # declare progress start date as now
+        if new_status == "ongoing" and project.status == "pending-approval":
+            project.progress_started = datetime.now()
+
         project.status = new_status
         project.save()
         return Response({'status': project.get_status_display()}, status=status.HTTP_200_OK)
@@ -64,6 +69,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = ProjectReadSerializer(project, context={"request": request}).data
         stats = get_stats(project.id)
         return Response({**serializer, "tasks": serialized_tasks, "stats": stats}, status=status.HTTP_200_OK)
+
+    # @action(detail=True, methods=['get'])
+    # def form_data(self, request, pk=None):
+    #     project = Project.objects.filter(id=pk).first()
+    #     if not project:
+    #         return Response({'detail': _('مشروع غير موجود')}, status=status.HTTP_404_NOT_FOUND)
+    #     serializer = ProjectReadSerializer(project, context={"request": self.request}).data
+    #     return Response(serializer)
 
 
 class TaskViewSet(viewsets.ModelViewSet):

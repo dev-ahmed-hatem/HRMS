@@ -165,20 +165,16 @@ const ProjectForm = ({
             <Col xs={24} md={12}>
               <Form.Item
                 name="start_date"
-                label="تاريخ البدء"
-                rules={[{ required: true, message: "يرجى اختيار تاريخ البدء" }]}
+                label="تاريخ الاستلام"
+                rules={[
+                  { required: true, message: "يرجى اختيار تاريخ الاستلام" },
+                ]}
               >
                 <DatePicker format="YYYY-MM-DD" className="w-full" />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item
-                name="end_date"
-                label="تاريخ الانتهاء"
-                rules={[
-                  { required: true, message: "يرجى اختيار تاريخ الانتهاء" },
-                ]}
-              >
+              <Form.Item name="end_date" label="تاريخ الانتهاء">
                 <DatePicker format="YYYY-MM-DD" className="w-full" />
               </Form.Item>
             </Col>

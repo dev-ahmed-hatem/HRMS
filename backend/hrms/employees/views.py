@@ -50,11 +50,12 @@ class EmployeeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'])
     def form_data(self, request, pk=None):
-        employee = Employee.objects.filter(id=pk).first()
-        if not employee:
+        try:
+            employee = Employee.objects.get(id=pk)
+            serializer = EmployeeWriteSerializer(employee, context={"request": self.request}).data
+            return Response(serializer)
+        except Exception:
             return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
-        serializer = EmployeeWriteSerializer(employee, context={"request": self.request}).data
-        return Response(serializer)
 
 
 @api_view(["DELETE"])

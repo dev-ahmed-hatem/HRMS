@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Card, Avatar, Tabs, Button, Popconfirm, Tag } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getInitials, isOverdue } from "@/utils";
 import ProjectDetails from "@/components/projects/ProjectDetails";
 import TasksOverview from "@/components/tasks/TasksOverview";
-import { Project, statusColors } from "@/types/project";
+import { Project } from "@/types/project";
 import ProjectTasks from "@/components/projects/ProjectTasks";
 import { useNavigate, useParams } from "react-router";
 import { useNotification } from "@/providers/NotificationProvider";
@@ -21,7 +21,7 @@ import ProjectStatus from "@/components/projects/ProjectStatus";
 const getTabItems = (project: Project) => {
   const items: TabsProps["items"] = [];
 
-  if (project.status === "قيد التنفيذ") {
+  if (["قيد التنفيذ", "مكتمل"].includes(project.status)) {
     items.push({
       label: "نظرة عامة على المهام",
       key: "1",
@@ -35,7 +35,7 @@ const getTabItems = (project: Project) => {
     children: <ProjectDetails project={project} />,
   });
 
-  if (project.status === "قيد التنفيذ") {
+  if (["قيد التنفيذ", "مكتمل"].includes(project.status)) {
     items.push({
       label: "المهام",
       key: "3",
@@ -61,9 +61,11 @@ const ProjectProfilePage: React.FC = () => {
     format: "detailed",
   });
 
-  const isProjectOverdue =
-    isOverdue(project?.end_date!) &&
-    !["مكتمل", "قيد الموافقة"].includes(project?.status as string);
+  const isProjectOverdue = !!(
+    project?.end_date &&
+    isOverdue(project?.end_date) &&
+    !["مكتمل", "قيد الموافقة"].includes(project?.status as string)
+  );
 
   const [
     deleteProject,
@@ -100,13 +102,18 @@ const ProjectProfilePage: React.FC = () => {
       {/* Project Header */}
       <Card
         className={`shadow-lg rounded-xl ${
-          isProjectOverdue && "border-red-500 border-x-8"
-        }`}
+          project?.status === "مكتمل" && "border-green-600 border-x-8"
+        } ${isProjectOverdue && "border-red-500 border-x-8 "}`}
       >
         <div className="flex items-center justify-between flex-wrap gap-y-6 gap-x-4">
           {/* Avatar with Fallback */}
           <div className="flex items-center flex-wrap gap-4">
-            <Avatar size={80} className="bg-calypso-700 font-semibold">
+            <Avatar
+              size={80}
+              className={`bg-calypso-700 ${
+                project?.status === "مكتمل" && "bg-green-600"
+              } ${isProjectOverdue && "bg-red-500"} font-semibold`}
+            >
               {getInitials(project!.name)}
             </Avatar>
             <div>
@@ -116,7 +123,11 @@ const ProjectProfilePage: React.FC = () => {
           </div>
 
           {/* Status */}
-          {project?.status !== "مكتمل" && (
+          {project?.status === "مكتمل" ? (
+            <Tag color="green" className="text-sm p-2 text-center">
+              مكتمل
+            </Tag>
+          ) : (
             <ProjectStatus
               id={project_id as string}
               isProjectOverdue={isProjectOverdue}

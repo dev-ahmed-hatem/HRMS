@@ -1,103 +1,55 @@
-import React, { useEffect } from "react";
-import { Card, Avatar, Tabs, Button, Popconfirm, Tag, Select } from "antd";
+import React, { useEffect, useState } from "react";
+import { Card, Avatar, Tabs, Button, Popconfirm, Tag } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { getInitials, isOverdue } from "../../utils";
-import ProjectDetails from "../../components/projects/ProjectDetails";
-import TasksOverview from "../../components/tasks/TasksOverview";
-import { Project, ProjectStatus } from "../../types/project";
-import { Task } from "../../types/task";
-import ProjectTasks from "../../components/projects/ProjectTasks";
+import { getInitials, isOverdue } from "@/utils";
+import ProjectDetails from "@/components/projects/ProjectDetails";
+import TasksOverview from "@/components/tasks/TasksOverview";
+import { Project, statusColors } from "@/types/project";
+import ProjectTasks from "@/components/projects/ProjectTasks";
 import { useNavigate, useParams } from "react-router";
 import { useNotification } from "@/providers/NotificationProvider";
 import {
-  projectsEndpoints,
   useDeleteProjectMutation,
   useGetProjectQuery,
-  useSwitchProjectStatusMutation,
 } from "@/app/api/endpoints/projects";
 import Loading from "@/components/Loading";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
-import Error from "../Error";
-import { useAppDispatch } from "@/app/redux/hooks";
+import Error from "@/pages/Error";
+import { TabsProps } from "antd/lib";
+import ProjectStatus from "@/components/projects/ProjectStatus";
 
-const tasks: Task[] = [
-  {
-    id: 1,
-    title: "تحليل المتطلبات",
-    description: "جمع وتحليل متطلبات المشروع وتوثيقها.",
-    departments: [{ name: "تحليل", id: 1 }],
-    status: "مكتمل",
-    priority: "مرتفع",
-    due_date: "2024-02-10",
-    assigned_to: [{ name: "أحمد علي", id: 1 }],
-  },
-  {
-    id: 2,
-    title: "تصميم قاعدة البيانات",
-    description: "تصميم قاعدة البيانات بما يتناسب مع احتياجات المشروع.",
-    status: "غير مكتمل",
-    priority: "مرتفع",
-    due_date: "2024-03-15",
-    departments: [{ name: "تحليل", id: 1 }],
-    assigned_to: [{ name: "أحمد علي", id: 1 }],
-  },
-  {
-    id: 3,
-    title: "تطوير الواجهة الأمامية",
-    description: "تنفيذ التصميمات وبناء الواجهة الأمامية للموقع.",
-    status: "غير مكتمل",
-    priority: "متوسط",
-    due_date: "2024-04-20",
-    departments: [{ name: "تحليل", id: 1 }],
-    assigned_to: [{ name: "أحمد علي", id: 1 }],
-  },
-  {
-    id: 4,
-    title: "اختبار النظام",
-    description: "إجراء اختبارات على النظام والتأكد من جودته.",
-    status: "غير مكتمل",
-    priority: "منخفض",
-    due_date: "2024-05-30",
-    departments: [{ name: "تحليل", id: 1 }],
-    assigned_to: [{ name: "أحمد علي", id: 1 }],
-  },
-];
+const getTabItems = (project: Project) => {
+  const items: TabsProps["items"] = [];
 
-const items = (project: Project) => [
-  {
-    label: "نظرة عامة على المهام",
-    key: "1",
-    children: <TasksOverview stats={project.stats} />,
-  },
-  {
+  if (project.status === "قيد التنفيذ") {
+    items.push({
+      label: "نظرة عامة على المهام",
+      key: "1",
+      children: <TasksOverview stats={project.stats} />,
+    });
+  }
+
+  items.push({
     label: "تفاصيل المشروع",
     key: "2",
     children: <ProjectDetails project={project} />,
-  },
-  {
-    label: "المهام",
-    key: "3",
-    children: <ProjectTasks tasks={project.tasks} />,
-  },
-];
+  });
 
-type StatusOption = {
-  text: ProjectStatus;
-  value: string;
-  color: string;
+  if (project.status === "قيد التنفيذ") {
+    items.push({
+      label: "المهام",
+      key: "3",
+      children: <ProjectTasks tasks={project.tasks} />,
+    });
+  }
+
+  return items;
 };
-
-const statusOptions: StatusOption[] = [
-  { value: "ongoing", text: "قيد التنفيذ", color: "blue" },
-  { value: "pending-approval", text: "قيد الموافقة", color: "orange" },
-  { value: "paused", text: "متوقف", color: "red" },
-];
 
 const ProjectProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const notification = useNotification();
   const { project_id } = useParams();
-  const dispatch = useAppDispatch();
 
   const {
     data: project,
@@ -109,52 +61,18 @@ const ProjectProfilePage: React.FC = () => {
     format: "detailed",
   });
 
-  const [
-    changeState,
-    { data: switchRes, isLoading: switchingState, isError: switchError },
-  ] = useSwitchProjectStatusMutation();
+  const isProjectOverdue =
+    isOverdue(project?.end_date!) &&
+    !["مكتمل", "قيد الموافقة"].includes(project?.status as string);
 
   const [
     deleteProject,
     { isError: deleteError, isLoading: deleting, isSuccess: deleted },
   ] = useDeleteProjectMutation();
 
-  const isProjectOverdue =
-    isOverdue(project?.end_date!) &&
-    !["مكتمل", "قيد الموافقة"].includes(project?.status as string);
-
-  const handleStatusChange = (value: string) => {
-    changeState({ id: project_id!, status: value });
-  };
-
   const handleDelete = () => {
     deleteProject(project_id as string);
   };
-
-  useEffect(() => {
-    if (switchError) {
-      notification.error({
-        message: "حدث خطأ في تغيير الحالة ! برجاء إعادة المحاولة",
-      });
-    }
-  }, [switchError]);
-
-  useEffect(() => {
-    if (switchRes) {
-      dispatch(
-        projectsEndpoints.util.updateQueryData(
-          "getProject",
-          { id: project_id as string, format: "detailed" },
-          (draft: Project) => {
-            draft.status = switchRes.status;
-          }
-        )
-      );
-      notification.success({
-        message: "تم تغيير الحالة بنجاح",
-      });
-    }
-  }, [switchRes]);
 
   useEffect(() => {
     if (deleteError) {
@@ -182,10 +100,10 @@ const ProjectProfilePage: React.FC = () => {
       {/* Project Header */}
       <Card
         className={`shadow-lg rounded-xl ${
-          isProjectOverdue && "border-red-500"
+          isProjectOverdue && "border-red-500 border-x-8"
         }`}
       >
-        <div className="flex items-center justify-between flex-wrap gap-y-6">
+        <div className="flex items-center justify-between flex-wrap gap-y-6 gap-x-4">
           {/* Avatar with Fallback */}
           <div className="flex items-center flex-wrap gap-4">
             <Avatar size={80} className="bg-calypso-700 font-semibold">
@@ -197,40 +115,13 @@ const ProjectProfilePage: React.FC = () => {
             </div>
           </div>
 
-          {/* Status Selector */}
-          <div>
-            {isProjectOverdue && (
-              <Tag color="red" className="w-[80px] text-center p-1">
-                متأخر
-              </Tag>
-            )}
-            {project?.status === "مكتمل" ? (
-              <Tag color="green">مكتمل</Tag>
-            ) : (
-              <Select
-                value={project!.status}
-                onChange={(value) => {
-                  handleStatusChange(value);
-                }}
-                style={{ minWidth: 150 }}
-                optionLabelProp="label"
-                loading={switchingState}
-                disabled={switchingState}
-              >
-                {statusOptions.map((opt) => (
-                  <Select.Option
-                    key={opt.value}
-                    value={opt.value}
-                    label={opt.text}
-                  >
-                    <Tag color={opt.color} className="w-full text-center">
-                      {opt.text}
-                    </Tag>
-                  </Select.Option>
-                ))}
-              </Select>
-            )}
-          </div>
+          {/* Status */}
+          {project?.status !== "مكتمل" && (
+            <ProjectStatus
+              id={project_id as string}
+              isProjectOverdue={isProjectOverdue}
+            />
+          )}
         </div>
       </Card>
 
@@ -239,7 +130,7 @@ const ProjectProfilePage: React.FC = () => {
         className="mt-4"
         defaultActiveKey="1"
         direction="rtl"
-        items={items(project!)}
+        items={getTabItems(project!)}
       />
 
       <div className="flex justify-between mt-2 flex-wrap gap-2">

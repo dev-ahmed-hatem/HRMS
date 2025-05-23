@@ -3,6 +3,14 @@ import { Task, TasksStats } from "./task";
 
 export type ProjectStatus = "قيد التنفيذ" | "مكتمل" | "قيد الموافقة" | "متوقف";
 
+// Status Color Mapping
+export const statusColors: Record<Project["status"], string> = {
+  "قيد التنفيذ": "blue",
+  مكتمل: "green",
+  "قيد الموافقة": "gold",
+  متوقف: "gray",
+};
+
 export type Project = {
   id: string;
   name: string;

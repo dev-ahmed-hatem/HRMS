@@ -50,7 +50,7 @@ export const projectsEndpoints = api.injectEndpoints({
         method: "POST",
         data: { status },
       }),
-      invalidatesTags: [{ type: "Task", id: "LIST" }],
+      invalidatesTags: [{ type: "Project", id: "LIST" }],
     }),
     project: builder.mutation<
       Project,

@@ -29,6 +29,7 @@ const ProjectDetails = ({ project }: { project: Project }) => {
               <Link
                 to={`/employees/employee-profile/${sup.id}`}
                 className="text-blue-700 hover:underline hover:text-blue-500"
+                key={sup.id}
               >
                 {sup.name}
                 {index + 1 !== array.length && "،"}

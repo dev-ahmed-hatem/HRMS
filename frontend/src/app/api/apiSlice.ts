@@ -7,6 +7,7 @@ export const api = createApi({
   endpoints: () => ({}),
   tagTypes: ["Employee", "Project", "Task"],
   keepUnusedDataFor: 180,
+  refetchOnReconnect: true,
 });
 
 export default api;

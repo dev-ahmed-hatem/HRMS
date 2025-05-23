@@ -1,28 +1,20 @@
-import ProjectsOverview from "../../components/projects/ProjectOverview";
+import ProjectsOverview from "@/components/projects/ProjectOverview";
 import { Input, Table, Tag } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import { Project } from "../../types/project";
-import { tablePaginationConfig } from "../../utils/antd";
+import { Project, statusColors } from "@/types/project";
+import { tablePaginationConfig } from "@/utils/antd";
 import { Link, useNavigate } from "react-router";
 import { AssignedEmployee } from "@/types/employee";
-import Error from "../Error";
+import Error from "@/pages/Error";
 import Loading from "@/components/Loading";
 import {
   useGetProjectsQuery,
   useGetProjectsStatsQuery,
 } from "@/app/api/endpoints/projects";
 import { isOverdue } from "@/utils";
-
-// Status Color Mapping
-const statusColors: Record<Project["status"], string> = {
-  "قيد التنفيذ": "blue",
-  مكتمل: "green",
-  "قيد الموافقة": "gold",
-  متوقف: "gray",
-};
 
 // Define table columns
 const columns: (statusFilter: string[] | null) => ColumnsType<Project> = (
@@ -49,7 +41,7 @@ const columns: (statusFilter: string[] | null) => ColumnsType<Project> = (
     render: (status: Project["status"], record) => (
       <div className="flex gap-2">
         <Tag color={statusColors[status]}>{status}</Tag>
-        {isOverdue(record.end_date) &&
+        {record.end_date && isOverdue(record.end_date) &&
           !["مكتمل", "قيد الموافقة"].includes(record.status) && (
             <Tag color="red">متأخر</Tag>
           )}

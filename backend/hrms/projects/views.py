@@ -70,13 +70,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
         stats = get_stats(project.id)
         return Response({**serializer, "tasks": serialized_tasks, "stats": stats}, status=status.HTTP_200_OK)
 
-    # @action(detail=True, methods=['get'])
-    # def form_data(self, request, pk=None):
-    #     project = Project.objects.filter(id=pk).first()
-    #     if not project:
-    #         return Response({'detail': _('مشروع غير موجود')}, status=status.HTTP_404_NOT_FOUND)
-    #     serializer = ProjectReadSerializer(project, context={"request": self.request}).data
-    #     return Response(serializer)
+    @action(detail=True, methods=['get'])
+    def form_data(self, request, pk=None):
+        try:
+            project = Project.objects.get(id=pk)
+            serializer = ProjectReadSerializer(project, context={"request": self.request}).data
+            return Response(serializer)
+        except Exception:
+            return Response({'detail': _('مشروع غير موجود')}, status=status.HTTP_404_NOT_FOUND)
 
 
 class TaskViewSet(viewsets.ModelViewSet):

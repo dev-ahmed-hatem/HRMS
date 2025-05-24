@@ -109,6 +109,10 @@ const ProjectForm = ({
           end_date: initialValues?.end_date
             ? dayjs(initialValues.end_date)
             : null,
+          supervisors: initialValues?.supervisors?.map((sup) => ({
+            value: sup.id,
+            label: sup.name,
+          })),
         }}
         className="add-form"
       >

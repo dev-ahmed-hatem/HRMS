@@ -1,9 +1,9 @@
-import { Task, TasksStats } from "@/types/task";
+import { Task, TasksStats, TaskStatus } from "@/types/task";
 import api from "../apiSlice";
 import qs from "query-string";
 import { PaginatedResponse } from "@/types/paginatedResponse";
 
-const tasksEndpoints = api.injectEndpoints({
+export const tasksEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
     getTasksStats: builder.query<TasksStats, void>({
       query: () => ({
@@ -41,6 +41,13 @@ const tasksEndpoints = api.injectEndpoints({
       }),
       providesTags: (res, error, arg) => [{ type: "Task", id: arg.id }],
     }),
+    switchTaskState: builder.mutation<{ status: TaskStatus }, string>({
+      query: (id) => ({
+        url: `/projects/tasks/${id}/switch_state/`,
+        method: "GET",
+      }),
+      invalidatesTags: [{ type: "Task", id: "LIST" }],
+    }),
     task: builder.mutation<
       Task,
       { data?: Partial<Task>; method: string; url: string }
@@ -50,6 +57,7 @@ const tasksEndpoints = api.injectEndpoints({
         method: method || "DELETE",
         data,
       }),
+      invalidatesTags: (res, error, arg) => [{ type: "Task", id: res?.id }],
     }),
   }),
 });
@@ -58,5 +66,6 @@ export const {
   useGetTasksStatsQuery,
   useGetTasksQuery,
   useGetTaskQuery,
+  useSwitchTaskStateMutation,
   useTaskMutation,
 } = tasksEndpoints;

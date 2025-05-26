@@ -131,6 +131,16 @@ class TaskViewSet(viewsets.ModelViewSet):
         return Response({**serializer, "project_tasks": project_tasks_serialized}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
+    def switch_state(self, request, pk=None):
+        try:
+            task = Task.objects.get(pk=pk)
+            task.status = "completed" if task.status == "incomplete" else "incomplete"
+            task.save()
+            return Response({"status": task.get_status_display()}, status=status.HTTP_200_OK)
+        except Exception:
+            return Response({'detail': _('مهمة غير موجودة')}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['get'])
     def form_data(self, request, pk=None):
         try:
             task = Task.objects.get(id=pk)

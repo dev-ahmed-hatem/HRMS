@@ -1,16 +1,22 @@
-import React, { useEffect } from "react";
-import { Card, Avatar, Tabs, Button, Tag, Popconfirm } from "antd";
+import React, { useEffect, useState } from "react";
+import { Card, Avatar, Tabs, Button, Tag, Popconfirm, Switch } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getInitials, isOverdue } from "@/utils";
 import TaskDetails from "@/components/tasks/TaskDetails";
 import RelatedTasks from "@/components/tasks/RelatedTasks";
-import { statusColors, priorityColors, Task } from "@/types/task";
+import { statusColors, priorityColors, Task, TaskStatus } from "@/types/task";
 import { Link, useNavigate, useParams } from "react-router";
 import { useNotification } from "@/providers/NotificationProvider";
-import { useGetTaskQuery, useTaskMutation } from "@/app/api/endpoints/tasks";
+import {
+  tasksEndpoints,
+  useGetTaskQuery,
+  useSwitchTaskStateMutation,
+  useTaskMutation,
+} from "@/app/api/endpoints/tasks";
 import Loading from "@/components/Loading";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import Error from "@/pages/Error";
+import { useAppDispatch } from "@/app/redux/hooks";
 
 const items = (task: Task) => [
   {
@@ -29,6 +35,7 @@ const TaskProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const notification = useNotification();
   const { task_id } = useParams();
+  const dispatch = useAppDispatch();
 
   const {
     data: task,
@@ -40,14 +47,55 @@ const TaskProfilePage: React.FC = () => {
     format: "detailed",
   });
 
+  const isTaskOverdue = !!(
+    task?.due_date &&
+    isOverdue(task?.due_date) &&
+    task?.status !== "مكتمل"
+  );
+
+  // change status
+  const [
+    switchStatus,
+    { data: switchRes, isLoading: switching, isError: switchError },
+  ] = useSwitchTaskStateMutation();
+
   const [
     deleteTask,
     { isError: deleteError, isLoading: deleting, isSuccess: deleted },
   ] = useTaskMutation();
 
+  const toggleStatus = () => {
+    switchStatus(task_id as string);
+  };
+
   const handleDelete = () => {
     deleteTask({ url: `projects/tasks/${task_id}/`, method: "DELETE" });
   };
+
+  useEffect(() => {
+    if (switchError) {
+      notification.error({
+        message: "حدث خطأ في تغيير الحالة ! برجاء إعادة المحاولة",
+      });
+    }
+  }, [switchError]);
+
+  useEffect(() => {
+    if (switchRes) {
+      dispatch(
+        tasksEndpoints.util.updateQueryData(
+          "getTask",
+          { id: task_id as string, format: "detailed" },
+          (draft: Task) => {
+            draft.status = switchRes.status;
+          }
+        )
+      );
+      notification.success({
+        message: "تم تغيير الحالة بنجاح",
+      });
+    }
+  }, [switchRes]);
 
   useEffect(() => {
     if (deleteError) {
@@ -79,11 +127,20 @@ const TaskProfilePage: React.FC = () => {
   return (
     <>
       {/* Task Header */}
-      <Card className="shadow-lg rounded-xl">
+      <Card
+        className={`shadow-lg rounded-xl  ${
+          task?.status === "مكتمل" && "border-green-600 border-x-8"
+        } ${isTaskOverdue && "border-red-500 border-x-8 "}`}
+      >
         <div className="flex items-center justify-between flex-wrap gap-y-6">
           {/* Avatar with Fallback */}
           <div className="flex items-center flex-wrap gap-4">
-            <Avatar size={80} className="bg-calypso-700 font-semibold">
+            <Avatar
+              size={80}
+              className={`bg-calypso-700 ${
+                task?.status === "مكتمل" && "bg-green-600"
+              } ${isTaskOverdue && "bg-red-500"} font-semibold`}
+            >
               {getInitials(task!.title)}
             </Avatar>
             <div>
@@ -96,9 +153,6 @@ const TaskProfilePage: React.FC = () => {
 
           {/* Status & Priority */}
           <div className="flex flex-col gap-2 text-center">
-            <Tag className="text-center" color={statusColors[task!.status]}>
-              {task!.status}
-            </Tag>
             <Tag className="text-center" color={priorityColors[task!.priority]}>
               {task!.priority}
             </Tag>
@@ -121,6 +175,17 @@ const TaskProfilePage: React.FC = () => {
             ) : (
               <Tag color="gray">غير مرتبط بمشروع</Tag>
             )}
+          </div>
+
+          {/* Status */}
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={task!.status === "مكتمل"}
+              onChange={toggleStatus}
+              checkedChildren="مكتمل"
+              unCheckedChildren="غير مكتمل"
+              loading={switching}
+            />
           </div>
         </div>
       </Card>

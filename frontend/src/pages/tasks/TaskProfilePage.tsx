@@ -1,13 +1,18 @@
 import React from "react";
 import { Card, Avatar, Tabs, Button, Tag } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { getInitials } from "../../utils";
-import TaskDetails from "../../components/tasks/TaskDetails";
-import RelatedTasks from "../../components/tasks/RelatedTasks";
-import { Task } from "../../types/task";
-import { Link } from "react-router";
+import { getInitials, isOverdue } from "@/utils";
+import TaskDetails from "@/components/tasks/TaskDetails";
+import RelatedTasks from "@/components/tasks/RelatedTasks";
+import { statusColors, priorityColors, Task } from "@/types/task";
+import { Link, useNavigate, useParams } from "react-router";
+import { useNotification } from "@/providers/NotificationProvider";
+import { useGetTaskQuery } from "@/app/api/endpoints/tasks";
+import Loading from "@/components/Loading";
+import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
+import Error from "@/pages/Error";
 
-const task: Task = {
+const task2: Task = {
   id: 1,
   title: "تحليل المتطلبات",
   description: "جمع وتحليل متطلبات المشروع وتوثيقها.",
@@ -19,31 +24,43 @@ const task: Task = {
   project: { id: "P001", name: "تطوير نظام إدارة الموارد" },
 };
 
+const items = (task: Task) => [
+  {
+    label: "تفاصيل المهمة",
+    key: "1",
+    children: <TaskDetails task={task} />,
+  },
+  {
+    label: "مهام مرتبطة",
+    key: "2",
+    children: <RelatedTasks task={task} />,
+  },
+];
+
 const TaskProfilePage: React.FC = () => {
-  const statusColors: Record<Task["status"], string> = {
-    مكتمل: "green",
-    "غير مكتمل": "red",
-  };
+  const navigate = useNavigate();
+  const notification = useNotification();
+  const { task_id } = useParams();
 
-  const priorityColors: Record<Task["priority"], string> = {
-    منخفض: "blue",
-    متوسط: "orange",
-    مرتفع: "red",
-  };
+  const {
+    data: task,
+    isFetching,
+    isError,
+    error: projectError,
+  } = useGetTaskQuery({
+    id: task_id as string,
+    format: "detailed",
+  });
 
-  const items = [
-    {
-      label: "تفاصيل المهمة",
-      key: "1",
-      children: <TaskDetails task={task} />,
-    },
-    {
-      label: "مهام مرتبطة",
-      key: "2",
-      children: <RelatedTasks taskId={task.id} />,
-    },
-  ];
+  if (isFetching) return <Loading />;
+  if (isError) {
+    const error_title =
+      (projectError as axiosBaseQueryError).status === 404
+        ? "مهمة غير موجودة! تأكد من كود المهمة المدخل."
+        : undefined;
 
+    return <Error subtitle={error_title} reload={error_title === undefined} />;
+  }
   return (
     <>
       {/* Task Header */}
@@ -52,28 +69,39 @@ const TaskProfilePage: React.FC = () => {
           {/* Avatar with Fallback */}
           <div className="flex items-center flex-wrap gap-4">
             <Avatar size={80} className="bg-calypso-700 font-semibold">
-              {getInitials(task.title)}
+              {getInitials(task!.title)}
             </Avatar>
             <div>
-              <h2 className="text-xl font-bold">{task.title}</h2>
-              <p className="text-gray-500">{task.departments.join()}</p>
+              <h2 className="text-xl font-bold">{task!.title}</h2>
+              <p className="text-gray-500">
+                {task!.departments.map((dep) => dep.name).join("،")}
+              </p>
             </div>
           </div>
 
           {/* Status & Priority */}
           <div className="flex flex-col gap-2 text-center">
-            <Tag color={statusColors[task.status]}>{task.status}</Tag>
-            <Tag color={priorityColors[task.priority]}>{task.priority}</Tag>
+            <Tag className="text-center" color={statusColors[task!.status]}>
+              {task!.status}
+            </Tag>
+            <Tag className="text-center" color={priorityColors[task!.priority]}>
+              {task!.priority}
+            </Tag>
+            {isOverdue(task!.due_date) && task!.status === "غير مكتمل" && (
+              <Tag className="text-center" color="red">
+                متأخر
+              </Tag>
+            )}
           </div>
 
           {/* Project Association */}
           <div>
-            {task.project ? (
+            {task!.project ? (
               <Link
-                to={`/projects/project/${task.project.id}`}
+                to={`/projects/project/${task!.project.id}`}
                 className="text-blue-700 hover:underline hover:text-blue-500"
               >
-                مرتبط بـ {task.project.name}
+                مرتبط بـ {task!.project.name}
               </Link>
             ) : (
               <Tag color="gray">غير مرتبط بمشروع</Tag>
@@ -87,7 +115,7 @@ const TaskProfilePage: React.FC = () => {
         className="mt-4"
         defaultActiveKey="1"
         direction="rtl"
-        items={items}
+        items={items(task!)}
       />
 
       {/* Action Buttons */}

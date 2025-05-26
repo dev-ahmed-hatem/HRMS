@@ -15,6 +15,7 @@ export interface Task {
   due_date: string;
   assigned_to: AssignedEmployee[];
   project?: AssignedProject | null;
+  project_tasks?: Task[];
 }
 
 export type TasksStats = {

@@ -4,15 +4,15 @@ import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { priorityColors, statusColors, Task } from "../../types/task";
-import { tablePaginationConfig } from "../../utils/antd";
+import { tablePaginationConfig } from "@/utils/antd";
 import { Link, useNavigate } from "react-router";
-import TasksOverview from "../../components/tasks/TasksOverview";
+import TasksOverview from "@/components/tasks/TasksOverview";
 import {
   useGetTasksQuery,
   useGetTasksStatsQuery,
 } from "@/app/api/endpoints/tasks";
 import Loading from "@/components/Loading";
-import Error from "../Error";
+import Error from "@/pages/Error";
 import { isOverdue } from "@/utils";
 
 const columns: (

@@ -10,6 +10,7 @@ const tasksEndpoints = api.injectEndpoints({
         url: "/projects/tasks-stats/",
         method: "GET",
       }),
+      providesTags: [{ type: "Task", id: "LIST" }],
     }),
     getTasks: builder.query<
       PaginatedResponse<Task>,
@@ -19,8 +20,29 @@ const tasksEndpoints = api.injectEndpoints({
         url: `/projects/tasks/?${qs.stringify(params || {})}`,
         method: "GET",
       }),
+      providesTags: (results) =>
+        results?.data
+          ? [
+              ...results.data.map((task) => ({
+                type: "Task" as const,
+                id: task.id,
+              })),
+              { type: "Task", id: "LIST" },
+            ]
+          : [{ type: "Task", id: "LIST" }],
+    }),
+    getTask: builder.query<
+      Task,
+      { id: string; format: "detailed" | "form_data" }
+    >({
+      query: ({ id, format }) => ({
+        url: `projects/tasks/${id}/${format}/`,
+        method: "GET",
+      }),
+      providesTags: (res, error, arg) => [{ type: "Task", id: arg.id }],
     }),
   }),
 });
 
-export const { useGetTasksStatsQuery, useGetTasksQuery } = tasksEndpoints;
+export const { useGetTasksStatsQuery, useGetTasksQuery, useGetTaskQuery } =
+  tasksEndpoints;

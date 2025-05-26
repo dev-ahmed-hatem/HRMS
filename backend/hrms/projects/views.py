@@ -62,12 +62,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def detailed(self, request, pk=None):
         try:
             project = Project.objects.get(pk=pk)
-        except Project.DoesNotExist:
+        except Exception:
             return Response({"detail": _("مشروع غير موجود")}, status=status.HTTP_404_NOT_FOUND)
         tasks = Task.objects.filter(project=project)
         serialized_tasks = TaskListSerializer(tasks, many=True, context={'request': request}).data
         serializer = ProjectReadSerializer(project, context={"request": request}).data
-        stats = get_stats(project.id)
+        stats = calculate_tasks_stats(project.id)
         return Response({**serializer, "tasks": serialized_tasks, "stats": stats}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
@@ -123,10 +123,12 @@ class TaskViewSet(viewsets.ModelViewSet):
     def detailed(self, request, pk=None):
         try:
             task = Task.objects.get(pk=pk)
+            project_tasks = Task.objects.filter(project=task.project)
+            project_tasks_serialized = TaskListSerializer(project_tasks, many=True, context={'request': request}).data
         except Task.DoesNotExist:
             return Response({"detail": _("مهمة غير موجود")}, status=status.HTTP_404_NOT_FOUND)
         serializer = TaskReadSerializer(task, context={"request": request}).data
-        return Response(serializer, status=status.HTTP_200_OK)
+        return Response({**serializer, "project_tasks": project_tasks_serialized}, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
@@ -148,7 +150,7 @@ def projects_stats(request):
     }, status=status.HTTP_200_OK)
 
 
-def get_stats(project_id=None):
+def calculate_tasks_stats(project_id=None):
     today = datetime.today().astimezone(settings.CAIRO_TZ).date()
     if project_id is not None:
         tasks = Task.objects.filter(project__id=project_id)
@@ -171,5 +173,5 @@ def get_stats(project_id=None):
 
 @api_view(["GET"])
 def tasks_stats(request):
-    stats = get_stats()
+    stats = calculate_tasks_stats()
     return Response(stats, status=status.HTTP_200_OK)

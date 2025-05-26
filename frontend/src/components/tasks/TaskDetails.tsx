@@ -1,31 +1,20 @@
 import React from "react";
 import { Card, Descriptions, Tag } from "antd";
-import { Task } from "../../types/task";
+import { priorityColors, statusColors, Task } from "@/types/task";
 
 interface TaskDetailsProps {
   task: Task;
 }
 
 const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
-  const statusColors: Record<Task["status"], string> = {
-    مكتمل: "green",
-    "غير مكتمل": "red",
-  };
-
-  const priorityColors: Record<Task["priority"], string> = {
-    منخفض: "blue",
-    متوسط: "orange",
-    مرتفع: "red",
-  };
-
   return (
     <Card className="shadow-md rounded-xl">
       <Descriptions title="تفاصيل المهمة" bordered column={1}>
         <Descriptions.Item label="الكود">{task.id}</Descriptions.Item>
         <Descriptions.Item label="الاسم">{task.title}</Descriptions.Item>
         <Descriptions.Item label="الوصف">{task.description}</Descriptions.Item>
-        <Descriptions.Item label="القسم">
-          {task.departments.join()}
+        <Descriptions.Item label="الأقسام">
+          {task!.departments.map((dep) => dep.name).join("،")}
         </Descriptions.Item>
         <Descriptions.Item label="الموعد النهائي">
           {task.due_date}

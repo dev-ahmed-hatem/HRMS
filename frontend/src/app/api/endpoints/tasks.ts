@@ -41,8 +41,22 @@ const tasksEndpoints = api.injectEndpoints({
       }),
       providesTags: (res, error, arg) => [{ type: "Task", id: arg.id }],
     }),
+    task: builder.mutation<
+      Task,
+      { data?: Partial<Task>; method: string; url: string }
+    >({
+      query: ({ data, method, url }) => ({
+        url: url || "projects/tasks/",
+        method: method || "DELETE",
+        data,
+      }),
+    }),
   }),
 });
 
-export const { useGetTasksStatsQuery, useGetTasksQuery, useGetTaskQuery } =
-  tasksEndpoints;
+export const {
+  useGetTasksStatsQuery,
+  useGetTasksQuery,
+  useGetTaskQuery,
+  useTaskMutation,
+} = tasksEndpoints;

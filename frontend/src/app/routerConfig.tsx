@@ -5,7 +5,7 @@ import EmployeeForm from "@/pages/employees/EmployeeForm";
 import ProjectForm from "@/pages/projects/ProjectForm";
 import ProjectProfilePage from "@/pages/projects/ProjectProfilePage";
 import TaskProfilePage from "@/pages/tasks/TaskProfilePage";
-import AddTask from "@/pages/tasks/AddTask";
+import TaskForm from "@/pages/tasks/TaskForm";
 import FinancialForm from "@/pages/financials/FinancialForm";
 import FinancialProfilePage from "@/pages/financials/FinancialProfilePage";
 import SalaryForm from "@/pages/financials/SalaryForm";
@@ -14,6 +14,7 @@ import NotePreview from "@/pages/notes/NotePreview";
 import AddNote from "@/pages/notes/AddNote";
 import EmployeeEdit from "@/pages/employees/EmployeeEdit";
 import ProjectEdit from "@/pages/projects/ProjectEdit";
+import TaskEdit from "@/pages/tasks/TaskEdit";
 
 const alterRoute = function (
   appRoutes: AppRoute[],
@@ -83,7 +84,8 @@ let routes: RouteObject[] = addSubRoutes(appRoutes, {
   ],
   tasks: [
     { path: "task/:task_id", element: <TaskProfilePage /> },
-    { path: "add", element: <AddTask /> },
+    { path: "add", element: <TaskForm /> },
+    { path: "edit/:task_id", element: <TaskEdit /> },
   ],
   "financials/incomes": [
     { path: "add", element: <FinancialForm financialItem="income" /> },

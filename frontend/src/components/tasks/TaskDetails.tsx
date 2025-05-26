@@ -14,7 +14,7 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
         <Descriptions.Item label="الاسم">{task.title}</Descriptions.Item>
         <Descriptions.Item label="الوصف">{task.description}</Descriptions.Item>
         <Descriptions.Item label="الأقسام">
-          {task!.departments.map((dep) => dep.name).join("،")}
+          {task!.departments.map((dep) => dep.name).join("، ")}
         </Descriptions.Item>
         <Descriptions.Item label="الموعد النهائي">
           {task.due_date}

@@ -58,8 +58,8 @@ export const projectsEndpoints = api.injectEndpoints({
       { data: Partial<Project>; method?: string; url?: string }
     >({
       query: ({ data, method, url }) => ({
-        url: url ? url : `projects/projects/`,
-        method: method ? method : "POST",
+        url: url || `projects/projects/`,
+        method: method || "POST",
         data,
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {

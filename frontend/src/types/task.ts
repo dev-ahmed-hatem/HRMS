@@ -16,6 +16,8 @@ export interface Task {
   assigned_to: AssignedEmployee[];
   project?: AssignedProject | null;
   project_tasks?: Task[];
+  created_at: string;
+  created_by: string;
 }
 
 export type TasksStats = {

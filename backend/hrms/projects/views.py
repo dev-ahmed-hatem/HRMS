@@ -126,9 +126,18 @@ class TaskViewSet(viewsets.ModelViewSet):
             project_tasks = Task.objects.filter(project=task.project)
             project_tasks_serialized = TaskListSerializer(project_tasks, many=True, context={'request': request}).data
         except Task.DoesNotExist:
-            return Response({"detail": _("مهمة غير موجود")}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": _("مهمة غير موجودة")}, status=status.HTTP_404_NOT_FOUND)
         serializer = TaskReadSerializer(task, context={"request": request}).data
         return Response({**serializer, "project_tasks": project_tasks_serialized}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['get'])
+    def form_data(self, request, pk=None):
+        try:
+            task = Task.objects.get(id=pk)
+            serializer = TaskReadSerializer(task, context={"request": self.request}).data
+            return Response(serializer)
+        except Exception:
+            return Response({'detail': _('مهمة غير موجودة')}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["GET"])

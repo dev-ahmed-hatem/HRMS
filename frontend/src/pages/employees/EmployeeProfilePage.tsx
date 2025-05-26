@@ -182,7 +182,13 @@ const EmployeeProfilePage: React.FC = () => {
   }, [deleteError]);
 
   useEffect(() => {
-    if (deleted) navigate("/employees");
+    if (deleted) {
+      notification.success({
+        message: "تم حذف الموظف بنجاح",
+      });
+
+      navigate("/employees");
+    }
   }, [deleted]);
 
   if (isFetching) return <Loading />;

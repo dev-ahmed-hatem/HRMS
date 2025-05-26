@@ -85,7 +85,13 @@ const ProjectProfilePage: React.FC = () => {
   }, [deleteError]);
 
   useEffect(() => {
-    if (deleted) navigate("/projects");
+    if (deleted) {
+      notification.success({
+        message: "تم حذف المشروع بنجاح",
+      });
+
+      navigate("/projects");
+    }
   }, [deleted]);
 
   if (isFetching) return <Loading />;

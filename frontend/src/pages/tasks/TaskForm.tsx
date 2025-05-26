@@ -5,7 +5,7 @@ import { Project } from "../../types/project";
 
 const { Option } = Select;
 
-const AddTask = ({
+const TaskForm = ({
   initialValues,
   onSubmit,
   project,
@@ -163,4 +163,4 @@ const AddTask = ({
   );
 };
 
-export default AddTask;
+export default TaskForm;

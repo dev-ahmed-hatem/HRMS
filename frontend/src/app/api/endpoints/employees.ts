@@ -47,8 +47,8 @@ export const employeesEndpoints = api.injectEndpoints({
       { data: Partial<Employee>; method?: string; url?: string }
     >({
       query: ({ data, method, url }) => ({
-        url: url ? url : `employees/employees/`,
-        method: method ? method : "POST",
+        url: url || `employees/employees/`,
+        method: method || "POST",
         headers: {
           "Content-Type": "multipart/form-data",
         },

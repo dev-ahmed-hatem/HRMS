@@ -33,7 +33,7 @@ export const projectsEndpoints = api.injectEndpoints({
           : [{ type: "Project", id: "LIST" }],
     }),
     getProject: builder.query<
-      Project,
+      Partial<Project>,
       { id: string; format: "detailed" | "form_data" }
     >({
       query: ({ id, format }) => ({

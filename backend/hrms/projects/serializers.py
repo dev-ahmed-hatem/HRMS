@@ -43,9 +43,14 @@ class ProjectListSerializer(serializers.ModelSerializer):
 
 
 class ProjectWriteSerializer(serializers.ModelSerializer):
+    current_supervisors = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Project
         fields = '__all__'
+
+    def get_current_supervisors(self, obj: Project):
+        return [{"id": sup.id, "name": sup.name} for sup in obj.supervisors.all()]
 
     def create(self, validated_data):
         auth_user = self.context['request'].user

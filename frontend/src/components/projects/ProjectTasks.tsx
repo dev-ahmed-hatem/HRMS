@@ -77,13 +77,13 @@ const ProjectTasks = ({ project }: { project: Project }) => {
   const navigate = useNavigate();
   return (
     <>
-      <div className="flex justify-between flex-wrap mt-4">
+      <div className="flex justify-between flex-wrap my-4">
         <Input.Search
           placeholder="ابحث عن مهمة..."
           onSearch={(value) => {
             setSearch(value);
           }}
-          className="mb-4 w-full max-w-md h-10"
+          className="w-full max-w-md h-10 mb-2 md:mb-4"
           defaultValue={search}
           allowClear={true}
           onClear={() => setSearch("")}

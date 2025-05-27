@@ -74,7 +74,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def form_data(self, request, pk=None):
         try:
             project = Project.objects.get(id=pk)
-            serializer = ProjectReadSerializer(project, context={"request": self.request}).data
+            serializer = ProjectWriteSerializer(project, context={"request": self.request}).data
             return Response(serializer)
         except Exception:
             return Response({'detail': _('مشروع غير موجود')}, status=status.HTTP_404_NOT_FOUND)
@@ -165,7 +165,7 @@ class TaskViewSet(viewsets.ModelViewSet):
     def form_data(self, request, pk=None):
         try:
             task = Task.objects.get(id=pk)
-            serializer = TaskReadSerializer(task, context={"request": self.request}).data
+            serializer = TaskWriteSerializer(task, context={"request": self.request}).data
             return Response(serializer)
         except Exception:
             return Response({'detail': _('مهمة غير موجودة')}, status=status.HTTP_404_NOT_FOUND)

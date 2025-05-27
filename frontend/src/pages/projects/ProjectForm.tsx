@@ -10,6 +10,7 @@ import { handleServerErrors } from "@/utils/handleForm";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { useNotification } from "@/providers/NotificationProvider";
 import { useNavigate } from "react-router";
+import { AssignedEmployee } from "@/types/employee";
 
 type ProjectFormValues = Omit<Project, "status"> & {
   start_date: Dayjs;
@@ -21,7 +22,7 @@ const ProjectForm = ({
   projectId,
   onSubmit,
 }: {
-  initialValues?: Project;
+  initialValues?: Project & { current_supervisors: AssignedEmployee[] };
   projectId?: string;
   onSubmit?: (values: Project) => void;
 }) => {
@@ -54,6 +55,9 @@ const ProjectForm = ({
       ...values,
       start_date: values.start_date.format("YYYY-MM-DD"),
       end_date: values.end_date?.format("YYYY-MM-DD") || null,
+      supervisors: values.supervisors?.map((sup) =>
+        typeof sup === "object" ? sup.value : sup
+      ),
     };
 
     addProject({
@@ -109,7 +113,7 @@ const ProjectForm = ({
           end_date: initialValues?.end_date
             ? dayjs(initialValues.end_date)
             : null,
-          supervisors: initialValues?.supervisors?.map((sup) => ({
+          supervisors: initialValues?.current_supervisors?.map((sup) => ({
             value: sup.id,
             label: sup.name,
           })),

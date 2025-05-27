@@ -132,10 +132,6 @@ const TaskForm = ({
           due_date: initialValues?.due_date
             ? dayjs(initialValues.due_date)
             : null,
-          departments: initialValues?.departments?.map((dep) => ({
-            label: dep.name,
-            value: dep.id,
-          })),
           assigned_to: initialValues?.assigned_to?.map((emp) => ({
             label: (
               <span>

@@ -26,7 +26,7 @@ class ProjectReadSerializer(serializers.ModelSerializer):
             return None
 
     def get_supervisors(self, obj: Project):
-        return [{"id": s.id, "name": s.name} for s in obj.supervisors.all()]
+        return [{"id": s.id, "name": s.name, "is_active": s.is_active} for s in obj.supervisors.all()]
 
 
 class ProjectListSerializer(serializers.ModelSerializer):
@@ -63,7 +63,7 @@ class TaskReadSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_assigned_to(self, obj: Task):
-        return [{"name": emp.name, "id": emp.id} for emp in obj.assigned_to.all()]
+        return [{"name": emp.name, "id": emp.id, "is_active": emp.is_active} for emp in obj.assigned_to.all()]
 
     def get_project(self, obj: Task):
         if obj.project:

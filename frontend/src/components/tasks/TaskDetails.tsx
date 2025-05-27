@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, Descriptions, Tag } from "antd";
 import { priorityColors, statusColors, Task } from "@/types/task";
+import { Link } from "react-router";
 
 interface TaskDetailsProps {
   task: Task;
@@ -20,7 +21,20 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
           {task.due_date}
         </Descriptions.Item>
         <Descriptions.Item label="فريق العمل">
-          {task.assigned_to[0].name}
+          {task.assigned_to.map((emp, index, array) => (
+            <Link
+              to={`/employees/employee-profile/${emp.id}`}
+              className={`${
+                emp.is_active
+                  ? "text-blue-700 hover:text-blue-500"
+                  : "text-red-700 hover:text-red-500"
+              } hover:underline`}
+              key={emp.id}
+            >
+              {emp.name}
+              {index + 1 !== array.length && "،"}
+            </Link>
+          ))}
         </Descriptions.Item>
         <Descriptions.Item label="الحالة">
           <Tag color={statusColors[task.status]}>{task.status}</Tag>
@@ -28,11 +42,18 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
         <Descriptions.Item label="الأولوية">
           <Tag color={priorityColors[task.priority]}>{task.priority}</Tag>
         </Descriptions.Item>
-        {task.project && (
-          <Descriptions.Item label="المشروع المرتبط">
-            <Tag color="cyan">{task.project.name}</Tag>
-          </Descriptions.Item>
-        )}
+        <Descriptions.Item label="المشروع المرتبط">
+          {task!.project ? (
+            <Link
+              to={`/projects/project/${task!.project.id}`}
+              className="text-blue-700 hover:underline hover:text-blue-500"
+            >
+              {task!.project.name}
+            </Link>
+          ) : (
+            <Tag color="gray">غير مرتبط بمشروع</Tag>
+          )}
+        </Descriptions.Item>
       </Descriptions>
     </Card>
   );

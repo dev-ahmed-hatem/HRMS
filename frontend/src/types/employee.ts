@@ -40,5 +40,6 @@ export type Employee = {
 export interface AssignedEmployee {
   id: number | string;
   name: string;
+  is_active: boolean;
   [key: string]: any;
 }

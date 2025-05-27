@@ -41,12 +41,19 @@ export const tasksEndpoints = api.injectEndpoints({
       }),
       providesTags: (res, error, arg) => [{ type: "Task", id: arg.id }],
     }),
-    switchTaskState: builder.mutation<{ status: TaskStatus }, string>({
-      query: (id) => ({
-        url: `/projects/tasks/${id}/switch_state/`,
+    switchTaskState: builder.mutation<
+      { status: TaskStatus },
+      { task_id: string; project_id: string }
+    >({
+      query: ({ task_id, project_id }) => ({
+        url: `/projects/tasks/${task_id}/switch_state/`,
         method: "GET",
       }),
-      invalidatesTags: [{ type: "Task", id: "LIST" }],
+      invalidatesTags: (res, error, arg) => [
+        { type: "Task", id: "LIST" },
+        { type: "Project", id: "LIST" },
+        { type: "Project", id: arg.project_id },
+      ],
     }),
     task: builder.mutation<
       Task,

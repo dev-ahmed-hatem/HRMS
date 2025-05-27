@@ -134,8 +134,29 @@ class TaskViewSet(viewsets.ModelViewSet):
     def switch_state(self, request, pk=None):
         try:
             task = Task.objects.get(pk=pk)
-            task.status = "completed" if task.status == "incomplete" else "incomplete"
+            project = task.project
+            updated_project = False
+
+            if task.status == "completed":
+                task.status = "incomplete"
+                # Downgrade project status only if it was marked as completed
+                if project.status == "completed":
+                    project.status = "ongoing"
+                    updated_project = True
+            else:
+                task.status = "completed"
+                # Check if this was the last incomplete task
+                has_remaining_tasks = Task.objects.filter(
+                    project=project, status="incomplete"
+                ).exclude(pk=task.pk).exists()
+                if not has_remaining_tasks:
+                    project.status = "completed"
+                    updated_project = True
+
             task.save()
+            if updated_project:
+                project.save()
+
             return Response({"status": task.get_status_display()}, status=status.HTTP_200_OK)
         except Exception:
             return Response({'detail': _('مهمة غير موجودة')}, status=status.HTTP_404_NOT_FOUND)

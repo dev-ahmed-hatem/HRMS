@@ -33,7 +33,11 @@ const ProjectDetails = ({ project }: { project: Project }) => {
             {project.supervisors?.map((sup, index, array) => (
               <Link
                 to={`/employees/employee-profile/${sup.id}`}
-                className="text-blue-700 hover:underline hover:text-blue-500"
+                className={`${
+                  sup.is_active
+                    ? "text-blue-700 hover:text-blue-500"
+                    : "text-red-700 hover:text-red-500"
+                } hover:underline`}
                 key={sup.id}
               >
                 {sup.name}

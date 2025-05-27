@@ -15,7 +15,7 @@ export interface Task {
   due_date: string;
   assigned_to: AssignedEmployee[];
   project?: AssignedProject | null;
-  project_tasks?: Task[];
+  project_tasks: Task[];
   created_at: string;
   created_by: string;
 }

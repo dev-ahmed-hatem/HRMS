@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Card, Avatar, Tabs, Button, Tag, Popconfirm, Switch } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getInitials, isOverdue } from "@/utils";
 import TaskDetails from "@/components/tasks/TaskDetails";
 import RelatedTasks from "@/components/tasks/RelatedTasks";
-import { statusColors, priorityColors, Task, TaskStatus } from "@/types/task";
+import { priorityColors, Task } from "@/types/task";
 import { Link, useNavigate, useParams } from "react-router";
 import { useNotification } from "@/providers/NotificationProvider";
 import {
@@ -65,7 +65,10 @@ const TaskProfilePage: React.FC = () => {
   ] = useTaskMutation();
 
   const toggleStatus = () => {
-    switchStatus(task_id as string);
+    switchStatus({
+      task_id: task?.id as string,
+      project_id: task?.project?.id as string,
+    });
   };
 
   const handleDelete = () => {

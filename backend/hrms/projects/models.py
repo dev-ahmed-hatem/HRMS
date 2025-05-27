@@ -145,7 +145,6 @@ class Task(AbstractBaseModel):
         error_messages={
             'invalid': _("يرجى إدخال تاريخ صالح."),
         },
-        validators=[MinValueValidator(datetime.date.today())],
     )
     assigned_to = models.ManyToManyField(
         'employees.Employee',

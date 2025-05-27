@@ -47,6 +47,10 @@ class ProjectWriteSerializer(serializers.ModelSerializer):
         model = Project
         fields = '__all__'
 
+    def create(self, validated_data):
+        auth_user = self.context['request'].user
+        return Project.objects.create(**validated_data, created_by=auth_user)
+
 
 class TaskReadSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='task-detail')
@@ -92,3 +96,7 @@ class TaskWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = '__all__'
+
+    def create(self, validated_data):
+        auth_user = self.context['request'].user
+        return Task.objects.create(**validated_data, created_by=auth_user)

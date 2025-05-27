@@ -30,7 +30,7 @@ const TaskForm = ({
   taskId?: string;
   onSubmit?: (values: Task) => void;
 }) => {
-  const [form] = Form.useForm<TaskFormValues>();
+  const [form] = Form.useForm();
 
   const location = useLocation();
   const project = location.state;
@@ -61,7 +61,6 @@ const TaskForm = ({
   } = useGetAllDepartmentsQuery();
 
   // handle form data submission
-
   const [
     addTask,
     {
@@ -78,6 +77,13 @@ const TaskForm = ({
       ...values,
       due_date: values.due_date.format("YYYY-MM-DD"),
     };
+
+    if (values.project?.value) {
+      data["project"] = values.project.value;
+    }
+
+    console.log(data);
+    
 
     addTask({
       data: data as Task,
@@ -103,7 +109,7 @@ const TaskForm = ({
   useEffect(() => {
     if (taskDone) {
       notification.success({
-        message: `تم ${initialValues ? "تعديل بيانات" : "إضافة"} المهمة`,
+        message: `تم ${initialValues ? "تحديث بيانات" : "إضافة"} المهمة`,
       });
       navigate(`/tasks/task/${initialValues ? initialValues.id : taskData.id}`);
     }
@@ -123,8 +129,27 @@ const TaskForm = ({
         onFinish={handleSubmit}
         initialValues={{
           ...initialValues,
-          dueDate: initialValues?.due_date
+          due_date: initialValues?.due_date
             ? dayjs(initialValues.due_date)
+            : null,
+          departments: initialValues?.departments?.map((dep) => ({
+            label: dep.name,
+            value: dep.id,
+          })),
+          assigned_to: initialValues?.assigned_to?.map((emp) => ({
+            label: (
+              <span>
+                {emp.name}
+                {!emp.is_active && " (غير نشط)"}
+              </span>
+            ),
+            value: emp.id,
+          })),
+          project: initialValues?.project
+            ? {
+                label: initialValues.project.name,
+                value: initialValues.project.id,
+              }
             : null,
         }}
         className="add-form"
@@ -269,7 +294,12 @@ const TaskForm = ({
 
         {/* Submit Button */}
         <Form.Item style={{ textAlign: "center", marginTop: "20px" }}>
-          <Button type="primary" htmlType="submit" size="large">
+          <Button
+            type="primary"
+            htmlType="submit"
+            size="large"
+            loading={taskLoad}
+          >
             {initialValues ? "تحديث المهمة" : "إضافة المهمة"}
           </Button>
         </Form.Item>

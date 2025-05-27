@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { Card, Descriptions, Tag } from "antd";
 import { priorityColors, statusColors, Task } from "@/types/task";
 import { Link } from "react-router";
@@ -13,7 +13,9 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
       <Descriptions title="تفاصيل المهمة" bordered column={1}>
         <Descriptions.Item label="الكود">{task.id}</Descriptions.Item>
         <Descriptions.Item label="الاسم">{task.title}</Descriptions.Item>
-        <Descriptions.Item label="الوصف">{task.description}</Descriptions.Item>
+        <Descriptions.Item label="الوصف">
+          {task.description || "-"}
+        </Descriptions.Item>
         <Descriptions.Item label="الأقسام">
           {task!.departments.map((dep) => dep.name).join("، ")}
         </Descriptions.Item>
@@ -22,18 +24,19 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
         </Descriptions.Item>
         <Descriptions.Item label="فريق العمل">
           {task.assigned_to.map((emp, index, array) => (
-            <Link
-              to={`/employees/employee-profile/${emp.id}`}
-              className={`${
-                emp.is_active
-                  ? "text-blue-700 hover:text-blue-500"
-                  : "text-red-700 hover:text-red-500"
-              } hover:underline`}
-              key={emp.id}
-            >
-              {emp.name}
-              {index + 1 !== array.length && "،"}
-            </Link>
+            <Fragment key={emp.id}>
+              <Link
+                to={`/employees/employee-profile/${emp.id}`}
+                className={`${
+                  emp.is_active
+                    ? "text-blue-700 hover:text-blue-500"
+                    : "text-red-700 hover:text-red-500"
+                } hover:underline`}
+              >
+                {emp.name}
+              </Link>
+              {index + 1 !== array.length && "، "}
+            </Fragment>
           ))}
         </Descriptions.Item>
         <Descriptions.Item label="الحالة">

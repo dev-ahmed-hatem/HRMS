@@ -1,11 +1,13 @@
 import { Tag, Table, Space, Input } from "antd";
 import { priorityColors, statusColors, Task } from "@/types/task";
 import { tablePaginationConfig } from "../../utils/antd";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { ColumnsType } from "antd/lib/table";
 import { isOverdue } from "@/utils";
 import { dayjs } from "@/utils/locale";
 import { useState } from "react";
+import { PlusOutlined } from "@ant-design/icons";
+import { Project } from "@/types/project";
 
 const columns: ColumnsType<Task> = [
   {
@@ -69,7 +71,7 @@ const columns: ColumnsType<Task> = [
   },
 ];
 
-const ProjectTasks = ({ tasks }: { tasks: Task[] }) => {
+const ProjectTasks = ({ project }: { project: Project }) => {
   const [search, setSearch] = useState<string>("");
 
   const navigate = useNavigate();
@@ -86,13 +88,26 @@ const ProjectTasks = ({ tasks }: { tasks: Task[] }) => {
           allowClear={true}
           onClear={() => setSearch("")}
         />
+
+        {/* Add Button */}
+        <Link
+          to={"/tasks/add"}
+          className="h-10 px-6 flex items-center text-white gap-2 rounded-lg
+                 bg-green-700 hover:bg-green-600 shadow-[0_2px_0_rgba(0,58,58,0.31)]"
+          state={{ name: project.name, id: project.id }}
+        >
+          <PlusOutlined />
+          <span>إضافة مهمة للمشروع</span>
+        </Link>
       </div>
       <Table
         columns={columns}
         onRow={(record) => ({
           onClick: () => navigate(`/tasks/task/${record.id}`),
         })}
-        dataSource={tasks.filter((tasks) => tasks.title.includes(search))}
+        dataSource={project.tasks.filter((tasks) =>
+          tasks.title.includes(search)
+        )}
         rowKey="id"
         pagination={tablePaginationConfig()}
         className="clickable-table calypso-header"

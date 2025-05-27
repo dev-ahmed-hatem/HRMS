@@ -1,23 +1,117 @@
 import { Form, Input, Select, DatePicker, Button, Row, Col, Card } from "antd";
-import dayjs from "dayjs";
-import { Task } from "../../types/task";
-import { Project } from "../../types/project";
+import dayjs, { Dayjs } from "dayjs";
+import { Task } from "@/types/task";
+import { useLocation, useNavigate } from "react-router";
+import Loading from "@/components/Loading";
+import ErrorPage from "../Error";
+import { useEffect, useState } from "react";
+import { useNotification } from "@/providers/NotificationProvider";
+import {
+  useGetAllDepartmentsQuery,
+  useGetEmployeesQuery,
+} from "@/app/api/endpoints/employees";
+import { useGetProjectsQuery } from "@/app/api/endpoints/projects";
+import { useTaskMutation } from "@/app/api/endpoints/tasks";
+import { handleServerErrors } from "@/utils/handleForm";
+import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 
 const { Option } = Select;
 
+type TaskFormValues = Partial<Task> & {
+  due_date: Dayjs;
+};
+
 const TaskForm = ({
   initialValues,
+  taskId,
   onSubmit,
-  project,
-  projects = [],
 }: {
   initialValues?: Task;
+  taskId?: string;
   onSubmit?: (values: Task) => void;
-  project?: Project; // Optional project for task assignment
-  projects?: Project[]; // List of all projects for selection
 }) => {
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<TaskFormValues>();
 
+  const location = useLocation();
+  const project = location.state;
+
+  const [employeeSearch, setEmployeeSearch] = useState<string>("");
+  const [projectSearch, setProjectSearch] = useState<string>("");
+  const notification = useNotification();
+  const navigate = useNavigate();
+
+  const {
+    data: employees,
+    isLoading: gettingEmployees,
+    isFetching: refetchingEmployees,
+    isError: employeesError,
+  } = useGetEmployeesQuery({ search: employeeSearch });
+
+  const {
+    data: projects,
+    isLoading: gettingProjects,
+    isFetching: refetchingProjects,
+    isError: projectsError,
+  } = useGetProjectsQuery({ search: projectSearch });
+
+  const {
+    data: departments,
+    isLoading: gettingDepartments,
+    isError: departmentsError,
+  } = useGetAllDepartmentsQuery();
+
+  // handle form data submission
+
+  const [
+    addTask,
+    {
+      data: taskData,
+      isLoading: taskLoad,
+      isError: taskIsError,
+      isSuccess: taskDone,
+      error: taskError,
+    },
+  ] = useTaskMutation();
+
+  const handleSubmit = (values: TaskFormValues) => {
+    const data = {
+      ...values,
+      due_date: values.due_date.format("YYYY-MM-DD"),
+    };
+
+    addTask({
+      data: data as Task,
+      method: initialValues ? "PATCH" : "POST",
+      url: taskId ? `/projects/tasks/${taskId}/` : "/projects/tasks/",
+    });
+  };
+
+  useEffect(() => {
+    if (taskIsError) {
+      const error = taskError as axiosBaseQueryError;
+      if (error.status == 400) {
+        handleServerErrors({
+          errorData: error.data as Record<string, string[]>,
+          form,
+        });
+      }
+
+      notification.error({ message: "خطأ في إضافة المهمة!" });
+    }
+  }, [taskIsError]);
+
+  useEffect(() => {
+    if (taskDone) {
+      notification.success({
+        message: `تم ${initialValues ? "تعديل بيانات" : "إضافة"} المهمة`,
+      });
+      navigate(`/tasks/task/${initialValues ? initialValues.id : taskData.id}`);
+    }
+  }, [taskDone]);
+
+  if (gettingEmployees || gettingProjects || gettingDepartments)
+    return <Loading />;
+  if (employeesError || projectsError || departmentsError) return <ErrorPage />;
   return (
     <>
       <h1 className="mb-6 text-2xl font-bold">
@@ -26,11 +120,12 @@ const TaskForm = ({
       <Form
         form={form}
         layout="vertical"
-        onFinish={onSubmit}
+        onFinish={handleSubmit}
         initialValues={{
           ...initialValues,
-          dueDate: initialValues?.due_date ? dayjs(initialValues.due_date) : null,
-          projectId: project?.id, // Pre-fill project if provided
+          dueDate: initialValues?.due_date
+            ? dayjs(initialValues.due_date)
+            : null,
         }}
         className="add-form"
       >
@@ -47,8 +142,21 @@ const TaskForm = ({
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item name="department" label="القسم">
-                <Input placeholder="القسم المسؤول عن المهمة" />
+              <Form.Item
+                name="departments"
+                label="الأقسام"
+                rules={[{ required: true, message: "يرجى الأقسام المسؤولة" }]}
+              >
+                <Select
+                  mode="multiple"
+                  placeholder="الأقسام المسؤولة عن المهمة"
+                  allowClear
+                  options={departments?.map((dep) => ({
+                    label: dep.name,
+                    value: dep.id,
+                  }))}
+                  optionFilterProp="label"
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -70,36 +178,54 @@ const TaskForm = ({
           <Row gutter={[16, 16]}>
             {/* Project Selection (Optional) */}
             <Col xs={24} md={12}>
-              <Form.Item name="projectId" label="المشروع (اختياري)">
+              <Form.Item name="project" label="المشروع (اختياري)">
                 <Select
+                  showSearch
                   placeholder="اختر المشروع"
-                  defaultValue={project?.id}
+                  defaultValue={project?.name}
                   disabled={!!project} // Disable if a project is passed
-                  allowClear
-                >
-                  {projects.map((proj) => (
-                    <Option key={proj.id} value={proj.id}>
-                      {proj.name}
-                    </Option>
-                  ))}
-                </Select>
+                  allowClear={!project}
+                  loading={refetchingProjects}
+                  onSearch={(value) => {
+                    setProjectSearch(value);
+                  }}
+                  searchValue={projectSearch}
+                  options={projects?.data.map((project) => ({
+                    label: project.name,
+                    value: project.id,
+                  }))}
+                  filterOption={false}
+                />
               </Form.Item>
             </Col>
 
             {/* Assigned Person */}
             <Col xs={24} md={12}>
               <Form.Item
-                name="assignedTo"
-                label="المسؤول عن المهمة"
-                rules={[
-                  { required: true, message: "يرجى اختيار المسؤول عن المهمة" },
-                ]}
+                name="assigned_to"
+                label="فريق العمل"
+                rules={[{ required: true, message: "يرجى اختيار فريق العمل" }]}
               >
-                <Select placeholder="اختر المسؤول" mode="multiple">
-                  <Option value="محمد">محمد</Option>
-                  <Option value="أحمد">أحمد</Option>
-                  <Option value="سارة">سارة</Option>
-                </Select>
+                <Select
+                  mode="multiple"
+                  placeholder="اختر فريق العمل"
+                  allowClear
+                  loading={refetchingEmployees}
+                  onSearch={(value) => {
+                    setEmployeeSearch(value);
+                  }}
+                  searchValue={employeeSearch}
+                  options={employees?.data.map((emp) => ({
+                    label: (
+                      <span>
+                        {emp.name}
+                        {!emp.is_active && " (غير نشط)"}
+                      </span>
+                    ),
+                    value: emp.id,
+                  }))}
+                  filterOption={false}
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -113,40 +239,29 @@ const TaskForm = ({
                 rules={[{ required: true, message: "يرجى اختيار الأولوية" }]}
               >
                 <Select placeholder="اختر الأولوية">
-                  <Option value="مرتفع">مرتفع</Option>
-                  <Option value="متوسط">متوسط</Option>
-                  <Option value="منخفض">منخفض</Option>
+                  <Option value="high">مرتفع</Option>
+                  <Option value="medium">متوسط</Option>
+                  <Option value="low">منخفض</Option>
                 </Select>
               </Form.Item>
             </Col>
 
-            {/* Task Status */}
+            {/* Task Due Date */}
             <Col xs={24} md={12}>
               <Form.Item
-                name="status"
-                label="حالة المهمة"
-                rules={[{ required: true, message: "يرجى اختيار حالة المهمة" }]}
-              >
-                <Select placeholder="اختر الحالة">
-                  <Option value="غير مكتمل">غير مكتمل</Option>
-                  <Option value="مكتمل">مكتمل</Option>
-                  <Option value="متأخر">متأخر</Option>
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-
-          {/* Due Date */}
-          <Row gutter={[16, 16]}>
-            <Col xs={24} md={12}>
-              <Form.Item
-                name="dueDate"
-                label="الموعد النهائي"
+                name="due_date"
+                label="تاريخ الاستحقاق"
                 rules={[
-                  { required: true, message: "يرجى اختيار الموعد النهائي" },
+                  { required: true, message: "يرجى اختيار تاريخ الاستحقاق" },
                 ]}
               >
-                <DatePicker format="YYYY-MM-DD" className="w-full" />
+                <DatePicker
+                  format="YYYY-MM-DD"
+                  className="w-full"
+                  disabledDate={(current) =>
+                    current && current < dayjs().startOf("day")
+                  }
+                />
               </Form.Item>
             </Col>
           </Row>

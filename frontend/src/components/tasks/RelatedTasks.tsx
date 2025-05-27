@@ -80,12 +80,20 @@ const RelatedTasks: React.FC<RelatedTasksProps> = ({ task }) => {
 
   // Get current task
   if (!task.project) {
-    return <p className="text-gray-500">هذه المهمة غير مرتبطة بمشروع.</p>;
+    return (
+      <p className="text-gray-500 text-lg text-center mb-3">
+        هذه المهمة غير مرتبطة بمشروع.
+      </p>
+    );
   }
 
   // display empty message if only contains this task
-  if (task.project_tasks?.length === 1) {
-    return <p className="text-gray-500 text-lg text-center mb-3">لا توجد مهام مرتبطة أخرى.</p>;
+  if (task.project_tasks?.length < 2) {
+    return (
+      <p className="text-gray-500 text-lg text-center mb-3">
+        لا توجد مهام مرتبطة أخرى.
+      </p>
+    );
   }
 
   return (

@@ -39,7 +39,7 @@ const getTabItems = (project: Project) => {
     items.push({
       label: "المهام",
       key: "3",
-      children: <ProjectTasks tasks={project.tasks} />,
+      children: <ProjectTasks project={project} />,
     });
   }
 

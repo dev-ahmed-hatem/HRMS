@@ -197,7 +197,12 @@ const ProjectForm = ({
                   }}
                   searchValue={employeeSearch}
                   options={employees?.data.map((emp) => ({
-                    label: `${emp.name} ${emp.is_active ? "(غير نشط)" : ""}`,
+                    label: (
+                      <span>
+                        {emp.name}
+                        {!emp.is_active && " (غير نشط)"}
+                      </span>
+                    ),
                     value: emp.id,
                   }))}
                   filterOption={false}

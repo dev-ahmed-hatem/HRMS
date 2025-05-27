@@ -12,7 +12,7 @@ const ProjectDetails = ({ project }: { project: Project }) => {
         </Descriptions.Item>
         <Descriptions.Item label="العميل">{project.client}</Descriptions.Item>
         <Descriptions.Item label="الوصف">
-          {project.description}
+          {project.description || "-"}
         </Descriptions.Item>
         <Descriptions.Item label="الميزانية">
           {project.budget}

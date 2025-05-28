@@ -1,30 +1,20 @@
 import { Form, Input, Select, DatePicker, Button, Row, Col, Card } from "antd";
-import dayjs, { Dayjs } from "dayjs";
-import { Project } from "../../types/project";
-import { useEffect, useState } from "react";
+import dayjs from "dayjs";
+import { Project, ProjectFormParams, ProjectFormValues } from "@/types/project";
+import { FC, useEffect, useState } from "react";
 import { useGetEmployeesQuery } from "@/app/api/endpoints/employees";
-import Error from "../Error";
+import Error from "@/pages/Error";
 import Loading from "@/components/Loading";
 import { useProjectMutation } from "@/app/api/endpoints/projects";
 import { handleServerErrors } from "@/utils/handleForm";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { useNotification } from "@/providers/NotificationProvider";
 import { useNavigate } from "react-router";
-import { AssignedEmployee } from "@/types/employee";
 
-type ProjectFormValues = Omit<Project, "status"> & {
-  start_date: Dayjs;
-  end_date: Dayjs;
-};
-
-const ProjectForm = ({
+const ProjectForm: FC<ProjectFormParams> = ({
   initialValues,
   projectId,
   onSubmit,
-}: {
-  initialValues?: Project & { current_supervisors: AssignedEmployee[] };
-  projectId?: string;
-  onSubmit?: (values: Project) => void;
 }) => {
   const [form] = Form.useForm();
 
@@ -51,6 +41,7 @@ const ProjectForm = ({
   ] = useProjectMutation();
 
   const handleSubmit = (values: ProjectFormValues) => {
+    // normalizing form values
     const data = {
       ...values,
       start_date: values.start_date.format("YYYY-MM-DD"),
@@ -115,7 +106,12 @@ const ProjectForm = ({
             : null,
           supervisors: initialValues?.current_supervisors?.map((sup) => ({
             value: sup.id,
-            label: sup.name,
+            label: (
+              <span>
+                {sup.name}
+                {!sup.is_active && " (غير نشط)"}
+              </span>
+            ),
           })),
         }}
         className="add-form"
@@ -224,7 +220,7 @@ const ProjectForm = ({
             size="large"
             loading={projectLoad}
           >
-            {initialValues ? "تحديث المشروع" : "إضافة المشروع"}
+            {initialValues ? "تعديل المشروع" : "إضافة المشروع"}
           </Button>
         </Form.Item>
       </Form>

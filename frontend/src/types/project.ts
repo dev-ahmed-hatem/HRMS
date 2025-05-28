@@ -1,3 +1,4 @@
+import { Dayjs } from "dayjs";
 import { AssignedEmployee } from "./employee";
 import { Task, TasksStats } from "./task";
 
@@ -41,4 +42,17 @@ export type AssignedProject = {
   name: string;
   id: number | string;
   [key: string]: any;
+};
+
+// form component params
+export type ProjectFormParams = {
+  initialValues?: Project & { current_supervisors: AssignedEmployee[] };
+  projectId?: string;
+  onSubmit?: (values: Project) => void;
+};
+
+// collected form values
+export type ProjectFormValues = Omit<Project, "status"> & {
+  start_date: Dayjs;
+  end_date: Dayjs;
 };

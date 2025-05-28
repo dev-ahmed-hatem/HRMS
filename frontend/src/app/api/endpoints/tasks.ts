@@ -61,10 +61,24 @@ export const tasksEndpoints = api.injectEndpoints({
     >({
       query: ({ data, method, url }) => ({
         url: url || "projects/tasks/",
-        method: method || "DELETE",
+        method: method || "POST",
         data,
       }),
-      invalidatesTags: (res, error, arg) => [{ type: "Task", id: res?.id }],
+      async onQueryStarted(queryArgument, mutationLifeCycleApi) {
+        try {
+          await mutationLifeCycleApi.queryFulfilled;
+
+          // Invalidate the Employee LIST tag on successful POST
+          mutationLifeCycleApi.dispatch(
+            api.util.invalidateTags([
+              { type: "Task", id: "LIST" },
+              { type: "Task", id: queryArgument.data?.id },
+            ])
+          );
+        } catch {
+          // Do nothing if the request fails
+        }
+      },
     }),
   }),
 });

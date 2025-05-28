@@ -1,10 +1,10 @@
 import { Form, Input, Select, DatePicker, Button, Row, Col, Card } from "antd";
-import dayjs, { Dayjs } from "dayjs";
-import { Task } from "@/types/task";
+import dayjs from "dayjs";
+import { Task, TaskFormParams, TaskFormValues } from "@/types/task";
 import { useLocation, useNavigate } from "react-router";
 import Loading from "@/components/Loading";
 import ErrorPage from "../Error";
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useNotification } from "@/providers/NotificationProvider";
 import {
   useGetAllDepartmentsQuery,
@@ -17,19 +17,7 @@ import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 
 const { Option } = Select;
 
-type TaskFormValues = Partial<Task> & {
-  due_date: Dayjs;
-};
-
-const TaskForm = ({
-  initialValues,
-  taskId,
-  onSubmit,
-}: {
-  initialValues?: Task;
-  taskId?: string;
-  onSubmit?: (values: Task) => void;
-}) => {
+const TaskForm: FC<TaskFormParams> = ({ initialValues, taskId, onSubmit }) => {
   const [form] = Form.useForm();
 
   const location = useLocation();
@@ -73,17 +61,18 @@ const TaskForm = ({
   ] = useTaskMutation();
 
   const handleSubmit = (values: TaskFormValues) => {
+    // normalizing form values
     const data = {
       ...values,
       due_date: values.due_date.format("YYYY-MM-DD"),
+      assigned_to: values.assigned_to?.map((emp) =>
+        typeof emp === "object" ? emp.value : emp
+      ),
+      project:
+        typeof values.project === "object"
+          ? values.project?.value
+          : values.project,
     };
-
-    if (values.project?.value) {
-      data["project"] = values.project.value;
-    }
-
-    console.log(data);
-    
 
     addTask({
       data: data as Task,
@@ -109,7 +98,7 @@ const TaskForm = ({
   useEffect(() => {
     if (taskDone) {
       notification.success({
-        message: `تم ${initialValues ? "تحديث بيانات" : "إضافة"} المهمة`,
+        message: `تم ${initialValues ? "تعديل بيانات" : "إضافة"} المهمة`,
       });
       navigate(`/tasks/task/${initialValues ? initialValues.id : taskData.id}`);
     }
@@ -132,7 +121,7 @@ const TaskForm = ({
           due_date: initialValues?.due_date
             ? dayjs(initialValues.due_date)
             : null,
-          assigned_to: initialValues?.assigned_to?.map((emp) => ({
+          assigned_to: initialValues?.currently_assigned?.map((emp) => ({
             label: (
               <span>
                 {emp.name}
@@ -141,10 +130,10 @@ const TaskForm = ({
             ),
             value: emp.id,
           })),
-          project: initialValues?.project
+          project: initialValues?.current_project
             ? {
-                label: initialValues.project.name,
-                value: initialValues.project.id,
+                label: initialValues.current_project.name,
+                value: initialValues.current_project.id,
               }
             : null,
         }}
@@ -296,7 +285,7 @@ const TaskForm = ({
             size="large"
             loading={taskLoad}
           >
-            {initialValues ? "تحديث المهمة" : "إضافة المهمة"}
+            {initialValues ? "تعديل المهمة" : "إضافة المهمة"}
           </Button>
         </Form.Item>
       </Form>

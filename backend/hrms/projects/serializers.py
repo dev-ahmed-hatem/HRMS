@@ -43,6 +43,7 @@ class ProjectListSerializer(serializers.ModelSerializer):
 
 
 class ProjectWriteSerializer(serializers.ModelSerializer):
+    # used only to render the current data in the edit form
     current_supervisors = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -50,7 +51,7 @@ class ProjectWriteSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_current_supervisors(self, obj: Project):
-        return [{"id": sup.id, "name": sup.name} for sup in obj.supervisors.all()]
+        return [{"id": sup.id, "name": sup.name, "is_active": sup.is_active} for sup in obj.supervisors.all()]
 
     def create(self, validated_data):
         auth_user = self.context['request'].user
@@ -98,6 +99,10 @@ class TaskListSerializer(serializers.ModelSerializer):
 
 
 class TaskWriteSerializer(serializers.ModelSerializer):
+    # used only to render the current data in the edit form
+    currently_assigned = serializers.SerializerMethodField(read_only=True)
+    current_project = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Task
         fields = '__all__'
@@ -105,3 +110,9 @@ class TaskWriteSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         auth_user = self.context['request'].user
         return Task.objects.create(**validated_data, created_by=auth_user)
+
+    def get_currently_assigned(self, obj: Task):
+        return [{"name": emp.name, "id": emp.id, "is_active": emp.is_active} for emp in obj.assigned_to.all()]
+
+    def get_current_project(self, obj: Task):
+        return {"name": obj.project.name, "id": obj.project.id}

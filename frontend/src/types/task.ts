@@ -1,3 +1,4 @@
+import { Dayjs } from "dayjs";
 import { Department } from "./department";
 import { AssignedEmployee } from "./employee";
 import { AssignedProject } from "./project";
@@ -38,4 +39,19 @@ export const priorityColors: Record<TaskPriority, string> = {
   منخفض: "blue",
   متوسط: "orange",
   مرتفع: "red",
+};
+
+// form component params
+export type TaskFormParams = {
+  initialValues?: Task & {
+    currently_assigned: AssignedEmployee[];
+    current_project: AssignedProject;
+  };
+  taskId?: string;
+  onSubmit?: (values: Task) => void;
+};
+
+// collected form values
+export type TaskFormValues = Partial<Task> & {
+  due_date: Dayjs;
 };

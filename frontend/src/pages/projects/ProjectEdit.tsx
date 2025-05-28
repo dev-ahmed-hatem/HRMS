@@ -4,6 +4,7 @@ import Loading from "@/components/Loading";
 import ProjectForm from "./ProjectForm";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { useGetProjectQuery } from "@/app/api/endpoints/projects";
+import { ProjectFormParams } from "@/types/project";
 
 const ProjectEdit = () => {
   const { project_id } = useParams();
@@ -25,7 +26,12 @@ const ProjectEdit = () => {
 
     return <Error subtitle={error_title} reload={error_title === undefined} />;
   }
-  return <ProjectForm initialValues={projectData} projectId={project_id} />;
+  return (
+    <ProjectForm
+      initialValues={projectData as ProjectFormParams["initialValues"]}
+      projectId={project_id}
+    />
+  );
 };
 
 export default ProjectEdit;

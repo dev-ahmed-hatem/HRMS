@@ -2,6 +2,8 @@ import { Task, TasksStats, TaskStatus } from "@/types/task";
 import api from "../apiSlice";
 import qs from "query-string";
 import { PaginatedResponse } from "@/types/paginatedResponse";
+import { TagDescription } from "@reduxjs/toolkit/query";
+import { Project } from "@/types/project";
 
 export const tasksEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -56,10 +58,15 @@ export const tasksEndpoints = api.injectEndpoints({
       ],
     }),
     task: builder.mutation<
-      Task,
-      { data?: Partial<Task>; method: string; url: string }
+      Task & { project: string },
+      {
+        data?: Partial<Task>;
+        method: string;
+        url: string;
+        projectId?: Project["id"];
+      }
     >({
-      query: ({ data, method, url }) => ({
+      query: ({ data, method, url, projectId }) => ({
         url: url || "projects/tasks/",
         method: method || "POST",
         data,
@@ -68,12 +75,32 @@ export const tasksEndpoints = api.injectEndpoints({
         try {
           await mutationLifeCycleApi.queryFulfilled;
 
+          const invalidateTags: TagDescription<
+            "Employee" | "Project" | "Task"
+          >[] = [
+            { type: "Task", id: "LIST" },
+            { type: "Task", id: queryArgument.data?.id },
+          ];
+
+          // invalidates the task project data in case of task deletion
+          if (queryArgument.method.toLowerCase() === "delete") {
+            invalidateTags.push({
+              type: "Project",
+              id: queryArgument.projectId,
+            });
+          }
+
+          // gets project data from new task data then invalidates
+          if (["post", "patch"].includes(queryArgument.method.toLowerCase())) {
+            invalidateTags.push({
+              type: "Project",
+              id: (await mutationLifeCycleApi.queryFulfilled).data.project,
+            });
+          }
+
           // Invalidate the Employee LIST tag on successful POST
           mutationLifeCycleApi.dispatch(
-            api.util.invalidateTags([
-              { type: "Task", id: "LIST" },
-              { type: "Task", id: queryArgument.data?.id },
-            ])
+            api.util.invalidateTags(invalidateTags)
           );
         } catch {
           // Do nothing if the request fails

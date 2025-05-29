@@ -20,6 +20,7 @@ const { Option } = Select;
 const TaskForm: FC<TaskFormParams> = ({ initialValues, taskId, onSubmit }) => {
   const [form] = Form.useForm();
 
+  // check a selected project for the new task
   const location = useLocation();
   const project = location.state;
 
@@ -130,8 +131,12 @@ const TaskForm: FC<TaskFormParams> = ({ initialValues, taskId, onSubmit }) => {
             ),
             value: emp.id,
           })),
-          project: initialValues?.current_project
-            ? {
+          project: project
+            ? // initially set the project if passed
+              { label: project.name, value: project.id }
+            : initialValues?.current_project
+            ? // normalize the current project in the edit form values
+              {
                 label: initialValues.current_project.name,
                 value: initialValues.current_project.id,
               }
@@ -192,7 +197,6 @@ const TaskForm: FC<TaskFormParams> = ({ initialValues, taskId, onSubmit }) => {
                 <Select
                   showSearch
                   placeholder="اختر المشروع"
-                  defaultValue={project?.name}
                   disabled={!!project} // Disable if a project is passed
                   allowClear={!project}
                   loading={refetchingProjects}

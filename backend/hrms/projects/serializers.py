@@ -54,8 +54,11 @@ class ProjectWriteSerializer(serializers.ModelSerializer):
         return [{"id": sup.id, "name": sup.name, "is_active": sup.is_active} for sup in obj.supervisors.all()]
 
     def create(self, validated_data):
+        project = super(ProjectWriteSerializer, self).create(validated_data)
         auth_user = self.context['request'].user
-        return Project.objects.create(**validated_data, created_by=auth_user)
+        project.created_by = auth_user
+        project.save()
+        return project
 
 
 class TaskReadSerializer(serializers.ModelSerializer):
@@ -108,8 +111,17 @@ class TaskWriteSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
+        task = super(TaskWriteSerializer, self).create(validated_data)
+
+        # mark project as ongoing if it is completed
+        if task.project.status == "completed":
+            task.project.status = "ongoing"
+            task.project.save()
+
         auth_user = self.context['request'].user
-        return Task.objects.create(**validated_data, created_by=auth_user)
+        task.created_by = auth_user
+        task.save()
+        return task
 
     def get_currently_assigned(self, obj: Task):
         return [{"name": emp.name, "id": emp.id, "is_active": emp.is_active} for emp in obj.assigned_to.all()]

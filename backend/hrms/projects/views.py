@@ -54,6 +54,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if new_status == "ongoing" and project.status == "pending-approval":
             project.progress_started = datetime.now()
 
+        if not project.remaining_tasks().exists():
+            new_status = "completed"
+
         project.status = new_status
         project.save()
         return Response({'status': project.get_status_display()}, status=status.HTTP_200_OK)
@@ -146,9 +149,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             else:
                 task.status = "completed"
                 # Check if this was the last incomplete task
-                has_remaining_tasks = Task.objects.filter(
-                    project=project, status="incomplete"
-                ).exclude(pk=task.pk).exists()
+                has_remaining_tasks = project.remaining_tasks().exclude(pk=task.pk).exists()
                 if not has_remaining_tasks:
                     project.status = "completed"
                     updated_project = True

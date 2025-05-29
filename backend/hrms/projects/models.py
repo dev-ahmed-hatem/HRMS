@@ -104,6 +104,11 @@ class Project(AbstractBaseModel):
         verbose_name = _("مشروع")
         verbose_name_plural = _("المشاريع")
 
+    def remaining_tasks(self):
+        return Task.objects.filter(
+            project=self, status="incomplete"
+        )
+
     def __str__(self):
         return self.name
 
@@ -163,6 +168,13 @@ class Task(AbstractBaseModel):
     class Meta:
         verbose_name = _("مهمة")
         verbose_name_plural = _("المهام")
+
+    def delete(self, using=None, keep_parents=False):
+        project = self.project
+        super(Task, self).delete()
+        if not project.remaining_tasks().exists():
+            project.status = "completed"
+            project.save()
 
     def __str__(self):
         return self.title

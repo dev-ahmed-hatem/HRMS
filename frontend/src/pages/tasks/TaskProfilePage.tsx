@@ -72,7 +72,11 @@ const TaskProfilePage: React.FC = () => {
   };
 
   const handleDelete = () => {
-    deleteTask({ url: `projects/tasks/${task_id}/`, method: "DELETE" });
+    deleteTask({
+      url: `projects/tasks/${task_id}/`,
+      method: "DELETE",
+      projectId: `${task?.project?.id}`,
+    });
   };
 
   useEffect(() => {

@@ -38,7 +38,7 @@ const LoginPage = () => {
     if (logged || verified) window.location.href = path;
   }, [logged, verified]);
 
-  if (verifying) return <Loading />;
+  if (verifying || logged || verified) return <Loading />;
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="bg-white shadow-xl rounded-md overflow-hidden flex flex-col md:flex-row w-full max-w-md md:max-w-4xl">

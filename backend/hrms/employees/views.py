@@ -1,7 +1,8 @@
 from rest_framework.response import Response
 from rest_framework import viewsets, status
-from .serializers import DepartmentSerializer, EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer
-from .models import Department, Employee
+from .serializers import DepartmentSerializer, EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer, \
+    AttendanceReadSerializer, AttendanceWriteSerializer
+from .models import Department, Employee, Attendance
 from rest_framework.decorators import action, api_view
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
@@ -56,6 +57,22 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             return Response(serializer)
         except Exception:
             return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
+
+
+class AttendanceViewSet(viewsets.ModelViewSet):
+    pagination_class = None
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            return AttendanceWriteSerializer
+        return AttendanceReadSerializer
+
+    def get_queryset(self):
+        queryset = Attendance.objects.all()
+        date = self.request.query_params.get("date", None)
+        if date is not None:
+            queryset = queryset.filter(date=date)
+        return queryset
 
 
 @api_view(["DELETE"])

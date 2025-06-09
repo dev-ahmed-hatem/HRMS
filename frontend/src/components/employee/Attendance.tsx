@@ -1,10 +1,10 @@
-import { Table, DatePicker, Typography, Space } from "antd";
+import { Table, DatePicker, Space } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs, { Dayjs } from "dayjs";
 import { useState } from "react";
-import { Employee } from "../../types/employee";
+import { Attendance as AttendanceType } from "@/types/attendance";
 
-const Attendance = ({ attendance }: { attendance: Employee["attendance"] }) => {
+const Attendance = ({ attendance }: { attendance: AttendanceType[] }) => {
   const [selectedMonth, setSelectedMonth] = useState<Dayjs>(dayjs()); // Default to current week
 
   // Ensure all 7 days are shown
@@ -22,15 +22,15 @@ const Attendance = ({ attendance }: { attendance: Employee["attendance"] }) => {
 
       monthData.push({
         date: day.format("YYYY-MM-DD"),
-        checkIn: record?.checkIn || "-",
-        checkOut: record?.checkOut || "-",
+        check_in: record?.check_in || "-",
+        check_out: record?.check_out || "-",
       });
     }
     return monthData;
   };
 
   // Table columns
-  const columns: ColumnsType<Employee["attendance"][number]> = [
+  const columns: ColumnsType<Omit<AttendanceType, "id">> = [
     {
       title: "التاريخ",
       dataIndex: "date",
@@ -45,13 +45,14 @@ const Attendance = ({ attendance }: { attendance: Employee["attendance"] }) => {
     },
     {
       title: "وقت الحضور",
-      dataIndex: "checkIn",
-      key: "checkIn",
+      dataIndex: "check_in",
+      key: "check_in",
     },
     {
-      title: "وقت المغادرة",
-      dataIndex: "checkOut",
-      key: "checkOut",
+      title: "وقت الانصراف",
+      dataIndex: "check_out",
+      key: "check_out",
+      render: (time: string | undefined) => time ?? "-",
     },
   ];
 

@@ -1,3 +1,5 @@
+import { Attendance } from "./attendance";
+
 export type Employee = {
   id: number;
   url: string;
@@ -28,11 +30,7 @@ export type Employee = {
     activeAssignments: number;
   };
 
-  attendance: {
-    date: string;
-    checkIn?: string;
-    checkOut?: string;
-  }[];
+  attendance: Attendance[];
 
   salaryHistory: { date: string; baseSalary: number; bonuses: number }[];
 };

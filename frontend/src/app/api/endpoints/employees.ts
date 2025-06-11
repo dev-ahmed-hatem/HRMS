@@ -6,6 +6,12 @@ import qs from "query-string";
 
 export const employeesEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
+    getAllEmployees: builder.query<Employee[], void>({
+      query: () => ({
+        url: `/employees/employees?no_pagination=true`,
+        method: "GET",
+      }),
+    }),
     getEmployees: builder.query<
       PaginatedResponse<Employee>,
       Record<string, any> | void
@@ -104,6 +110,7 @@ export const employeesEndpoints = api.injectEndpoints({
 });
 
 export const {
+  useGetAllEmployeesQuery,
   useGetEmployeesQuery,
   useGetEmployeeQuery,
   useSwitchEmployeeActiveMutation,

@@ -10,7 +10,7 @@ import {
   Space,
   Form,
 } from "antd";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -18,43 +18,19 @@ import {
   SaveOutlined,
 } from "@ant-design/icons";
 import { useGetDayAttendanceQuery } from "@/app/api/endpoints/attendance";
-import Loading from "../Loading";
-import Error from "@/pages/Error";
-
-const { Option } = Select;
-
-const employees = ["محمد", "أحمد", "سارة", "خالد", "يوسف"];
+import Loading from "@/components/Loading";
+import ErrorPage from "@/pages/Error";
+import { useGetAllEmployeesQuery } from "@/app/api/endpoints/employees";
+import { AssignedEmployee } from "@/types/employee";
 
 type AttendanceRecord = {
   key: string | number;
-  employee?: string;
+  employee?: AssignedEmployee | null;
   check_in?: string | null;
   check_out?: string | null;
   editing?: boolean;
-  saving: boolean;
   saved: boolean;
 };
-
-const savedAttendanceRecords = [
-  {
-    key: "rec-001",
-    employee: "محمد",
-    check_in: "08:30",
-    check_out: "17:00",
-    editing: false, // Saved records are not editing
-    saving: false,
-    saved: false,
-  },
-  {
-    key: "rec-002",
-    employee: "أحمد",
-    check_in: "09:00",
-    check_out: "18:00",
-    editing: false,
-    saving: false,
-    saved: false,
-  },
-];
 
 const AttendanceRecords = () => {
   const [attendanceRecords, setAttendanceRecords] = useState<
@@ -70,11 +46,10 @@ const AttendanceRecords = () => {
       ...attendanceRecords,
       {
         key: Date.now(),
-        employee: "",
+        employee: null,
         check_in: null,
         check_out: null,
         editing: true,
-        saving: false,
         saved: false,
       },
     ]);
@@ -102,6 +77,10 @@ const AttendanceRecords = () => {
     // set initial values
     form.setFields([
       {
+        name: `employee-${key}`,
+        value: { label: record?.employee?.name, value: record?.employee?.id },
+      },
+      {
         name: `check-in-${key}`,
         value: record?.check_in ? dayjs(record.check_in, "HH:mm") : null,
       },
@@ -113,34 +92,21 @@ const AttendanceRecords = () => {
   };
 
   // save record changes
-  const saveChanges = (key: string) => {
-    const record = attendanceRecords.find((record) => record.key === key);
-    const { employee, check_in, check_out } = record as AttendanceRecord;
-
-    // reset record errors
-    form.setFields([
-      { errors: undefined, name: `employee-${key}` },
-      { errors: undefined, name: `check-in-${key}` },
-    ]);
-
-    if (employee == "") {
-      form.setFields([{ errors: ["اختر الموظف"], name: `employee-${key}` }]);
-    }
-
-    if (check_in === null) {
-      form.setFields([{ errors: ["حدد وقت الحضور"], name: `check-in-${key}` }]);
-    }
-
-    setAttendanceRecords((prev) => [
-      ...prev.map((record) =>
-        record.key === key ? { ...record, saving: true } : record
-      ),
-    ]);
+  const handleSave = () => {
+    form
+      .validateFields({ recursive: false, validateOnly: false })
+      .then((values) => {
+        console.log(values);
+      })
+      .catch((errorInfo) => {
+        console.log(errorInfo);
+      });
   };
 
   // Delete a Row
   const handleDelete = (key: string) => {
     setAttendanceRecords((prev) => prev.filter((record) => record.key !== key));
+    //////////////////// TODO: check wether deleted record is savd in database or not ////////////////////
   };
 
   // Table Columns
@@ -148,25 +114,42 @@ const AttendanceRecords = () => {
     {
       title: "الموظف",
       dataIndex: "employee",
-      render: (text: string, record: any) =>
+      render: (employee: AssignedEmployee, record: any) =>
         record.editing && !record.saved ? (
-          <Form.Item name={`employee-${record.key}`}>
+          <Form.Item
+            name={`employee-${record.key}`}
+            rules={[
+              { required: true, message: "اختر الموظف" },
+              {
+                validator: (rule, value) => {
+                  if (
+                    attendanceRecords.find(
+                      (record) => record.employee?.id === value
+                    )
+                  ) {
+                    return Promise.reject(new Error("يوجد تسجيل لهذا الموظف"));
+                  }
+
+                  return Promise.resolve();
+                },
+              },
+            ]}
+          >
             <Select
               style={{ width: "100%" }}
               placeholder="اختر الموظف"
-              value={text || undefined}
               onChange={(value) => handleEdit(record.key, "employee", value)}
               allowClear={false}
-            >
-              {employees.map((name) => (
-                <Option key={name} value={name}>
-                  {name}
-                </Option>
-              ))}
-            </Select>
+              showSearch={true}
+              options={employees?.map((emp) => ({
+                value: emp.id,
+                label: emp.name,
+              }))}
+              optionFilterProp="label"
+            />
           </Form.Item>
         ) : (
-          text
+          employee.name
         ),
     },
     {
@@ -174,7 +157,10 @@ const AttendanceRecords = () => {
       dataIndex: "check_in",
       render: (text: string, record: any) =>
         record.editing ? (
-          <Form.Item name={`check-in-${record.key}`}>
+          <Form.Item
+            name={`check-in-${record.key}`}
+            rules={[{ required: true, message: "حدد وقت الحضور" }]}
+          >
             <TimePicker
               placeholder="حدد وقت الحضور"
               className="w-40"
@@ -194,7 +180,22 @@ const AttendanceRecords = () => {
       dataIndex: "check_out",
       render: (text: string, record: any) =>
         record.editing ? (
-          <Form.Item name={`check-out-${record.key}`}>
+          <Form.Item
+            name={`check-out-${record.key}`}
+            rules={[
+              {
+                validator: (_, value) => {
+                  const checkIn = form.getFieldValue(`check-in-${record.key}`);
+                  if (!value || !checkIn || value.isAfter(checkIn)) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error("وقت الانصراف يجب أن يكون بعد وقت الحضور")
+                  );
+                },
+              },
+            ]}
+          >
             <TimePicker
               placeholder="حدد وقت الانصراف"
               className="w-40"
@@ -237,19 +238,6 @@ const AttendanceRecords = () => {
               />
             </Popconfirm>
           </Space>
-
-          {record.editing && (
-            <Space>
-              <Button
-                type="primary"
-                icon={<SaveOutlined />}
-                onClick={() => saveChanges(record.key)}
-                loading={record.saving}
-              >
-                حفظ
-              </Button>
-            </Space>
-          )}
         </div>
       ),
     },
@@ -261,11 +249,17 @@ const AttendanceRecords = () => {
     isLoading,
     isFetching,
     isError,
-    error,
     refetch,
   } = useGetDayAttendanceQuery({
     date: date.format("YYYY-MM-DD"),
   });
+
+  // fetch employees
+  const {
+    data: employees,
+    isError: employeesError,
+    isFetching: employeesFetching,
+  } = useGetAllEmployeesQuery();
 
   useEffect(() => {
     refetch();
@@ -280,17 +274,16 @@ const AttendanceRecords = () => {
           check_in: attendance.check_in,
           check_out: attendance.check_out,
           editing: false,
-          saving: false,
           saved: true,
         }))
       );
     }
   }, [savedAttendanceRecords]);
 
-  if (isLoading) return <Loading />;
-  if (isError) {
+  if (isLoading || employeesFetching) return <Loading />;
+  if (isError || employeesError) {
     return (
-      <Error subtitle={"حدث خطأ أثناء تحميل بيانات الحضور"} reload={true} />
+      <ErrorPage subtitle={"حدث خطأ أثناء تحميل بيانات الحضور"} reload={true} />
     );
   }
 
@@ -331,6 +324,19 @@ const AttendanceRecords = () => {
             >
               إضافة صف
             </Button>
+
+            {attendanceRecords.some((record) => record.editing) && (
+              <Space>
+                <Button
+                  type="primary"
+                  icon={<SaveOutlined />}
+                  onClick={handleSave}
+                  // loading={record.saving}
+                >
+                  حفظ
+                </Button>
+              </Space>
+            )}
           </div>
         </>
       )}

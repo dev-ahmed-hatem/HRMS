@@ -75,7 +75,7 @@ class EmployeeWriteSerializer(serializers.ModelSerializer):
 
 class AttendanceReadSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='attendance-detail')
-    employee = serializers.StringRelatedField(read_only=True, source='employee.name')
+    employee = serializers.SerializerMethodField()
     check_in = serializers.SerializerMethodField()
     check_out = serializers.SerializerMethodField()
 
@@ -88,6 +88,9 @@ class AttendanceReadSerializer(serializers.ModelSerializer):
 
     def get_check_out(self, obj):
         return obj.check_out.strftime('%H:%M') if obj.check_out else None
+
+    def get_employee(self, obj):
+        return {"name": obj.employee.name, "id": obj.employee.id}
 
 
 class AttendanceWriteSerializer(serializers.ModelSerializer):

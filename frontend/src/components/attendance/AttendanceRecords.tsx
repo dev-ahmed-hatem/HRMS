@@ -124,7 +124,9 @@ const AttendanceRecords = () => {
                 validator: (rule, value) => {
                   if (
                     attendanceRecords.find(
-                      (record) => record.employee?.id === value
+                      (current) =>
+                        current.employee?.id === value &&
+                        current.key !== record.key
                     )
                   ) {
                     return Promise.reject(new Error("يوجد تسجيل لهذا الموظف"));
@@ -138,7 +140,17 @@ const AttendanceRecords = () => {
             <Select
               style={{ width: "100%" }}
               placeholder="اختر الموظف"
-              onChange={(value) => handleEdit(record.key, "employee", value)}
+              onChange={(value, option) =>
+                handleEdit(record.key, "employee", {
+                  id: value,
+                  name: (
+                    option as {
+                      value: number;
+                      label: string;
+                    }
+                  ).label,
+                })
+              }
               allowClear={false}
               showSearch={true}
               options={employees?.map((emp) => ({

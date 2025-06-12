@@ -20,6 +20,9 @@ createRoot(document.getElementById("root")!).render(
           fontFamily: "cairo",
         },
       }}
+      form={{
+        scrollToFirstError: { behavior: "smooth", block: "center" },
+      }}
       locale={arEG}
     >
       <ReduxProvider store={store}>

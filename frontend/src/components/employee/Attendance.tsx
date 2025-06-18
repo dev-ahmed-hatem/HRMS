@@ -4,11 +4,21 @@ import dayjs, { Dayjs } from "dayjs";
 import { useState } from "react";
 import { Attendance as AttendanceType } from "@/types/attendance";
 
-const Attendance = ({ attendance }: { attendance: AttendanceType[] }) => {
+type TableColumnType = {
+  date: string;
+  check_in: string;
+  check_out?: string;
+};
+
+const Attendance = ({
+  attendance,
+}: {
+  attendance: Partial<AttendanceType>[];
+}) => {
   const [selectedMonth, setSelectedMonth] = useState<Dayjs>(dayjs()); // Default to current week
 
   // Ensure all 7 days are shown
-  const getMonthAttendance = () => {
+  const getMonthAttendance = (): TableColumnType[] => {
     const startOfMonth = selectedMonth.startOf("month");
     const endOfMonth = selectedMonth.endOf("month");
 
@@ -30,7 +40,7 @@ const Attendance = ({ attendance }: { attendance: AttendanceType[] }) => {
   };
 
   // Table columns
-  const columns: ColumnsType<Omit<AttendanceType, "id">> = [
+  const columns: ColumnsType<TableColumnType> = [
     {
       title: "التاريخ",
       dataIndex: "date",

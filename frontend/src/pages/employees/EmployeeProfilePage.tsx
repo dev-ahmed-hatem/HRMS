@@ -63,10 +63,10 @@ const employee3: Employee = {
   },
 
   attendance: [
-    { date: "2025-03-10", checkIn: "08:30 AM", checkOut: "05:00 PM" },
-    { date: "2025-03-11", checkIn: "09:00 AM", checkOut: "04:45 PM" },
+    { date: "2025-03-10", check_in: "08:30 AM", check_out: "05:00 PM" },
+    { date: "2025-03-11", check_in: "09:00 AM", check_out: "04:45 PM" },
     { date: "2025-03-12" }, // No record for this day
-    { date: "2025-03-13", checkIn: "07:45 AM", checkOut: "05:30 PM" },
+    { date: "2025-03-13", check_in: "07:45 AM", check_out: "05:30 PM" },
     { date: "2025-03-14" }, // No record
   ],
 

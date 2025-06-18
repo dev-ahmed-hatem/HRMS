@@ -30,7 +30,7 @@ export type Employee = {
     activeAssignments: number;
   };
 
-  attendance: any;
+  attendance: Partial<Attendance>[];
 
   salaryHistory: { date: string; baseSalary: number; bonuses: number }[];
 };

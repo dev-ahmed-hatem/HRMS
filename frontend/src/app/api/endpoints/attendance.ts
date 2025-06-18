@@ -41,7 +41,7 @@ export const attendanceEndpoints = api.injectEndpoints({
         url: `/employees/attendance/${id}/`,
         method: "DELETE",
       }),
-      // invalidation will be applied manually within the component
+      // tags invalidation will be applied manually within the component
     }),
   }),
 });

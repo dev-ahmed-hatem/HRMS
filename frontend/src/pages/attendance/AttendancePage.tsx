@@ -1,7 +1,7 @@
 import { Tabs } from "antd";
-import AttendanceRecords from "../components/attendance/AttendanceRecords";
-import AttendanceSummary from "../components/attendance/AttendanceSummary";
-import AttendanceSettings from "../components/attendance/AttendanceSettings";
+import AttendanceRecords from "../../components/attendance/AttendanceRecords";
+import AttendanceSummary from "../../components/attendance/AttendanceSummary";
+import AttendanceSettings from "../../components/attendance/settings/AttendanceSettings";
 
 const AttendancePage: React.FC = () => {
   const tabItems = [

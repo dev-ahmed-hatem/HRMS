@@ -10,7 +10,7 @@ import { LuNotebookPen } from "react-icons/lu";
 import { MdAssignment } from "react-icons/md";
 import { RouteObject } from "react-router";
 import TasksList from "@/pages/tasks/TasksList";
-import AttendancePage from "@/pages/AttendancePage";
+import AttendancePage from "@/pages/attendance/AttendancePage";
 import FinancialsPage from "@/pages/financials/FinancialsPage";
 import FilesPage from "@/pages/files/FilesPage";
 import SalariesPage from "@/pages/financials/Salaries";

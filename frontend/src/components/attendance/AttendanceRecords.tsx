@@ -9,25 +9,32 @@ import {
   TimePicker,
   Space,
   Form,
+  Spin,
 } from "antd";
 import dayjs from "dayjs";
 import {
   DeleteOutlined,
   EditOutlined,
+  LoadingOutlined,
   PlusOutlined,
   SaveOutlined,
 } from "@ant-design/icons";
-import { useGetDayAttendanceQuery } from "@/app/api/endpoints/attendance";
+import {
+  useDeleteAttendanceRecordMutation,
+  useGetDayAttendanceQuery,
+  useUpdateDayAttendanceMutation,
+} from "@/app/api/endpoints/attendance";
 import Loading from "@/components/Loading";
 import ErrorPage from "@/pages/Error";
 import { useGetAllEmployeesQuery } from "@/app/api/endpoints/employees";
 import { AssignedEmployee } from "@/types/employee";
+import { useNotification } from "@/providers/NotificationProvider";
 
 type AttendanceRecord = {
   key: string | number;
-  employee?: AssignedEmployee | null;
-  check_in?: string | null;
-  check_out?: string | null;
+  employee: AssignedEmployee | null;
+  check_in: string | null;
+  check_out?: string;
   editing?: boolean;
   saved: boolean;
 };
@@ -36,9 +43,50 @@ const AttendanceRecords = () => {
   const [attendanceRecords, setAttendanceRecords] = useState<
     AttendanceRecord[]
   >([]);
+  const notification = useNotification();
   const [form] = Form.useForm();
 
   const [date, setDate] = useState(dayjs()); // Default to today's date
+
+  const [currentDeletedRecord, setcurrentDeletedRecord] = useState<
+    number | null
+  >(null);
+
+  // queries
+
+  // fetch attendance data
+  const {
+    data: savedAttendanceRecords,
+    isLoading,
+    isFetching,
+    isError,
+    refetch,
+  } = useGetDayAttendanceQuery({
+    date: date.format("YYYY-MM-DD"),
+  });
+
+  // update attendnace data
+  const [
+    updateAttendnace,
+    { isLoading: updating, isError: updateError, isSuccess: updateSuccess },
+  ] = useUpdateDayAttendanceMutation();
+
+  // delete attendance record
+  const [
+    deleteSavedRecord,
+    {
+      isLoading: deletingRecord,
+      isSuccess: recordDeleted,
+      isError: recordDeletingError,
+    },
+  ] = useDeleteAttendanceRecordMutation();
+
+  // fetch employees
+  const {
+    data: employees,
+    isError: employeesError,
+    isFetching: employeesFetching,
+  } = useGetAllEmployeesQuery();
 
   // Add New Attendance Row
   const addAttendanceRow = () => {
@@ -48,7 +96,6 @@ const AttendanceRecords = () => {
         key: Date.now(),
         employee: null,
         check_in: null,
-        check_out: null,
         editing: true,
         saved: false,
       },
@@ -96,17 +143,33 @@ const AttendanceRecords = () => {
     form
       .validateFields({ recursive: false, validateOnly: false })
       .then((values) => {
-        console.log(values);
-      })
-      .catch((errorInfo) => {
-        console.log(errorInfo);
+        // normalizing attendance records for database
+        const records = attendanceRecords
+          .filter((record) => record.editing === true)
+          .map((record) => ({
+            id: record.key,
+            employee: record.employee?.id,
+            check_in: record.check_in,
+            check_out: record.check_out,
+            saved: record.saved,
+          }));
+
+        // perform update
+        updateAttendnace({ date: date.format("YYYY-MM-DD"), records });
       });
   };
 
   // Delete a Row
-  const handleDelete = (key: string) => {
-    setAttendanceRecords((prev) => prev.filter((record) => record.key !== key));
-    //////////////////// TODO: check wether deleted record is savd in database or not ////////////////////
+  const handleDelete = (key: number) => {
+    const record = attendanceRecords.find((record) => record.key === key);
+    if (record?.saved) {
+      setcurrentDeletedRecord(key);
+      deleteSavedRecord(key.toString());
+    } else {
+      setAttendanceRecords((prev) =>
+        prev.filter((record) => record.key !== key)
+      );
+    }
   };
 
   // Table Columns
@@ -123,6 +186,7 @@ const AttendanceRecords = () => {
               {
                 validator: (rule, value) => {
                   if (
+                    value &&
                     attendanceRecords.find(
                       (current) =>
                         current.employee?.id === value &&
@@ -234,6 +298,7 @@ const AttendanceRecords = () => {
                 type="primary"
                 icon={<EditOutlined />}
                 onClick={() => editRecord(record.key)}
+                disabled={record.key === currentDeletedRecord}
               />
             )}
 
@@ -246,32 +311,17 @@ const AttendanceRecords = () => {
               <Button
                 danger
                 icon={<DeleteOutlined />}
-                disabled={record.saving}
+                disabled={record.key === currentDeletedRecord}
               />
             </Popconfirm>
+            {record.key === currentDeletedRecord && (
+              <Spin indicator={<LoadingOutlined spin />} />
+            )}
           </Space>
         </div>
       ),
     },
   ];
-
-  // fetch attendance data
-  const {
-    data: savedAttendanceRecords,
-    isLoading,
-    isFetching,
-    isError,
-    refetch,
-  } = useGetDayAttendanceQuery({
-    date: date.format("YYYY-MM-DD"),
-  });
-
-  // fetch employees
-  const {
-    data: employees,
-    isError: employeesError,
-    isFetching: employeesFetching,
-  } = useGetAllEmployeesQuery();
 
   useEffect(() => {
     refetch();
@@ -292,6 +342,49 @@ const AttendanceRecords = () => {
     }
   }, [savedAttendanceRecords]);
 
+  // notification listeners
+
+  // update records
+  useEffect(() => {
+    if (updateSuccess) {
+      notification.success({
+        message: "تم حفظ تسجيلات الحضور",
+      });
+      setAttendanceRecords((prev) =>
+        prev.map((record) => ({ ...record, editing: false }))
+      );
+    }
+  }, [updateSuccess]);
+
+  useEffect(() => {
+    if (updateError) {
+      notification.error({
+        message: "حدث خطأ أثناء حفظ تسجيلات الحضور ! برجاء إعادة المحاولة",
+      });
+    }
+  }, [updateError]);
+
+  // deleting record
+  useEffect(() => {
+    if (recordDeleted) {
+      notification.success({
+        message: "تم حذف تسجيل الحضور",
+      });
+    }
+    setAttendanceRecords((prev) =>
+      prev.filter((record) => record.key !== currentDeletedRecord)
+    );
+  }, [recordDeleted]);
+
+  useEffect(() => {
+    if (recordDeletingError) {
+      notification.error({
+        message: "حدث خطأ أثناء حذف تسجيل الحضور ! برجاء إعادة المحاولة",
+      });
+      setcurrentDeletedRecord(null);
+    }
+  }, [recordDeletingError]);
+
   if (isLoading || employeesFetching) return <Loading />;
   if (isError || employeesError) {
     return (
@@ -311,7 +404,7 @@ const AttendanceRecords = () => {
           allowClear={false}
         />
       </div>
-      {isFetching ? (
+      {isLoading ? (
         <Loading />
       ) : (
         <>
@@ -343,7 +436,7 @@ const AttendanceRecords = () => {
                   type="primary"
                   icon={<SaveOutlined />}
                   onClick={handleSave}
-                  // loading={record.saving}
+                  loading={isFetching || updating}
                 >
                   حفظ
                 </Button>

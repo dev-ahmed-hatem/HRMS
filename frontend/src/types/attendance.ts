@@ -5,5 +5,5 @@ export type Attendance = {
   employee: AssignedEmployee;
   date: string;
   check_in: string;
-  check_out?: string | null;
+  check_out?: string;
 };

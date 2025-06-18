@@ -9,18 +9,45 @@ export const attendanceEndpoints = api.injectEndpoints({
         url: `employees/attendance/?${qs.stringify(params || {})}`,
         method: "GET",
       }),
-      providesTags: (results) =>
+      providesTags: (results, error, arg) =>
         results
           ? [
               ...results.map((attendance) => ({
                 type: "Attendance" as const,
-                id: attendance.id,
+                id: `${arg?.date ?? "unprovided"}${attendance.id}`,
               })),
-              { type: "Attendance", id: "LIST" },
+              { type: "Attendance", id: arg?.date || "LIST" },
             ]
-          : [{ type: "Attendance", id: "LIST" }],
+          : [{ type: "Attendance", id: arg?.date || "LIST" }],
+    }),
+    updateDayAttendance: builder.mutation<
+      void,
+      {
+        date: string;
+        records: any;
+      }
+    >({
+      query: (data) => ({
+        url: "employees/update-day-attendance/?",
+        method: "POST",
+        data,
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: "Attendance", id: arg.date ?? "LIST" },
+      ],
+    }),
+    deleteAttendanceRecord: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/employees/attendance/${id}/`,
+        method: "DELETE",
+      }),
+      // invalidation will be applied manually within the component
     }),
   }),
 });
 
-export const { useGetDayAttendanceQuery } = attendanceEndpoints;
+export const {
+  useGetDayAttendanceQuery,
+  useUpdateDayAttendanceMutation,
+  useDeleteAttendanceRecordMutation,
+} = attendanceEndpoints;

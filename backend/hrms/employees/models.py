@@ -161,11 +161,11 @@ class Attendance(models.Model):
     class Meta:
         verbose_name = _("تسجيل حضور")
         verbose_name_plural = _("تسجيلات الحضور")
-        ordering = ['-check_in']
+        ordering = ['id']
         unique_together = ["date", "employee"]
 
     def __str__(self):
-        return f"{self.employee} - {self.check_in.strftime('%Y-%m-%d %H:%M')}"
+        return f"{self.employee} - {self.date.strftime('%Y-%m-%d')} {self.check_in.strftime('%H:%M')}"
 
     def clean(self):
         # Ensure check_out is not earlier than check_in

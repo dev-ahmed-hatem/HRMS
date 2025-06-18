@@ -112,7 +112,7 @@ const EmployeesList = () => {
   }, [deleted]);
 
   useEffect(() => {
-    if (deleted) {
+    if (deleteError) {
       notification.error({
         message: "حدث خطأ أثناء حذف الموظفين ! برجاء إعادة المحاولة",
       });

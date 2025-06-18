@@ -30,7 +30,7 @@ export type Employee = {
     activeAssignments: number;
   };
 
-  attendance: Attendance[];
+  attendance: any;
 
   salaryHistory: { date: string; baseSalary: number; bonuses: number }[];
 };

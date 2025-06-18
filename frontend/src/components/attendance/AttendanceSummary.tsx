@@ -10,7 +10,7 @@ const AttendanceSummary = () => {
       id: 1,
       employee: "محمد أحمد",
       checkIn: "10:15",
-      checkOut: "17:10",
+      checkOut: "16:50",
     },
     {
       id: 2,
@@ -59,6 +59,12 @@ const AttendanceSummary = () => {
     {
       title: "الخصم (دقائق)",
       key: "deduction",
+      render: (_: string, record: { checkIn: string; checkOut: string }) =>
+        calculateDeduction(record.checkIn, record.checkOut),
+    },
+    {
+      title: "الإضافي (دقائق)",
+      key: "extra",
       render: (_: string, record: { checkIn: string; checkOut: string }) =>
         calculateDeduction(record.checkIn, record.checkOut),
     },

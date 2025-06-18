@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Department, Employee, Attendance
+from .models import Department, Employee
 from hrms.utils import calculate_age
 from django.conf import settings
 
@@ -71,29 +71,3 @@ class EmployeeWriteSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
-
-
-class AttendanceReadSerializer(serializers.ModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='attendance-detail')
-    employee = serializers.SerializerMethodField()
-    check_in = serializers.SerializerMethodField()
-    check_out = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Attendance
-        fields = ['id', 'url', 'employee', 'date', 'check_in', 'check_out']
-
-    def get_check_in(self, obj):
-        return obj.check_in.strftime('%H:%M')
-
-    def get_check_out(self, obj):
-        return obj.check_out.strftime('%H:%M') if obj.check_out else None
-
-    def get_employee(self, obj):
-        return {"name": obj.employee.name, "id": obj.employee.id}
-
-
-class AttendanceWriteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Attendance
-        fields = '__all__'

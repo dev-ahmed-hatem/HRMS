@@ -6,7 +6,7 @@ export const attendanceEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
     getDayAttendance: builder.query<Attendance[], Record<string, any> | void>({
       query: (params) => ({
-        url: `employees/attendance/?${qs.stringify(params || {})}`,
+        url: `attendance/attendance/?${qs.stringify(params || {})}`,
         method: "GET",
       }),
       providesTags: (results, error, arg) =>
@@ -28,7 +28,7 @@ export const attendanceEndpoints = api.injectEndpoints({
       }
     >({
       query: (data) => ({
-        url: "employees/update-day-attendance/?",
+        url: "attendance/update-day-attendance/?",
         method: "POST",
         data,
       }),
@@ -38,7 +38,7 @@ export const attendanceEndpoints = api.injectEndpoints({
     }),
     deleteAttendanceRecord: builder.mutation<void, string>({
       query: (id) => ({
-        url: `/employees/attendance/${id}/`,
+        url: `/attendance/attendance/${id}/`,
         method: "DELETE",
       }),
       // tags invalidation will be applied manually within the component

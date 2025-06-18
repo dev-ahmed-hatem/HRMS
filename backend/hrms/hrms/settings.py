@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'employees.apps.EmployeesConfig',
     'projects.apps.ProjectsConfig',
+    'attendance.apps.AttendanceConfig',
 ]
 
 MIDDLEWARE = [

@@ -1,14 +1,12 @@
 from rest_framework.routers import DefaultRouter
-from .views import DepartmentViewSet, EmployeeViewSet, AttendanceViewSet, multiple_delete, update_day_attendance
+from .views import DepartmentViewSet, EmployeeViewSet, multiple_delete
 from django.urls import path, include
 
 router = DefaultRouter()
 router.register('departments', DepartmentViewSet, basename='department')
 router.register('employees', EmployeeViewSet, basename='employee')
-router.register('attendance', AttendanceViewSet, basename='attendance')
 
 urlpatterns = [
     path('', include(router.urls)),
     path('multiple-delete/', multiple_delete, name="multiple-delete"),
-    path('update-day-attendance/', update_day_attendance, name="update-day-attendance"),
 ]

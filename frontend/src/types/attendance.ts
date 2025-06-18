@@ -7,3 +7,12 @@ export type Attendance = {
   check_in: string;
   check_out?: string;
 };
+
+export type AttendanceSummary = {
+  id: number;
+  employee: string;
+  check_in: string;
+  check_out: string | null;
+  deductions: number | null;
+  extra: number | null;
+};

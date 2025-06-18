@@ -1,6 +1,7 @@
-import { Attendance } from "@/types/attendance";
+import { Attendance, AttendanceSummary } from "@/types/attendance";
 import api from "../apiSlice";
 import qs from "query-string";
+import { PaginatedResponse } from "@/types/paginatedResponse";
 
 export const attendanceEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -43,11 +44,31 @@ export const attendanceEndpoints = api.injectEndpoints({
       }),
       // tags invalidation will be applied manually within the component
     }),
+    getAttendanceSummary: builder.query<
+      PaginatedResponse<AttendanceSummary>,
+      string
+    >({
+      query: (date) => ({
+        url: `attendance/get-attendance-summary/?date=${date}`,
+        method: "GET",
+      }),
+      providesTags: (result, error, arg) =>
+        result
+          ? [
+              ...result.data.map((attendance) => ({
+                type: "Attendance" as const,
+                id: `${arg ?? "unprovided"}${attendance.id}`,
+              })),
+              { type: "Attendance", id: arg || "LIST" },
+            ]
+          : [{ type: "Attendance", id: arg || "LIST" }],
+    }),
   }),
 });
 
 export const {
   useGetDayAttendanceQuery,
+  useGetAttendanceSummaryQuery,
   useUpdateDayAttendanceMutation,
   useDeleteAttendanceRecordMutation,
 } = attendanceEndpoints;

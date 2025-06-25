@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta, time
+from typing import Optional
+
 from hrms.rest_framework_utils.custom_pagination import CustomPageNumberPagination
 from .models import Attendance
 from .serializers import AttendanceWriteSerializer, AttendanceReadSerializer
@@ -23,25 +26,42 @@ class AttendanceViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-# TODO: calculate deductions
-# js version:
-#
-#   // // Calculate deduction based on lateness and early departure
-#   // const calculateDeduction = (checkIn: string, checkOut: string) => {
-#   //   const checkInTime = dayjs(checkIn, "HH:mm");
-#   //   const checkOutTime = dayjs(checkOut, "HH:mm");
-#   //   const standardInTime = dayjs(standardCheckIn, "HH:mm");
-#   //   const standardOutTime = dayjs(standardCheckOut, "HH:mm");
-#
-#   //   let lateMinutes = checkInTime.isAfter(standardInTime)
-#   //     ? checkInTime.diff(standardInTime, "minute")
-#   //     : 0;
-#   //   let earlyLeaveMinutes = checkOutTime.isBefore(standardOutTime)
-#   //     ? standardOutTime.diff(checkOutTime, "minute")
-#   //     : 0;
-#
-#   //   return `${lateMinutes + earlyLeaveMinutes} دقيقة`;
-#   // };
+def calculate_deduction(checkin: time, checkout: Optional[time]):
+    today = datetime.today().date()
+
+    checkin_date = datetime.combine(today, checkin)
+    checkout_date = datetime.combine(today, checkout) if checkout else None
+    grace_period = timedelta(minutes=15)
+
+    standard_checkin = datetime.combine(today, time(hour=10))
+    standard_checkout = datetime.combine(today, time(hour=17))
+
+    # calculate late minutes and compare with grace period
+    late_minutes = 0
+    if checkin_date - standard_checkin > grace_period:
+        late_delta = checkin_date - standard_checkin
+        late_minutes = late_delta.total_seconds() / 60
+
+    # check if there early leave minutes
+    early_leave = 0
+    if checkout and standard_checkout - checkout_date >= timedelta(minutes=1):
+        early_delta = standard_checkout - checkout_date
+        early_leave = early_delta.total_seconds() / 60
+
+    return late_minutes + early_leave
+
+
+def calculate_extra(check_out: Optional[time]):
+    if not check_out:
+        return None
+
+    today = datetime.today().date()
+    checkout_date = datetime.combine(today, check_out)
+    standard_checkout = datetime.combine(today, time(hour=17))
+
+    if checkout_date - standard_checkout > timedelta(minutes=0):
+        extra_delta = checkout_date - standard_checkout
+        return extra_delta.total_seconds() / 60
 
 
 @api_view(['GET'])
@@ -60,8 +80,8 @@ def get_attendance_summary(request):
         "employee": record.employee.name,
         "check_in": record.check_in,
         "check_out": record.check_out,
-        "deductions": 15,
-        "extra": 10
+        "deductions": calculate_deduction(record.check_in, record.check_out),
+        "extra": calculate_extra(record.check_out)
     }
         for record in paginated_result]
 

@@ -26,11 +26,17 @@ const columns: ColumnType<AttendanceSummaryType>[] = [
   },
   {
     title: "الخصم (دقائق)",
+    dataIndex: "deductions",
     key: "deductions",
+    render: (value) =>
+      value ? `${value} ${value < 11 && value > 2 ? "دقائق" : "دقيقة"}` : "-",
   },
   {
     title: "الإضافي (دقائق)",
+    dataIndex: "extra",
     key: "extra",
+    render: (value) =>
+      value ? `${value} ${value < 11 && value > 2 ? "دقائق" : "دقيقة"}` : "-",
   },
 ];
 

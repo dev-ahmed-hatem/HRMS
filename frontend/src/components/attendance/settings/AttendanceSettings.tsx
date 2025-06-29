@@ -4,17 +4,30 @@ import Holidays from "./sections/Holidays";
 import EmergencyDays from "./sections/EmergencyDays";
 import { createContext } from "react";
 import { AttendanceSettings as AttendanceSettingsType } from "@/types/attendance";
-import { useGetAttendanceSettingsQuery } from "@/app/api/endpoints/attendance";
+import {
+  useGetAttendanceSettingsQuery,
+  useUpdateAttendanceSettingsMutation,
+} from "@/app/api/endpoints/attendance";
 import Error from "@/pages/Error";
 import Loading from "@/components/Loading";
 
-export const AttendanceContext = createContext<AttendanceSettingsType | undefined>(
-  undefined
-);
+interface AttendanceContextType {
+  settings: AttendanceSettingsType;
+  updateTrigger: Function;
+  updating: boolean;
+}
+
+export const AttendanceContext = createContext<
+  AttendanceContextType | undefined
+>(undefined);
 
 const AttendanceSettings = () => {
-  const { data, isLoading, isError, isSuccess } =
-    useGetAttendanceSettingsQuery();
+  const { data, isLoading, isError } = useGetAttendanceSettingsQuery();
+
+  const [
+    updateTrigger,
+    { data: updated, isLoading: updating, isSuccess: updateSuccess },
+  ] = useUpdateAttendanceSettingsMutation();
 
   if (isLoading) return <Loading />;
   if (isError) {
@@ -23,7 +36,9 @@ const AttendanceSettings = () => {
     );
   }
   return (
-    <AttendanceContext.Provider value={data}>
+    <AttendanceContext.Provider
+      value={{ settings: data!, updateTrigger, updating }}
+    >
       {/* Section 1: Official Times */}
       <OfficialTimes />
 

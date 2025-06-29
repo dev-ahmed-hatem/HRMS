@@ -3,8 +3,10 @@ from typing import Optional
 
 from hrms.rest_framework_utils.custom_pagination import CustomPageNumberPagination
 from .models import Attendance, AttendanceSettings
-from .serializers import AttendanceWriteSerializer, AttendanceReadSerializer, AttendanceSettingsReadSerializer
+from .serializers import AttendanceWriteSerializer, AttendanceReadSerializer, AttendanceSettingsReadSerializer, \
+    AttendanceSettingsWriteSerializer
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets
 from django.utils.translation import gettext_lazy as _
@@ -58,13 +60,14 @@ def calculate_extra(check_out: Optional[time]):
 
     today = datetime.today().date()
     attendance_settings = AttendanceSettings.objects.first()
-    
+
     checkout_date = datetime.combine(today, check_out)
     standard_checkout = datetime.combine(today, attendance_settings.check_out)
 
     if checkout_date - standard_checkout > timedelta(minutes=0):
         extra_delta = checkout_date - standard_checkout
         return extra_delta.total_seconds() / 60
+    return None
 
 
 @api_view(['GET'])
@@ -123,11 +126,23 @@ def update_day_attendance(request):
     return Response()
 
 
-@api_view(["GET"])
-def get_attendance_settings(request):
-    instance = AttendanceSettings.objects.first()
-    if instance is None:
-        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+class AttendanceSettingsView(APIView):
+    def get(self, request):
+        instance = AttendanceSettings.objects.first()
+        if instance is None:
+            return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
-    serializer = AttendanceSettingsReadSerializer(instance, context={"request": request}).data
-    return Response(serializer, status=status.HTTP_200_OK)
+        serializer = AttendanceSettingsReadSerializer(instance, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request):
+        instance = AttendanceSettings.objects.first()
+        if instance is None:
+            return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+
+        serializer = AttendanceSettingsWriteSerializer(instance, data=request.data, partial=True,
+                                                       context={"request": request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

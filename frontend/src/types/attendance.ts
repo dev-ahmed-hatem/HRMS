@@ -16,3 +16,9 @@ export type AttendanceSummary = {
   deductions: number | null;
   extra: number | null;
 };
+
+export type AttendanceSettings = {
+  check_in: string;
+  check_out: string;
+  grace_period: number;
+};

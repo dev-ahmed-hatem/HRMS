@@ -1,5 +1,5 @@
 from rest_framework.routers import DefaultRouter
-from .views import AttendanceViewSet, update_day_attendance, get_attendance_summary
+from .views import AttendanceViewSet, update_day_attendance, get_attendance_summary, get_attendance_settings
 from django.urls import path, include
 
 router = DefaultRouter()
@@ -9,4 +9,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('update-day-attendance/', update_day_attendance, name="update-day-attendance"),
     path('get-attendance-summary/', get_attendance_summary, name="get-attendance-summary"),
+    path('get-attendance-settings/', get_attendance_settings, name="get-attendance-settings"),
 ]

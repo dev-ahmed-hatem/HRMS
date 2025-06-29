@@ -1,4 +1,8 @@
-import { Attendance, AttendanceSummary } from "@/types/attendance";
+import {
+  Attendance,
+  AttendanceSettings,
+  AttendanceSummary,
+} from "@/types/attendance";
 import api from "../apiSlice";
 import qs from "query-string";
 import { PaginatedResponse } from "@/types/paginatedResponse";
@@ -63,6 +67,14 @@ export const attendanceEndpoints = api.injectEndpoints({
             ]
           : [{ type: "Attendance", id: arg || "LIST" }],
     }),
+    // attendance settings queries
+    getAttendanceSettings: builder.query<AttendanceSettings, void>({
+      query: () => ({
+        url: "attendance/get-attendance-settings/",
+        method: "GET",
+      }),
+      providesTags: [{ type: "Attendance", id: "settings" }],
+    }),
   }),
 });
 
@@ -71,4 +83,5 @@ export const {
   useGetAttendanceSummaryQuery,
   useUpdateDayAttendanceMutation,
   useDeleteAttendanceRecordMutation,
+  useGetAttendanceSettingsQuery,
 } = attendanceEndpoints;

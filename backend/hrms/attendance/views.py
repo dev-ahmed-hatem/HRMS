@@ -2,8 +2,8 @@ from datetime import datetime, timedelta, time
 from typing import Optional
 
 from hrms.rest_framework_utils.custom_pagination import CustomPageNumberPagination
-from .models import Attendance
-from .serializers import AttendanceWriteSerializer, AttendanceReadSerializer
+from .models import Attendance, AttendanceSettings
+from .serializers import AttendanceWriteSerializer, AttendanceReadSerializer, AttendanceSettingsReadSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status, viewsets
@@ -28,13 +28,14 @@ class AttendanceViewSet(viewsets.ModelViewSet):
 
 def calculate_deduction(checkin: time, checkout: Optional[time]):
     today = datetime.today().date()
+    attendance_settings = AttendanceSettings.objects.first()
 
     checkin_date = datetime.combine(today, checkin)
     checkout_date = datetime.combine(today, checkout) if checkout else None
     grace_period = timedelta(minutes=15)
 
-    standard_checkin = datetime.combine(today, time(hour=10))
-    standard_checkout = datetime.combine(today, time(hour=17))
+    standard_checkin = datetime.combine(today, attendance_settings.check_in)
+    standard_checkout = datetime.combine(today, attendance_settings.check_out)
 
     # calculate late minutes and compare with grace period
     late_minutes = 0
@@ -56,8 +57,10 @@ def calculate_extra(check_out: Optional[time]):
         return None
 
     today = datetime.today().date()
+    attendance_settings = AttendanceSettings.objects.first()
+    
     checkout_date = datetime.combine(today, check_out)
-    standard_checkout = datetime.combine(today, time(hour=17))
+    standard_checkout = datetime.combine(today, attendance_settings.check_out)
 
     if checkout_date - standard_checkout > timedelta(minutes=0):
         extra_delta = checkout_date - standard_checkout
@@ -118,3 +121,13 @@ def update_day_attendance(request):
                 serializer.save()
 
     return Response()
+
+
+@api_view(["GET"])
+def get_attendance_settings(request):
+    instance = AttendanceSettings.objects.first()
+    if instance is None:
+        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+
+    serializer = AttendanceSettingsReadSerializer(instance, context={"request": request}).data
+    return Response(serializer, status=status.HTTP_200_OK)

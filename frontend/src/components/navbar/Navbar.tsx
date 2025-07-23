@@ -31,7 +31,12 @@ const Navbar = ({
       />
       <div className="logo h-12 md:h-16">
         <NavLink to={"/"}>
-          <Logo className="fill-calypso-900 hover:fill-calypso-950" />
+          {/* <Logo className="fill-calypso-900 hover:fill-calypso-950" /> */}
+          <img
+            src="/nacdw.jpeg"
+            alt="nacdw logo"
+            className="w-12 md:w-16 rounded-full"
+          />
         </NavLink>
       </div>
       <div className="user">

@@ -9,7 +9,12 @@ const Footer = () => {
       >
         {/* Logo */}
         <a href="https://kaffo.co">
-          <Logo className="fill-orange hover:fill-orange-200 size-40" />
+          {/* <Logo className="fill-orange hover:fill-orange-200 size-40" /> */}
+          <img
+            src="/nacdw.jpeg"
+            alt="nacdw logo"
+            className="w-28 md:w-36 rounded-lg"
+          />
         </a>
 
         {/* Company Info */}

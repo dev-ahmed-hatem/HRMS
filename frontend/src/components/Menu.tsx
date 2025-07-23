@@ -57,10 +57,15 @@ const Menu = ({
       <Drawer title="القائمة" onClose={onClose} open={menuOpen}>
         <NavLink
           to={"/"}
-          className="logo h-20 flex items-center justify-center rounded-lg mb-10"
+          className="logo h-36 flex items-center justify-center rounded-lg mb-10"
           onClick={() => setMenuOpen(false)}
         >
-          <Logo className="fill-calypso-900 hover:fill-calypso-950 h-full rounded-lg" />
+          {/* <Logo className="fill-calypso-900 hover:fill-calypso-950 h-full rounded-lg" /> */}
+          <img
+            src="/nacdw.jpeg"
+            alt="nacdw logo"
+            className="h-full rounded-lg"
+          />
         </NavLink>
 
         <AntdMenu

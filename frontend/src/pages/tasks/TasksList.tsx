@@ -72,16 +72,7 @@ const columns: (
     dataIndex: "project",
     key: "project",
     render: (project) =>
-      project ? (
-        <Link
-          to={`/projects/project/${project.id}/`}
-          className="text-blue-700 hover:underline hover:text-blue-500"
-        >
-          {project.name}
-        </Link>
-      ) : (
-        <Tag color="gray">غير مرتبط</Tag>
-      ),
+      project ? project.name : <Tag color="gray">غير مرتبط</Tag>,
   },
   {
     title: "تاريخ الاستحقاق",

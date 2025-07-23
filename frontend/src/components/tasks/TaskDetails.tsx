@@ -47,12 +47,7 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
         </Descriptions.Item>
         <Descriptions.Item label="المشروع المرتبط">
           {task!.project ? (
-            <Link
-              to={`/projects/project/${task!.project.id}`}
-              className="text-blue-700 hover:underline hover:text-blue-500"
-            >
-              {task!.project.name}
-            </Link>
+            task!.project.name
           ) : (
             <Tag color="gray">غير مرتبط بمشروع</Tag>
           )}

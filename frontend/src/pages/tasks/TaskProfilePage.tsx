@@ -5,7 +5,7 @@ import { getInitials, isOverdue } from "@/utils";
 import TaskDetails from "@/components/tasks/TaskDetails";
 import RelatedTasks from "@/components/tasks/RelatedTasks";
 import { priorityColors, Task } from "@/types/task";
-import { Link, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useNotification } from "@/providers/NotificationProvider";
 import {
   tasksEndpoints,
@@ -167,20 +167,6 @@ const TaskProfilePage: React.FC = () => {
               <Tag className="text-center" color="red">
                 متأخر
               </Tag>
-            )}
-          </div>
-
-          {/* Project Association */}
-          <div>
-            {task!.project ? (
-              <Link
-                to={`/projects/project/${task!.project.id}`}
-                className="text-blue-700 hover:underline hover:text-blue-500"
-              >
-                مرتبط بـ {task!.project.name}
-              </Link>
-            ) : (
-              <Tag color="gray">غير مرتبط بمشروع</Tag>
             )}
           </div>
 

@@ -48,17 +48,17 @@ export const appRoutes: AppRoute[] = [
         icon: <FaUser />,
         label: "الموظفين",
       },
-      {
-        path: "projects",
-        element: (
-          <SectionView
-            parentComponent={<ProjectsList />}
-            parentUrl="/projects"
-          />
-        ),
-        icon: <FaDiagramProject />,
-        label: "المشاريع",
-      },
+      // {
+      //   path: "projects",
+      //   element: (
+      //     <SectionView
+      //       parentComponent={<ProjectsList />}
+      //       parentUrl="/projects"
+      //     />
+      //   ),
+      //   icon: <FaDiagramProject />,
+      //   label: "المشاريع",
+      // },
       {
         path: "tasks",
         element: (
@@ -67,38 +67,38 @@ export const appRoutes: AppRoute[] = [
         icon: <MdAssignment />,
         label: "المهام",
       },
-      {
-        path: "attendance",
-        element: <AttendancePage />,
-        icon: <FaCalendarCheck />,
-        label: "الحضور والانصراف",
-      },
-      {
-        path: "financials",
-        icon: <FaMoneyBill />,
-        label: "الماليات",
-        element: <FinancialsPage />,
-        children: [
-          {
-            path: "incomes",
-            element: <FinancialRecords financialItem="income" />,
-            icon: <GiReceiveMoney />,
-            label: "الإيرادات",
-          },
-          {
-            path: "expenses",
-            element: <FinancialRecords financialItem="expense" />,
-            icon: <GiPayMoney />,
-            label: "المصروفات",
-          },
-          {
-            path: "salaries",
-            element: <SalariesPage />,
-            icon: <GiMoneyStack />,
-            label: "الرواتب",
-          },
-        ],
-      },
+      // {
+      //   path: "attendance",
+      //   element: <AttendancePage />,
+      //   icon: <FaCalendarCheck />,
+      //   label: "الحضور والانصراف",
+      // },
+      // {
+      //   path: "financials",
+      //   icon: <FaMoneyBill />,
+      //   label: "الماليات",
+      //   element: <FinancialsPage />,
+      //   children: [
+      //     {
+      //       path: "incomes",
+      //       element: <FinancialRecords financialItem="income" />,
+      //       icon: <GiReceiveMoney />,
+      //       label: "الإيرادات",
+      //     },
+      //     {
+      //       path: "expenses",
+      //       element: <FinancialRecords financialItem="expense" />,
+      //       icon: <GiPayMoney />,
+      //       label: "المصروفات",
+      //     },
+      //     {
+      //       path: "salaries",
+      //       element: <SalariesPage />,
+      //       icon: <GiMoneyStack />,
+      //       label: "الرواتب",
+      //     },
+      //   ],
+      // },
       {
         path: "schedules",
         element: <SchedulesPage />,

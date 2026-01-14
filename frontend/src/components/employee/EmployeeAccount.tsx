@@ -27,6 +27,9 @@ import {
 import dayjs from "dayjs";
 import { Employee } from "@/types/employee";
 import { User } from "@/types/user";
+import { useCreateEmployeeAccountMutation } from "@/app/api/endpoints/employees";
+import { useNotification } from "@/providers/NotificationProvider";
+import { handleServerErrors } from "@/utils/handleForm";
 
 interface EmployeeAccountProps {
   employee: Employee;
@@ -37,8 +40,13 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [user, setUser] = useState<User | undefined>(employee.user);
+  const notification = useNotification();
 
-  // Generate default username based on employee info
+  // redux queries
+  const [createAccount, { isLoading: creating }] =
+    useCreateEmployeeAccountMutation();
+
+  // Generate default username based on employee info (not used currently)
   const generateDefaultUsername = (): string => {
     const nameParts = employee.name.split(" ");
     const firstName = nameParts[0]?.toLowerCase() || "";
@@ -49,33 +57,28 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
     );
   };
 
-  // Mock function to create user account linked to employee
-  const mockCreateAccount = async (values: any) => {
-    setLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  const handleSubmit = async (values: any) => {
+    try {
+      const data = {
+        id: employee.id,
+        username: values.username,
+        password: values.password,
+        password2: values.password2,
+      };
 
-    const newUser: User = {
-      // id: Date.now().toString(), // Temporary ID
-      name: employee.name,
-      username: values.username,
-      phone: employee.phone,
-      national_id: employee.national_id,
-      is_active: true,
-      is_moderator: values.is_moderator || false,
-      is_superuser: false,
-      is_root: false,
-      last_login: undefined,
-    };
+      const result = await createAccount(data).unwrap();
+      setUser(result);
 
-    setUser(newUser);
-    setLoading(false);
-    setIsModalVisible(false);
-    form.resetFields();
-    message.success("تم إنشاء حساب المستخدم بنجاح");
+      notification.success({ message: "تم إنشاء حساب الموظف بنجاح" });
 
-    console.log("Created user account:", newUser);
-    // In real app, you would call API to create user and link to employee
+      form.resetFields();
+    } catch (error: any) {
+      handleServerErrors({
+        errorData: error.data as Record<string, string[]>,
+        form,
+      });
+      notification.error({ message: "خطأ في إضافة الموظف!" });
+    }
   };
 
   // Mock function to change password
@@ -185,9 +188,9 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
         <Form
           form={form}
           layout="vertical"
-          onFinish={mockCreateAccount}
+          onFinish={handleSubmit}
           initialValues={{
-            username: generateDefaultUsername(),
+            // username: generateDefaultUsername(),
             phone: employee.phone,
             national_id: employee.national_id,
           }}
@@ -210,7 +213,6 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
                       "اسم المستخدم يمكن أن يحتوي على أحرف إنجليزية وأرقام ونقاط وشرطة سفلية فقط",
                   },
                 ]}
-                help="يمكن استخدام الأحرف الإنجليزية والأرقام والنقاط والشرطة السفلية"
               >
                 <Input
                   prefix={<UserOutlined />}
@@ -234,7 +236,6 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
                     message: "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
                   },
                 ]}
-                help="يمكن تغييرها فيما بعد"
               >
                 <Input.Password
                   prefix={<LockOutlined />}
@@ -245,7 +246,7 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
 
             <Col xs={24} md={12}>
               <Form.Item
-                name="confirmPassword"
+                name="password2"
                 label="تأكيد كلمة المرور"
                 dependencies={["password"]}
                 rules={[
@@ -314,7 +315,7 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
             <Button
               type="primary"
               htmlType="submit"
-              loading={loading}
+              loading={creating}
               icon={<CheckCircleOutlined />}
               size="large"
             >
@@ -333,13 +334,12 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
     );
   }
 
-  // If user account exists, show account details and management options
   return (
     <>
       <Card
         title={
           <span>
-            <UserOutlined /> حساب نظام الموظف
+            <UserOutlined /> حساب الموظف
           </span>
         }
         className="account-management-card"
@@ -354,16 +354,16 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
               <strong>{user.username}</strong>
             </Descriptions.Item>
             <Descriptions.Item label="الاسم الكامل">
-              {user.name}
+              {employee.name}
             </Descriptions.Item>
             <Descriptions.Item label="البريد الإلكتروني">
               {employee.email}
             </Descriptions.Item>
             <Descriptions.Item label="رقم الهاتف">
-              {user.phone}
+              {employee.phone}
             </Descriptions.Item>
             <Descriptions.Item label="الرقم القومي">
-              {user.national_id}
+              {employee.national_id}
             </Descriptions.Item>
             <Descriptions.Item label="آخر دخول">
               {user.last_login ? (
@@ -374,7 +374,7 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
                 <Tag color="orange">لم يسجل دخول بعد</Tag>
               )}
             </Descriptions.Item>
-            <Descriptions.Item label="حالة الحساب">
+            {/* <Descriptions.Item label="حالة الحساب">
               <Space>
                 <Switch
                   checked={user.is_active}
@@ -397,7 +397,7 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
                 />
                 {user.is_moderator && <Tag color="orange">مشرف</Tag>}
               </Space>
-            </Descriptions.Item>
+            </Descriptions.Item> */}
           </Descriptions>
 
           <Divider>إجراءات إدارة الحساب</Divider>

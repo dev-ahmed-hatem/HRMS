@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status
 
 from users.models import User
+from users.serializers import UserSerializer
 from .serializers import DepartmentSerializer, EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer
 from .models import Department, Employee
 from rest_framework.decorators import action, api_view
@@ -63,22 +64,74 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     def create_account(self, request, pk=None):
         try:
             employee = Employee.objects.get(id=pk)
+
+            if employee.user:
+                return Response(
+                    {'error': 'هذا الموظف لديه حساب بالفعل'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             username = request.data['username']
             if User.objects.filter(username=username).exists():
-                return Response({'username': [_('موظف غير موجود')]}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'username': [_('اسم مستخدم موجود')]}, status=status.HTTP_404_NOT_FOUND)
             password = request.data['password']
             password2 = request.data['password2']
-            if password == password2:
-                return Response({"password2": [_("كلمة المرور غير متظابقة")]}, status=status.HTTP_400_BAD_REQUEST)
+            if password != password2:
+                return Response({"password2": [_("كلمات المرور غير متطابقة")]}, status=status.HTTP_400_BAD_REQUEST)
 
-            User.objects.create(username=username,
-                                password=password,
-                                email=employee.email,
-                                phone=employee.phone,
-                                national_id=employee.national_id,
-                                )
+            user = User.objects.create_user(username=username,
+                                            password=password,
+                                            name=employee.name,
+                                            phone=employee.phone,
+                                            national_id=employee.national_id,
+                                            )
+
+            employee.user = user
+            employee.save()
+
+            return Response(UserSerializer(user, context={"request": request}).data, status=status.HTTP_201_CREATED)
+
         except Employee.DoesNotExist:
             return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['delete'])
+    def delete_account(self, request, pk=None):
+        try:
+            employee = Employee.objects.get(id=pk)
+
+            if not employee.user:
+                return Response(
+                    {'error': 'هذا الموظف ليس لديه حساب'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            employee.user.delete()
+
+            return Response({"detail": "تم حذف حساب الموظف"}, status=status.HTTP_204_NO_CONTENT)
+
+        except Employee.DoesNotExist:
+            return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['patch'])
+    def update_user_account(self, request, pk=None):
+        employee = self.get_object()
+
+        if not hasattr(employee, 'user'):
+            return Response(
+                {'error': 'Employee does not have a user account'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return Response()
+
+        user = employee.user
+        serializer = UserUpdateSerializer(user, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["DELETE"])

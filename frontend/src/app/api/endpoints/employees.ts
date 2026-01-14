@@ -3,6 +3,7 @@ import api from "../apiSlice";
 import { Employee } from "@/types/employee";
 import { PaginatedResponse } from "@/types/paginatedResponse";
 import qs from "query-string";
+import { User } from "@/types/user";
 
 export const employeesEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -105,6 +106,20 @@ export const employeesEndpoints = api.injectEndpoints({
         )}`,
       }),
     }),
+
+    // employee account
+
+    createEmployeeAccount: builder.mutation<
+      User,
+      { username: string; password: string; password2: string; id: number }
+    >({
+      query: (data) => ({
+        url: `/employees/employees/${data.id}/create_account/`,
+        method: "POST",
+        data,
+      }),
+      // invalidatesTags: (_, __, arg) => [{ type: "Employee", id: arg.id }],
+    }),
   }),
   overrideExisting: false,
 });
@@ -119,4 +134,5 @@ export const {
   useDeleteEmployeesMutation,
   useGetAllDepartmentsQuery,
   useGetPaginatedDepartmentsQuery,
+  useCreateEmployeeAccountMutation,
 } = employeesEndpoints;

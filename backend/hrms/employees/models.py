@@ -101,9 +101,12 @@ class Employee(models.Model):
 
     is_active = models.BooleanField(default=True, verbose_name=_("نشط"))
 
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("حساب الموظف"))
+
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("تاريخ الإنشاء"))
 
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("أُضيف بواسطة"))
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("أُضيف بواسطة"),
+                                   related_name="created_employees")
 
     class Meta:
         verbose_name = _("الموظف")

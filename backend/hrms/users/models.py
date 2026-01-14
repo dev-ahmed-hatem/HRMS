@@ -33,6 +33,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
     is_root = models.BooleanField(default=False)
 
+    last_login = models.DateTimeField(blank=True, null=True)
+
     objects = UserManager()
 
     USERNAME_FIELD = 'username'

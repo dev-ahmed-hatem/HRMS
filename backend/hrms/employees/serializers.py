@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from users.serializers import UserSerializer
 from .models import Department, Employee
 from hrms.utils import calculate_age
 from django.conf import settings
@@ -18,6 +20,7 @@ class EmployeeReadSerializer(serializers.ModelSerializer):
     mode = serializers.CharField(read_only=True, source='get_mode_display')
     created_by = serializers.CharField(read_only=True, source='created_by.name')
     created_at = serializers.SerializerMethodField()
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = Employee

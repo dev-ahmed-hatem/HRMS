@@ -118,7 +118,21 @@ export const employeesEndpoints = api.injectEndpoints({
         method: "POST",
         data,
       }),
-      // invalidatesTags: (_, __, arg) => [{ type: "Employee", id: arg.id }],
+    }),
+    changeEmployeeAccountPassword: builder.mutation<
+      void,
+      {
+        current_password?: string;
+        new_password: string;
+        confirm_new_password: string;
+        id: number;
+      }
+    >({
+      query: (data) => ({
+        url: `/employees/employees/${data.id}/change_password/`,
+        method: "POST",
+        data,
+      }),
     }),
   }),
   overrideExisting: false,
@@ -135,4 +149,5 @@ export const {
   useGetAllDepartmentsQuery,
   useGetPaginatedDepartmentsQuery,
   useCreateEmployeeAccountMutation,
+  useChangeEmployeeAccountPasswordMutation,
 } = employeesEndpoints;

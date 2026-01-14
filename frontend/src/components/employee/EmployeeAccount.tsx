@@ -9,9 +9,7 @@ import {
   Tag,
   Divider,
   Modal,
-  message,
   Space,
-  Switch,
   Spin,
   Row,
   Col,
@@ -27,7 +25,10 @@ import {
 import dayjs from "dayjs";
 import { Employee } from "@/types/employee";
 import { User } from "@/types/user";
-import { useCreateEmployeeAccountMutation } from "@/app/api/endpoints/employees";
+import {
+  useChangeEmployeeAccountPasswordMutation,
+  useCreateEmployeeAccountMutation,
+} from "@/app/api/endpoints/employees";
 import { useNotification } from "@/providers/NotificationProvider";
 import { handleServerErrors } from "@/utils/handleForm";
 
@@ -37,7 +38,6 @@ interface EmployeeAccountProps {
 
 const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [user, setUser] = useState<User | undefined>(employee.user);
   const notification = useNotification();
@@ -45,6 +45,8 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
   // redux queries
   const [createAccount, { isLoading: creating }] =
     useCreateEmployeeAccountMutation();
+  const [changePassword, { isLoading: changing }] =
+    useChangeEmployeeAccountPasswordMutation();
 
   // Generate default username based on employee info (not used currently)
   const generateDefaultUsername = (): string => {
@@ -81,55 +83,29 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
     }
   };
 
-  // Mock function to change password
-  const mockChangePassword = async (values: any) => {
-    setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setLoading(false);
-    setIsModalVisible(false);
-    form.resetFields();
-    message.success("تم تغيير كلمة المرور بنجاح");
-    console.log("Changed password for user:", user?.username);
-  };
+  // change password handler
+  const handleChangePassword = async (values: any) => {
+    try {
+      const data = {
+        id: employee.id,
+        new_password: values.password,
+        confirm_new_password: values.password2,
+      };
 
-  // Mock function to toggle user active status
-  const mockToggleUserStatus = async (active: boolean) => {
-    setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 600));
+      await changePassword(data).unwrap();
 
-    setUser((prev) =>
-      prev
-        ? {
-            ...prev,
-            is_active: active,
-          }
-        : prev
-    );
+      notification.success({ message: "تم تغيير كلمة مرور الحساب بنجاح" });
 
-    setLoading(false);
-    message.success(
-      active ? "تم تفعيل حساب المستخدم" : "تم تعطيل حساب المستخدم"
-    );
-  };
+      form.resetFields();
 
-  // Mock function to assign moderator role
-  const mockToggleModeratorRole = async (isModerator: boolean) => {
-    setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 600));
-
-    setUser((prev) =>
-      prev
-        ? {
-            ...prev,
-            is_moderator: isModerator,
-          }
-        : prev
-    );
-
-    setLoading(false);
-    message.success(
-      isModerator ? "تم منح صلاحية المشرف" : "تم إزالة صلاحية المشرف"
-    );
+      handleCancel();
+    } catch (error: any) {
+      handleServerErrors({
+        errorData: error.data as Record<string, string[]>,
+        form,
+      });
+      notification.error({ message: "خطأ في العميلة!" });
+    }
   };
 
   const showModal = () => {
@@ -344,7 +320,7 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
         }
         className="account-management-card"
       >
-        <Spin spinning={loading}>
+        <Spin spinning={changing}>
           <Descriptions
             title="معلومات حساب النظام"
             bordered
@@ -433,9 +409,9 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
         destroyOnClose
         width={600}
       >
-        <Form form={form} layout="vertical" onFinish={mockChangePassword}>
+        <Form form={form} layout="vertical" onFinish={handleChangePassword}>
           <Form.Item
-            name="newPassword"
+            name="password"
             label="كلمة المرور الجديدة"
             rules={[
               { required: true, message: "يرجى إدخال كلمة المرور الجديدة" },
@@ -447,14 +423,14 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
           </Form.Item>
 
           <Form.Item
-            name="confirmNewPassword"
+            name="password2"
             label="تأكيد كلمة المرور الجديدة"
-            dependencies={["newPassword"]}
+            dependencies={["password"]}
             rules={[
               { required: true, message: "يرجى تأكيد كلمة المرور الجديدة" },
               ({ getFieldValue }) => ({
                 validator(_, value) {
-                  if (!value || getFieldValue("newPassword") === value) {
+                  if (!value || getFieldValue("password") === value) {
                     return Promise.resolve();
                   }
                   return Promise.reject(new Error("كلمات المرور غير متطابقة"));
@@ -469,7 +445,7 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
             <Button onClick={handleCancel} style={{ marginLeft: 8 }}>
               إلغاء
             </Button>
-            <Button type="primary" htmlType="submit" loading={loading}>
+            <Button type="primary" htmlType="submit" loading={changing}>
               تغيير كلمة المرور
             </Button>
           </Form.Item>

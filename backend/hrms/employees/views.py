@@ -133,6 +133,44 @@ class EmployeeViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=True, methods=['post'])
+    def change_password(self, request, pk=None):
+        try:
+            employee = Employee.objects.get(id=pk)
+            user = employee.user if hasattr(employee, 'user') else None
+
+            if not user:
+                return Response(
+                    {'error': 'هذا الموظف ليس لديه حساب'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            is_admin_change = request.user.is_staff or request.user.is_superuser
+
+            if not is_admin_change:
+                if not user.check_password(request.data['current_password']):
+                    return Response({"current_password": "كلمة المرور الحالية غير صحيحة"})
+
+            new_password = request.data['new_password']
+            confirm_new_password = request.data['confirm_new_password']
+
+            if new_password != confirm_new_password:
+                return Response(
+                    {'confirm_new_password': [_('كلمات المرور الجديدة غير متطابقة')]},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            user.set_password(new_password)
+            user.save()
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        except Employee.DoesNotExist:
+            return Response(
+                {'detail': _('موظف غير موجود')},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
 
 @api_view(["DELETE"])
 def multiple_delete(request):

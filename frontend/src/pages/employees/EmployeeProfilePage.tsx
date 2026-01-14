@@ -30,9 +30,10 @@ import { useNavigate } from "react-router";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { useAppDispatch } from "@/app/redux/hooks";
 import { useNotification } from "@/providers/NotificationProvider";
+import EmployeeAccount from "@/components/employee/EmployeeAccount";
 
 // Sample Employee Data
-const employee3: Employee = {
+export const employee3: Employee = {
   id: 1,
   url: "http://127.0.0.1:8000/api/employees/employees/1/",
   department: "Social Media",
@@ -54,6 +55,18 @@ const employee3: Employee = {
   cv: "http://127.0.0.1:8000/media/employees/cv/Screenshot_2025-03-18_221316.png",
   image: "http://127.0.0.1:8000/media/employees/images/6mouhk.png",
   created_at: "2025-05-08T14:31:02.935535Z",
+
+  user: {
+    username: "aaa",
+    name: "sss",
+    phone: "ss",
+    national_id: "as",
+    is_active: true,
+    is_moderator: false,
+    is_superuser: false,
+    is_root: false,
+    last_login: "",
+  },
 
   performance: {
     totalProjects: 15,
@@ -89,18 +102,23 @@ const items = (employee: Employee) => [
     children: <PersonalInfo employee={employee} />,
   },
   {
-    label: `الأداء الوظيفي`,
+    label: `الحساب`,
     key: "3",
+    children: <EmployeeAccount employee={employee} />,
+  },
+  {
+    label: `الأداء الوظيفي`,
+    key: "4",
     children: <Performance performance={employee3.performance} />,
   },
   {
     label: `الحضور والانصراف`,
-    key: "4",
+    key: "5",
     children: <Attendance attendance={employee3.attendance} />,
   },
   {
     label: `تاريخ الراتب`,
-    key: "5",
+    key: "6",
     children: <SalaryHistory salaryHistory={employee3.salaryHistory} />,
   },
 ];

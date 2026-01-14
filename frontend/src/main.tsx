@@ -18,6 +18,7 @@ createRoot(document.getElementById("root")!).render(
         token: {
           colorPrimary: "#0E6B81",
           fontFamily: "cairo",
+          fontSize: 16,
         },
       }}
       form={{

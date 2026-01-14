@@ -1,5 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import viewsets, status
+
+from users.models import User
 from .serializers import DepartmentSerializer, EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer
 from .models import Department, Employee
 from rest_framework.decorators import action, api_view
@@ -55,6 +57,27 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             serializer = EmployeeWriteSerializer(employee, context={"request": self.request}).data
             return Response(serializer)
         except Exception:
+            return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['post'])
+    def create_account(self, request, pk=None):
+        try:
+            employee = Employee.objects.get(id=pk)
+            username = request.data['username']
+            if User.objects.filter(username=username).exists():
+                return Response({'username': [_('موظف غير موجود')]}, status=status.HTTP_404_NOT_FOUND)
+            password = request.data['password']
+            password2 = request.data['password2']
+            if password == password2:
+                return Response({"password2": [_("كلمة المرور غير متظابقة")]}, status=status.HTTP_400_BAD_REQUEST)
+
+            User.objects.create(username=username,
+                                password=password,
+                                email=employee.email,
+                                phone=employee.phone,
+                                national_id=employee.national_id,
+                                )
+        except Employee.DoesNotExist:
             return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
 
 

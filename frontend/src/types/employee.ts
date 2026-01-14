@@ -1,4 +1,5 @@
 import { Attendance } from "./attendance";
+import { User } from "./user";
 
 export type Employee = {
   id: number;
@@ -22,6 +23,7 @@ export type Employee = {
   image?: string;
   is_active: boolean;
   created_at: string;
+  user?: User; // Added user relationship
 
   performance: {
     totalProjects: number;

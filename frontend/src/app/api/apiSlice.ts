@@ -5,7 +5,7 @@ export const api = createApi({
   reducerPath: "api",
   baseQuery: axiosBaseQuery(),
   endpoints: () => ({}),
-  tagTypes: ["Employee", "Project", "Task", "Attendance"],
+  tagTypes: ["Employee", "Project", "Task", "Attendance", "User"],
   keepUnusedDataFor: 180,
   refetchOnReconnect: true,
 });

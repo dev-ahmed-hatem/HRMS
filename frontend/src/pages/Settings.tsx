@@ -1,6 +1,8 @@
 import { Divider, Tabs } from "antd";
 import { useAppSelector } from "@/app/redux/hooks";
 import ProfileBanner from "@/components/settings/ProfileBanner";
+import ChangePassword from "@/components/settings/account/ChangePassword";
+import AccountSettingsTab from "@/components/settings/account/AccountSettingsTab";
 // import AccountSettingsTab from "@/components/settings/account/AccountSettingsTab";
 // import ProfileBanner from "@/components/settings/account/ProfileBanner";
 // import SupervisorSettingsTab from "@/components/settings/supervisors/SupervisorSettingsTab";
@@ -24,7 +26,13 @@ const SettingsPage = () => {
         )}
         direction="rtl"
         defaultActiveKey="account"
-        items={[]}
+        items={[
+          {
+            key: "account",
+            label: "الحساب",
+            children: <AccountSettingsTab />,
+          },
+        ]}
       />
     </div>
   );

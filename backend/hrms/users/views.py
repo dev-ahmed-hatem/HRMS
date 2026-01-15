@@ -93,3 +93,54 @@ def set_user_permissions(request):
         return Response(status=status.HTTP_200_OK)
     except:
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["PATCH"])
+@permission_classes([IsAuthenticated])
+def change_password(request):
+    """
+    Change password for the currently authenticated user.
+    Expected payload:
+    {
+        "current_password": "old123",
+        "new_password": "new123",
+        "confirm_password": "new123"
+    }
+    """
+    user = request.user
+    data = request.data
+
+    current_password = data.get("current_password")
+    new_password = data.get("new_password")
+    confirm_password = data.get("confirm_password")
+
+    # Validate current password
+    if not user.check_password(current_password):
+        return Response(
+            {"current_password": ["كلمة المرور الحالية غير صحيحة"]},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Validate new password match
+    if new_password != confirm_password:
+        return Response(
+            {"confirm_password": ["كلمتا المرور غير متطابقتان"]},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Optional: add validation rules (min length, complexity, etc.)
+    if len(new_password) < 8:
+        return Response(
+            {"new_password": ["كلمة المرور يجب أن تكون 8 أحرف على الأقل"]},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Save new password
+    user.set_password(new_password)
+    user.save()
+
+    return Response(
+        {"detail": "تم تغيير كلمة المرور بنجاح"},
+        status=status.HTTP_200_OK,
+    )
+

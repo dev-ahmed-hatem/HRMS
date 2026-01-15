@@ -46,7 +46,10 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         try:
             employee = Employee.objects.get(pk=pk)
             employee.is_active = not employee.is_active
-            employee.save()
+            employee.save(update_fields=['is_active'])
+            if hasattr(employee, "user"):
+                employee.user.is_active = employee.is_active
+                employee.user.save(update_fields=['is_active'])
             return Response({"is_active": employee.is_active})
         except Exception:
             return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)

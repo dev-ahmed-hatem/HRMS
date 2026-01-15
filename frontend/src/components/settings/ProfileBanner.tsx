@@ -173,12 +173,12 @@ const ProfileBanner = ({ user, employee }: ProfileBannerProps) => {
               )}
             </div>
 
-            <button
+            {/* <button
               className="mt-6 w-full py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-blue-800 transition"
               onClick={() => (window.location.href = "/settings/profile")}
             >
               <SettingOutlined /> تعديل الملف الشخصي
-            </button>
+            </button> */}
           </div>
         </div>
 

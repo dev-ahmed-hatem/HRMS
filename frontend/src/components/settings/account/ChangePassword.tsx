@@ -49,7 +49,7 @@ const ChangePassword = () => {
   }, [isSuccess]);
 
   return (
-    <Card title="تغيير كلمة المرور" className="shadow-md mx-auto">
+    <Card title="تغيير كلمة المرور" className="shadow-md">
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item
           label="كلمة المرور الحالية"

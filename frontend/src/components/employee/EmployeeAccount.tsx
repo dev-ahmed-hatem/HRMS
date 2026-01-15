@@ -13,6 +13,7 @@ import {
   Spin,
   Row,
   Col,
+  Popconfirm,
 } from "antd";
 import {
   UserOutlined,
@@ -21,6 +22,7 @@ import {
   KeyOutlined,
   PhoneOutlined,
   IdcardOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { Employee } from "@/types/employee";
@@ -28,6 +30,7 @@ import { User } from "@/types/user";
 import {
   useChangeEmployeeAccountPasswordMutation,
   useCreateEmployeeAccountMutation,
+  useDeleteEmployeeAccountMutation,
 } from "@/app/api/endpoints/employees";
 import { useNotification } from "@/providers/NotificationProvider";
 import { handleServerErrors } from "@/utils/handleForm";
@@ -47,6 +50,8 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
     useCreateEmployeeAccountMutation();
   const [changePassword, { isLoading: changing }] =
     useChangeEmployeeAccountPasswordMutation();
+  const [deleteAccount, { isLoading: deleting }] =
+    useDeleteEmployeeAccountMutation();
 
   // Generate default username based on employee info (not used currently)
   const generateDefaultUsername = (): string => {
@@ -104,6 +109,19 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
         errorData: error.data as Record<string, string[]>,
         form,
       });
+      notification.error({ message: "خطأ في العميلة!" });
+    }
+  };
+
+  // change password handler
+  const handleDeleteAccount = async () => {
+    try {
+      await deleteAccount(employee.id).unwrap();
+
+      setUser(undefined);
+      notification.success({ message: "تم حذف حساب الموظف بنجاح" });
+      handleCancel();
+    } catch (error: any) {
       notification.error({ message: "خطأ في العميلة!" });
     }
   };
@@ -320,7 +338,7 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
         }
         className="account-management-card"
       >
-        <Spin spinning={changing}>
+        <Spin spinning={changing || deleting}>
           <Descriptions
             title="معلومات حساب النظام"
             bordered
@@ -343,9 +361,7 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
             </Descriptions.Item>
             <Descriptions.Item label="آخر دخول">
               {user.last_login ? (
-                <Tag color="green">
-                  {dayjs(user.last_login).format("DD/MM/YYYY HH:mm")}
-                </Tag>
+                <Tag color="green">{user.last_login}</Tag>
               ) : (
                 <Tag color="orange">لم يسجل دخول بعد</Tag>
               )}
@@ -378,7 +394,7 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
 
           <Divider>إجراءات إدارة الحساب</Divider>
 
-          <Space wrap style={{ marginBottom: 20 }}>
+          <Space wrap className="mb-5 flex flex-wrap gap-3">
             <Button
               type="primary"
               icon={<KeyOutlined />}
@@ -386,6 +402,21 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
             >
               تغيير كلمة المرور
             </Button>
+            <Popconfirm
+              title="هل أنت متأكد من حذف حساب هذا الموظف؟"
+              onConfirm={handleDeleteAccount}
+              okText="نعم"
+              cancelText="لا"
+            >
+              <Button
+                className="enabled:bg-red-500 enabled:border-red-500 enabled:shadow-[0_2px_0_rgba(0,58,58,0.31)]
+            enabled:hover:border-red-400 enabled:hover:bg-red-400 enabled:text-white"
+                icon={<DeleteOutlined />}
+                loading={deleting}
+              >
+                حذف الحساب
+              </Button>
+            </Popconfirm>
           </Space>
 
           {user.is_moderator && (

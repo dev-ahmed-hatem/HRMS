@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.authentication import CSRFCheck
 from rest_framework import exceptions
@@ -40,5 +42,10 @@ class BaseAuthentication(JWTAuthentication):
         # Enforce CSRF protection if the token is from a cookie
         # if "access_token" in request.COOKIES:
         #     enforce_csrf(request)
+
+        auth_user = self.get_user(validated_token)
+        if auth_user is not None:
+            auth_user.last_login = timezone.now()
+            auth_user.save(update_fields=['last_login'])
 
         return self.get_user(validated_token), validated_token

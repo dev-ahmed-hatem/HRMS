@@ -134,6 +134,12 @@ export const employeesEndpoints = api.injectEndpoints({
         data,
       }),
     }),
+    deleteEmployeeAccount: builder.mutation<void, number>({
+      query: (id) => ({
+        url: `/employees/employees/${id}/delete_account/`,
+        method: "DELETE",
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -150,4 +156,5 @@ export const {
   useGetPaginatedDepartmentsQuery,
   useCreateEmployeeAccountMutation,
   useChangeEmployeeAccountPasswordMutation,
+  useDeleteEmployeeAccountMutation,
 } = employeesEndpoints;

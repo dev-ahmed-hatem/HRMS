@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.relations import HyperlinkedIdentityField
 from .models import User
@@ -7,11 +8,15 @@ class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
     url = HyperlinkedIdentityField(view_name='user-detail', lookup_field='pk')
+    last_login = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
         fields = ['id', 'username', 'name', 'phone', 'national_id', 'is_superuser', 'is_moderator', 'password',
-                  'password2', 'url', 'is_root']
+                  'password2', 'url', 'is_root', 'last_login']
+
+    def get_last_login(self, obj):
+        return obj.last_login.astimezone(settings.CAIRO_TZ).strftime('%Y-%m-%d %I:%M%p')
 
     def validate(self, data):
         if 'password' in data and 'password2' in data:

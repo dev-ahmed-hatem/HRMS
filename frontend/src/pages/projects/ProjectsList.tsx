@@ -75,6 +75,7 @@ const columns: (statusFilter: string[] | null) => ColumnsType<Project> = (
 const ProjectsList = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
   const [statusFilters, setStatusFilters] = useState<string[] | null>(null);
   const navigate = useNavigate();
 
@@ -94,6 +95,7 @@ const ProjectsList = () => {
   const { data, isLoading, isFetching, isError, refetch } = useGetProjectsQuery(
     {
       page: page,
+      page_size: pageSize,
       search: search,
       status_filters: statusFilters?.join(),
     }
@@ -147,8 +149,11 @@ const ProjectsList = () => {
             pagination={tablePaginationConfig({
               total: data?.count,
               current: data?.page,
-              onChange(page) {
+              showQuickJumper: true,
+              pageSize,
+              onChange(page, pageSize) {
                 setPage(page);
+                setPageSize(pageSize);
               },
             })}
             onChange={(pagination, filters, sorter) => {

@@ -1,4 +1,6 @@
 import { Attendance } from "./attendance";
+import { Project } from "./project";
+import { Task } from "./task";
 import { User } from "./user";
 
 export type Employee = {
@@ -23,14 +25,10 @@ export type Employee = {
   image?: string;
   is_active: boolean;
   created_at: string;
-  user?: User; // Added user relationship
+  user?: User;
 
-  performance: {
-    totalProjects: number;
-    activeProjects: number;
-    totalAssignments: number;
-    activeAssignments: number;
-  };
+  projects?: Project[];
+  tasks?: Task[];
 
   attendance: Partial<Attendance>[];
 

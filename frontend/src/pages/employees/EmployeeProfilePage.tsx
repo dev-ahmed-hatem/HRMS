@@ -31,6 +31,238 @@ import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { useAppDispatch } from "@/app/redux/hooks";
 import { useNotification } from "@/providers/NotificationProvider";
 import EmployeeAccount from "@/components/employee/EmployeeAccount";
+import { Project } from "@/types/project";
+
+
+
+
+
+// Mock Project data
+export const mockProjects = [
+  {
+    id: "1",
+    name: "تطوير نظام إدارة الموارد البشرية",
+    status: 'ongoing',
+    start_date: '2024-01-15',
+    end_date: '2024-06-30',
+    progress_started: '2024-01-20T08:00:00',
+    client: "شركة التقنية المتحدة",
+    budget: 500000,
+    description: "تطوير نظام متكامل لإدارة الموارد البشرية يشمل التوظيف والحضور والرواتب",
+    created_at: '2023-12-10T10:00:00',
+    created_by: 101,
+    supervisors: [1, 3], // Employee IDs
+  },
+  {
+    id: 2,
+    name: "تحديث البنية التحتية للشبكة",
+    status: 'completed',
+    start_date: '2023-11-01',
+    end_date: '2024-02-28',
+    progress_started: '2023-11-05T09:00:00',
+    client: "إدارة تكنولوجيا المعلومات",
+    budget: 250000,
+    description: "ترقية كاملة للبنية التحتية للشبكة وتحسين الأمان",
+    created_at: '2023-10-20T14:30:00',
+    created_by: 1,
+    supervisors: [1],
+  },
+  {
+    id: 3,
+    name: "تطبيق الهواتف المحمولة للعملاء",
+    status: 'ongoing',
+    start_date: '2024-02-01',
+    end_date: '2024-09-30',
+    progress_started: '2024-02-10T08:30:00',
+    client: "قطاع التجزئة",
+    budget: 750000,
+    description: "تطوير تطبيق جوال للعملاء لتصفح المنتجات وإجراء الطلبات",
+    created_at: '2023-12-15T11:00:00',
+    created_by: 102,
+    supervisors: [1, 2],
+  },
+  {
+    id: 4,
+    name: "نظام إدارة المخزون الذكي",
+    status: 'paused',
+    start_date: '2023-09-01',
+    end_date: '2024-03-31',
+    progress_started: '2023-09-10T10:00:00',
+    client: "مستودعات الشرق",
+    budget: 300000,
+    description: "نظام متقدم لإدارة المخزون باستخدام الذكاء الاصطناعي",
+    created_at: '2023-08-20T16:00:00',
+    created_by: 1,
+    supervisors: [1],
+  },
+  {
+    id: 5,
+    name: "بوابة الخدمات الإلكترونية",
+    status: 'pending-approval',
+    start_date: '2024-03-15',
+    end_date: '2024-08-15',
+    client: "الحكومة الإلكترونية",
+    budget: 900000,
+    description: "تطوير بوابة إلكترونية متكاملة للخدمات الحكومية",
+    created_at: '2024-02-28T09:00:00',
+    created_by: 103,
+    supervisors: [1, 4],
+  },
+  {
+    id: 6,
+    name: "تحليل البيانات التسويقية",
+    status: 'completed',
+    start_date: '2023-12-01',
+    end_date: '2024-01-31',
+    progress_started: '2023-12-05T08:00:00',
+    client: "قسم التسويق",
+    budget: 120000,
+    description: "تحليل بيانات العملاء وتحسين استراتيجيات التسويق",
+    created_at: '2023-11-20T10:30:00',
+    created_by: 1,
+    supervisors: [1],
+  },
+];
+
+// Mock Task data
+export const mockTasks = [
+  {
+    id: 1,
+    title: "تصميم واجهة المستخدم لوحة التحكم",
+    description: "تصميم واجهة مستخدم بديهية ومرنة لوحة تحكم الموظفين",
+    status: 'completed',
+    priority: 'high',
+    due_date: '2024-01-31',
+    project: 1,
+    assigned_to: [1, 5],
+    created_at: '2024-01-10T09:00:00',
+    created_by: 101,
+    departments: [1, 3],
+  },
+  {
+    id: 2,
+    title: "تطوير واجهة برمجة التطبيقات للرواتب",
+    description: "بناء API آمن ومعالج لعمليات حساب الرواتب",
+    status: 'incomplete',
+    priority: 'high',
+    due_date: '2024-03-15',
+    project: 1,
+    assigned_to: [1, 6],
+    created_at: '2024-01-15T10:30:00',
+    created_by: 101,
+    departments: [2],
+  },
+  {
+    id: 3,
+    title: "اختبار اختراق النظام",
+    description: "إجراء اختبارات اختراق شاملة للتأكد من أمان النظام",
+    status: 'incomplete',
+    priority: 'medium',
+    due_date: '2024-04-10',
+    project: 1,
+    assigned_to: [1],
+    created_at: '2024-02-01T14:00:00',
+    created_by: 101,
+    departments: [4],
+  },
+  {
+    id: 4,
+    title: "تثبيت أجهزة راوتر جديدة",
+    description: "تركيب وتكوين أجهزة راوتر من الجيل الجديد",
+    status: 'completed',
+    priority: 'medium',
+    due_date: '2024-01-15',
+    project: 2,
+    assigned_to: [1, 7],
+    created_at: '2023-11-10T08:00:00',
+    created_by: 102,
+    departments: [5],
+  },
+  {
+    id: 5,
+    title: "تصميم شاشة تسجيل الدخول للتطبيق",
+    description: "تصميم واجهة تسجيل دخول آمنة وجذابة للتطبيق",
+    status: 'incomplete',
+    priority: 'low',
+    due_date: '2024-02-28',
+    project: 3,
+    assigned_to: [1, 8],
+    created_at: '2024-02-05T11:00:00',
+    created_by: 103,
+    departments: [1, 3],
+  },
+  {
+    id: 6,
+    title: "ربط النظام بقاعدة البيانات",
+    description: "ربط نظام إدارة المخزون بقاعدة البيانات الرئيسية",
+    status: 'incomplete',
+    priority: 'high',
+    due_date: '2024-01-20', // Overdue
+    project: 4,
+    assigned_to: [1],
+    created_at: '2023-09-15T10:00:00',
+    created_by: 104,
+    departments: [2, 6],
+  },
+  {
+    id: 7,
+    title: "كتابة وثائق المشروع",
+    description: "إعداد كامل الوثائق الفنية والإدارية للمشروع",
+    status: 'completed',
+    priority: 'low',
+    due_date: '2024-01-10',
+    project: 6,
+    assigned_to: [1, 9],
+    created_at: '2023-12-15T15:00:00',
+    created_by: 105,
+    departments: [7],
+  },
+  {
+    id: 8,
+    title: "تحليل متطلبات العميل",
+    description: "مقابلة العميل وتحديد المتطلبات التفصيلية",
+    status: 'incomplete',
+    priority: 'medium',
+    due_date: '2024-03-20',
+    project: 5,
+    assigned_to: [1, 10],
+    created_at: '2024-03-01T09:30:00',
+    created_by: 106,
+    departments: [8],
+  },
+  {
+    id: 9,
+    title: "تدريب فريق الدعم الفني",
+    description: "تدريب فريق الدعم على النظام الجديد",
+    status: 'incomplete',
+    priority: 'medium',
+    due_date: '2024-05-01',
+    project: 1,
+    assigned_to: [1, 11],
+    created_at: '2024-02-20T13:00:00',
+    created_by: 101,
+    departments: [9],
+  },
+  {
+    id: 10,
+    title: "مراجعة كود المصدر",
+    description: "مراجعة شاملة لكود المصدر للتأكد من الجودة",
+    status: 'incomplete',
+    priority: 'high',
+    due_date: '2024-03-25',
+    project: 1,
+    assigned_to: [1],
+    created_at: '2024-02-25T16:00:00',
+    created_by: 101,
+    departments: [2, 10],
+  },
+];
+
+
+
+
+
+
 
 // Sample Employee Data
 export const employee3: Employee = {
@@ -68,13 +300,6 @@ export const employee3: Employee = {
     last_login: "",
   },
 
-  performance: {
-    totalProjects: 15,
-    activeProjects: 3,
-    totalAssignments: 20,
-    activeAssignments: 5,
-  },
-
   attendance: [
     { date: "2025-03-10", check_in: "08:30 AM", check_out: "05:00 PM" },
     { date: "2025-03-11", check_in: "09:00 AM", check_out: "04:45 PM" },
@@ -109,7 +334,7 @@ const items = (employee: Employee) => [
   {
     label: `الأداء الوظيفي`,
     key: "4",
-    children: <Performance performance={employee3.performance} />,
+    children: <Performance employee={employee} />,
   },
   {
     label: `الحضور والانصراف`,

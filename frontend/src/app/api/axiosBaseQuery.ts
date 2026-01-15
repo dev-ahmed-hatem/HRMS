@@ -1,6 +1,6 @@
 import { BaseQueryFn } from "@reduxjs/toolkit/query";
 import axios, { AxiosRequestConfig, type AxiosError } from "axios";
-import getCookie from "@/utils/getCookie";
+import { storeTokens } from "@/utils/storage";
 
 const api_base_url = import.meta.env.VITE_API_BASE_URL;
 
@@ -11,7 +11,7 @@ interface CustomAxiosConfig extends AxiosRequestConfig {
 export type axiosBaseQueryError = {
   status: number | string;
   data: any;
-}
+};
 
 export const axiosInstance = axios.create({
   baseURL: api_base_url,
@@ -19,7 +19,7 @@ export const axiosInstance = axios.create({
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
-    "Accept-Language": "ar-eg"
+    "Accept-Language": "ar-eg",
   },
   xsrfCookieName: "csrftoken",
   xsrfHeaderName: "x-CSRFToken",
@@ -27,8 +27,14 @@ export const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use((config) => {
   // include csrftoken (not activated in this system)
-  const csrftoken = getCookie("csrftoken");
-  config.headers["X-CSRFToken"] = csrftoken;
+  // const csrftoken = getCookie("csrftoken");
+  // config.headers["X-CSRFToken"] = csrftoken;
+  // return config;
+
+  const access = localStorage.getItem("access");
+  if (access) {
+    config.headers["Authorization"] = `Bearer ${access}`;
+  }
   return config;
 });
 
@@ -36,16 +42,37 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const original_request = error.config as CustomAxiosConfig;
-    // if (error.response?.status == 401 && original_request?._retry !== true) {
-    //   try {
-    //     console.log("refreshing authentication");
-    //     await axios.post(`${api_base_url}/auth/refresh/`);
-    //     return axiosInstance(original_request);
-    //   } catch (error) {
-    //     console.error(error);
-    //     window.location.href = "/login";
-    //   }
-    // }
+    if (error.response?.status == 401 && original_request?._retry !== true) {
+      original_request._retry = true;
+
+      try {
+        const refreshToken = localStorage.getItem("refresh");
+
+        if (!refreshToken) {
+          throw new Error();
+        }
+
+        const refreshResponse = await axios.post(
+          `${api_base_url}/auth/refresh/`,
+          { refresh: refreshToken }
+        );
+
+        storeTokens(refreshResponse.data);
+
+        // Update Authorization header for retried request
+        original_request.headers = {
+          ...original_request.headers,
+          Authorization: `Bearer ${refreshResponse.data.access}`,
+        };
+
+        return axiosInstance(original_request);
+      } catch (err) {
+        // console.error(err);
+        // console.log("hrer");
+        // window.location.href = "/login";
+        /////// use redirect in auth provider instead
+      }
+    }
     return Promise.reject(error);
   }
 );

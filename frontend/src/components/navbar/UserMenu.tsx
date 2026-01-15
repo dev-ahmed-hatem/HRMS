@@ -1,23 +1,11 @@
-import { useLogoutMutation } from "@/app/api/endpoints/auth";
-import { useNotification } from "@/providers/NotificationProvider";
+import { removeTokens } from "@/utils/storage";
 import { Button } from "antd";
-import { useEffect } from "react";
 
 const UserMenu = ({ role }: { role: string }) => {
-  const [logout, { isLoading, isSuccess, isError }] = useLogoutMutation();
-  const notification = useNotification();
-
-  useEffect(() => {
-    if (isSuccess) {
-      location.href = "/login";
-    }
-  }, [isSuccess]);
-
-  useEffect(() => {
-    if (isError) {
-      notification.error({ message: "حدث خطأ! برجاء إعادة المحاولة" });
-    }
-  }, [isError]);
+  const logout = () => {
+    removeTokens();
+    location.href = "/login";
+  };
 
   return (
     <div>
@@ -29,7 +17,6 @@ const UserMenu = ({ role }: { role: string }) => {
         onClick={() => {
           logout();
         }}
-        loading={isLoading}
       >
         تسجيل خروج
       </Button>

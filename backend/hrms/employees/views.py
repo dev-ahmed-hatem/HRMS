@@ -57,7 +57,50 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             employee = Employee.objects.get(id=pk)
             serializer = EmployeeWriteSerializer(employee, context={"request": self.request}).data
             return Response(serializer)
-        except Exception:
+        except Employee.DoesNotExist:
+            return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=["get"], url_path="performance")
+    def performance(self, request, pk=None):
+        try:
+            employee = Employee.objects.get(id=pk)
+
+            projects = employee.supervised_projects.all()
+            tasks = employee.tasks.all()
+
+            data = {
+                "projects": [
+                    {
+                        "id": project.id,
+                        "name": project.name,
+                        "description": project.description,
+                        "status": project.get_status_display(),
+                        "start_date": project.start_date,
+                        "end_date": project.end_date,
+                        "budget": project.budget,
+                        "client": project.client,
+                    }
+                    for project in projects
+                ],
+                "tasks": [
+                    {
+                        "id": task.id,
+                        "title": task.title,
+                        "description": task.description,
+                        "status": task.get_status_display(),
+                        "priority": task.get_priority_display(),
+                        "due_date": task.due_date,
+                        "project": {
+                            "id": task.project.id,
+                            "name": task.project.name,
+                        } if task.project else None,
+                    }
+                    for task in tasks
+                ],
+            }
+            return Response(data, status=status.HTTP_200_OK)
+
+        except Employee.DoesNotExist:
             return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=True, methods=['post'])

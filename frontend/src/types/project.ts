@@ -1,6 +1,7 @@
 import { Dayjs } from "dayjs";
 import { AssignedEmployee } from "./employee";
 import { Task, TasksStats } from "./task";
+import { BadgeProps } from "antd";
 
 export type ProjectStatus = "قيد التنفيذ" | "مكتمل" | "قيد الموافقة" | "متوقف";
 
@@ -11,6 +12,15 @@ export const statusColors: Record<Project["status"], string> = {
   "قيد الموافقة": "gold",
   متوقف: "gray",
 };
+
+// Status for antd Badje
+export const badgeStatus: Record<Project["status"], BadgeProps["status"]> = {
+  "قيد التنفيذ": "processing",
+  مكتمل: "success",
+  "قيد الموافقة": "warning",
+  متوقف: "default",
+};
+
 
 export type Project = {
   id: string;

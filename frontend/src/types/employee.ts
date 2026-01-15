@@ -27,9 +27,6 @@ export type Employee = {
   created_at: string;
   user?: User;
 
-  projects?: Project[];
-  tasks?: Task[];
-
   attendance: Partial<Attendance>[];
 
   salaryHistory: { date: string; baseSalary: number; bonuses: number }[];

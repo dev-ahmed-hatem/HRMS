@@ -8,8 +8,10 @@ import {
   Tag,
   Progress,
   Tooltip,
+  Alert,
+  Button,
+  Spin,
 } from "antd";
-import { Employee } from "../../types/employee";
 import {
   ProjectOutlined,
   CheckCircleOutlined,
@@ -21,18 +23,26 @@ import {
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/ar";
+import { badgeStatus } from "@/types/project";
+import { priorityColors } from "@/types/task";
+import { useGetEmployeePerformanceQuery } from "@/app/api/endpoints/employees";
+import { MdAlarm } from "react-icons/md";
+import { useNavigate } from "react-router";
 dayjs.extend(relativeTime);
 
 interface PerformanceProps {
-  employee: Employee;
+  employeeId: number;
 }
 
-const Performance = ({ employee }: PerformanceProps) => {
-  const calculatePerformanceMetrics = () => {
-    const projects = employee.projects || [];
-    const assignedTasks = employee.tasks || [];
+const Performance = ({ employeeId }: PerformanceProps) => {
+  const navigate = useNavigate();
+  const { data, isFetching, isError, refetch } =
+    useGetEmployeePerformanceQuery(employeeId);
 
-    // Calculate metrics
+  const projects = data?.projects || [];
+  const assignedTasks = data?.tasks || [];
+
+  const calculatePerformanceMetrics = () => {
     const totalProjects = projects.length;
     const activeProjects = projects.filter(
       (project) => project.status === "قيد التنفيذ"
@@ -84,42 +94,57 @@ const Performance = ({ employee }: PerformanceProps) => {
       projectCompletionRate,
       overdueTasks,
       highPriorityTasks,
-      assignedTasks,
       projects,
+      assignedTasks,
     };
   };
 
   const metrics = calculatePerformanceMetrics();
 
-  // Helper to get status badge
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "ongoing":
-        return <Badge status="processing" text="قيد التنفيذ" />;
-      case "completed":
-        return <Badge status="success" text="مكتمل" />;
-      case "pending-approval":
-        return <Badge status="warning" text="قيد الموافقة" />;
-      case "paused":
-        return <Badge status="default" text="متوقف" />;
-      default:
-        return <Badge status="default" text={status} />;
-    }
-  };
+  if (isFetching)
+    return (
+      <Card title="الأداء الوظيفي">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: 300,
+          }}
+        >
+          <Spin
+            size="large"
+            tip="جاري تحميل بيانات الأداء..."
+            style={{ color: "#1890ff" }}
+          />
+        </div>
+      </Card>
+    );
 
-  // Helper to get priority tag
-  const getPriorityTag = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return <Tag color="red">مرتفع</Tag>;
-      case "medium":
-        return <Tag color="orange">متوسط</Tag>;
-      case "low":
-        return <Tag color="green">منخفض</Tag>;
-      default:
-        return <Tag>{priority}</Tag>;
-    }
-  };
+  if (isError)
+    return (
+      <Card title="الأداء الوظيفي" className="w-full">
+        <div className="flex justify-center items-center p-4 md:p-8 lg:p-12 xl:p-16">
+          <Alert
+            message="خطأ في تحميل البيانات"
+            description="حدث خطأ أثناء تحميل بيانات الأداء الوظيفي. يرجى المحاولة مرة أخرى."
+            type="error"
+            showIcon
+            className="w-full max-w-2xl"
+            action={
+              <Button
+                type="primary"
+                onClick={() => refetch()}
+                loading={isFetching}
+                className="mt-4 md:mt-0 md:mr-4"
+              >
+                إعادة المحاولة
+              </Button>
+            }
+          />
+        </div>
+      </Card>
+    );
 
   return (
     <div className="performance-container">
@@ -205,51 +230,57 @@ const Performance = ({ employee }: PerformanceProps) => {
                   (p) => p.status === "قيد التنفيذ"
                 )}
                 renderItem={(project) => (
-                  <List.Item>
+                  <List.Item
+                    className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-50 hover:border-blue-100
+                     hover:shadow-sm active:bg-blue-100 rounded-lg border-b border-gray-100 last:border-b-0 px-2"
+                    onClick={() => {
+                      navigate(`/projects/project/${project.id}`);
+                    }}
+                  >
                     <List.Item.Meta
                       avatar={
-                        <ProjectOutlined
-                          style={{ fontSize: 20, color: "#1890ff" }}
-                        />
+                        <ProjectOutlined className="text-blue-500 text-xl" />
                       }
                       title={
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                          }}
-                        >
-                          <span>{project.name}</span>
-                          {getStatusBadge(project.status)}
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                          <span className="font-medium text-gray-800 hover:text-blue-600">
+                            {project.name}
+                          </span>
+                          <Badge
+                            status={badgeStatus[project.status]}
+                            text={project.status}
+                            className="self-start sm:self-center"
+                          />
                         </div>
                       }
                       description={
-                        <div>
-                          <div>{project.description}</div>
-                          <div
-                            style={{
-                              marginTop: 8,
-                              display: "flex",
-                              gap: 16,
-                              flexWrap: "wrap",
-                            }}
-                          >
-                            <span>
-                              <CalendarOutlined /> تاريخ البدء:{" "}
+                        <div className="mt-2">
+                          <div className="text-gray-600 mb-3 line-clamp-2">
+                            {project.description}
+                          </div>
+                          <div className="flex flex-col sm:flex-row flex-wrap gap-3 text-sm text-gray-500">
+                            <span className="inline-flex items-center gap-1">
+                              <CalendarOutlined />
+                              <span className="font-medium">تاريخ البدء:</span>
                               {dayjs(project.start_date).format("DD/MM/YYYY")}
                             </span>
                             {project.end_date && (
-                              <span>
-                                تاريخ الانتهاء:{" "}
+                              <span className="inline-flex items-center gap-1">
+                                <span className="font-medium">
+                                  تاريخ الانتهاء:
+                                </span>
                                 {dayjs(project.end_date).format("DD/MM/YYYY")}
                               </span>
                             )}
-                            <span>
-                              الميزانية: {project.budget.toLocaleString()} ر.س
+                            <span className="inline-flex items-center gap-1">
+                              <span className="font-medium">الميزانية:</span>
+                              {project.budget.toLocaleString()} ر.س
                             </span>
                             {project.client && (
-                              <span>العميل: {project.client}</span>
+                              <span className="inline-flex items-center gap-1">
+                                <span className="font-medium">العميل:</span>
+                                {project.client}
+                              </span>
                             )}
                           </div>
                         </div>
@@ -259,8 +290,8 @@ const Performance = ({ employee }: PerformanceProps) => {
                 )}
               />
             ) : (
-              <div style={{ textAlign: "center", padding: 40, color: "#999" }}>
-                <ProjectOutlined style={{ fontSize: 48, marginBottom: 16 }} />
+              <div className="text-center py-10 text-gray-400">
+                <ProjectOutlined className="text-5xl mb-4" />
                 <div>لا توجد مشاريع حالية</div>
               </div>
             )}
@@ -288,74 +319,67 @@ const Performance = ({ employee }: PerformanceProps) => {
                     "day"
                   );
                   return (
-                    <List.Item>
+                    <List.Item
+                      className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-orange-50 hover:border-orange-100
+                          hover:shadow-sm active:bg-orange-100 rounded-lg border-b border-gray-100 last:border-b-0 px-2"
+                      onClick={() => {
+                        navigate(`/tasks/task/${task.id}`);
+                      }}
+                    >
                       <List.Item.Meta
                         avatar={
                           <div
-                            style={{
-                              width: 32,
-                              height: 32,
-                              borderRadius: "50%",
-                              backgroundColor: isOverdue
-                                ? "#ff4d4f"
+                            className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold
+                            ${
+                              isOverdue
+                                ? "bg-red-700" // dark red
                                 : task.priority === "مرتفع"
-                                ? "#ff4d4f"
+                                ? "bg-red-500" // red
                                 : task.priority === "متوسط"
-                                ? "#fa8c16"
-                                : "#52c41a",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              color: "white",
-                              fontSize: 16,
-                            }}
+                                ? "bg-amber-500" // amber
+                                : "bg-green-500" // green
+                            }
+                          `}
                           >
-                            {task.priority === "مرتفع" ? "!" : "✓"}
+                            {isOverdue ? (
+                              <MdAlarm className="text-white" />
+                            ) : task.priority === "مرتفع" ? (
+                              "!"
+                            ) : task.priority === "متوسط" ? (
+                              "•"
+                            ) : (
+                              "✓"
+                            )}
                           </div>
                         }
                         title={
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              alignItems: "center",
-                            }}
-                          >
-                            <span>{task.title}</span>
-                            <div
-                              style={{
-                                display: "flex",
-                                gap: 8,
-                                alignItems: "center",
-                              }}
-                            >
-                              {getPriorityTag(task.priority)}
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                            <span className="font-medium text-gray-800 hover:text-orange-600">
+                              {task.title}
+                            </span>
+                            <div className="flex flex-wrap gap-2 self-start sm:self-center">
+                              <Tag color={priorityColors[task.priority]}>
+                                {task.priority}
+                              </Tag>
                               {isOverdue && <Tag color="volcano">متأخرة</Tag>}
                             </div>
                           </div>
                         }
                         description={
-                          <div>
-                            <div>{task.description}</div>
-                            <div
-                              style={{
-                                marginTop: 8,
-                                display: "flex",
-                                gap: 16,
-                                flexWrap: "wrap",
-                              }}
-                            >
+                          <div className="mt-2">
+                            <div className="text-gray-600 mb-3 line-clamp-2">
+                              {task.description}
+                            </div>
+                            <div className="flex flex-col sm:flex-row flex-wrap gap-3 text-sm text-gray-500">
                               <Tooltip title="تاريخ الاستحقاق">
-                                <span>
+                                <span className="inline-flex items-center gap-1">
                                   <CalendarOutlined />
+                                  <span className="font-medium">
+                                    تاريخ الاستحقاق:
+                                  </span>
                                   {dayjs(task.due_date).format("DD/MM/YYYY")}
                                   {isOverdue && (
-                                    <span
-                                      style={{
-                                        color: "#ff4d4f",
-                                        marginRight: 4,
-                                      }}
-                                    >
+                                    <span className="text-red-500 mr-2">
                                       (متأخرة{" "}
                                       {dayjs(task.due_date).fromNow(true)})
                                     </span>
@@ -363,7 +387,10 @@ const Performance = ({ employee }: PerformanceProps) => {
                                 </span>
                               </Tooltip>
                               {task.project && (
-                                <span>المشروع: {task.project.name}</span>
+                                <span className="inline-flex items-center gap-1">
+                                  <span className="font-medium">المشروع:</span>
+                                  {task.project.name}
+                                </span>
                               )}
                             </div>
                           </div>
@@ -374,8 +401,8 @@ const Performance = ({ employee }: PerformanceProps) => {
                 }}
               />
             ) : (
-              <div style={{ textAlign: "center", padding: 40, color: "#999" }}>
-                <TrophyOutlined style={{ fontSize: 48, marginBottom: 16 }} />
+              <div className="text-center py-10 text-gray-400">
+                <TrophyOutlined className="text-5xl mb-4" />
                 <div>لا توجد مهام حالية</div>
               </div>
             )}

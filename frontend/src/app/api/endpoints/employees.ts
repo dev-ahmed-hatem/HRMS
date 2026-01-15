@@ -4,6 +4,8 @@ import { Employee } from "@/types/employee";
 import { PaginatedResponse } from "@/types/paginatedResponse";
 import qs from "query-string";
 import { User } from "@/types/user";
+import { Project } from "@/types/project";
+import { Task } from "@/types/task";
 
 export const employeesEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -76,6 +78,14 @@ export const employeesEndpoints = api.injectEndpoints({
         }
       },
     }),
+    getEmployeePerformance: builder.query<
+      { projects: Project[]; tasks: Task[] },
+      number
+    >({
+      query: (id) => ({
+        url: `/employees/employees/${id}/performance/`,
+      }),
+    }),
     deleteEmployee: builder.mutation<void, string>({
       query: (id) => ({
         url: `/employees/employees/${id}/`,
@@ -108,7 +118,6 @@ export const employeesEndpoints = api.injectEndpoints({
     }),
 
     // employee account
-
     createEmployeeAccount: builder.mutation<
       User,
       { username: string; password: string; password2: string; id: number }
@@ -150,6 +159,7 @@ export const {
   useGetEmployeeQuery,
   useSwitchEmployeeActiveMutation,
   useEmployeeMutation,
+  useGetEmployeePerformanceQuery,
   useDeleteEmployeeMutation,
   useDeleteEmployeesMutation,
   useGetAllDepartmentsQuery,

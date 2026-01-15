@@ -1,6 +1,6 @@
 from rest_framework import status
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -9,8 +9,13 @@ from django.middleware.csrf import get_token
 
 from datetime import timedelta
 
+from employees.serializers import EmployeeReadSerializer
 from users.models import User
 from users.serializers import UserSerializer
+
+from rest_framework_simplejwt.serializers import TokenVerifySerializer
+from rest_framework_simplejwt.exceptions import InvalidToken
+from rest_framework_simplejwt.tokens import UntypedToken
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=4),
@@ -94,20 +99,32 @@ class CustomTokenRefreshView(TokenRefreshView):
             return Response({"detail": "Invalid refresh token."}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-class CustomTokenVerifyView(APIView):
-    def get(self, request, *args, **kwargs):
-        access_token = request.COOKIES.get("access_token")
-        if not access_token:
-            return Response({"detail": "Access token not provided."}, status=status.HTTP_401_UNAUTHORIZED)
+class CustomTokenVerifySerializer(TokenVerifySerializer):
+    def validate(self, attrs):
+        token = attrs["token"]
+
+        # Validate token structure & expiry
+        validated_data = super().validate(attrs)
+
+        # Decode token
+        untyped_token = UntypedToken(token)
+        user_id = untyped_token.payload.get("user_id")
+
+        if not user_id:
+            raise InvalidToken("Token does not contain user_id")
 
         try:
-            AccessToken(access_token)
-            return Response({}, status=status.HTTP_200_OK)
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            raise InvalidToken("User does not exist")
 
-        except Exception as e:
-            return Response({
-                "detail": "Token is invalid or expired",
-                "code": "token_not_valid"}, status=status.HTTP_401_UNAUTHORIZED)
+        if not user.is_active:
+            raise InvalidToken("User account is inactive")
+
+        return validated_data
+
+class CustomTokenVerifyView(TokenVerifyView):
+    serializer_class = CustomTokenVerifySerializer
 
 
 class LogoutView(APIView):
@@ -143,4 +160,8 @@ def get_authenticated_user(request):
     is_authenticated = request.user.is_authenticated
     if is_authenticated:
         user_serialized = UserSerializer(request.user, context={"request": request}).data
-        return Response(user_serialized, status=status.HTTP_200_OK)
+        employee = None
+        if hasattr(request.user, "employee"):
+            employee = EmployeeReadSerializer(request.user.employee, context={"request": request}).data
+
+        return Response({"user": user_serialized, "employee": employee}, status=status.HTTP_200_OK)

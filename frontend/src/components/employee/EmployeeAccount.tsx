@@ -298,7 +298,7 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
           </Row>
 
           <Alert
-            message="ملاحظة هامة"
+            message="ملاحظة"
             description="سيتم إنشاء حساب مستخدم مرتبط بهذا الموظف. يمكن للموظف استخدام اسم المستخدم وكلمة المرور للدخول إلى النظام."
             type="warning"
             showIcon
@@ -313,7 +313,7 @@ const EmployeeAccount: React.FC<EmployeeAccountProps> = ({ employee }) => {
               icon={<CheckCircleOutlined />}
               size="large"
             >
-              إنشاء حساب المستخدم
+              إنشاء حساب
             </Button>
             <Button
               style={{ marginRight: 8 }}

@@ -1,5 +1,6 @@
 import { User } from "@/types/user";
 import api from "../apiSlice";
+import { Employee } from "@/types/employee";
 
 const auth = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -23,7 +24,7 @@ const auth = api.injectEndpoints({
         data: { token: data.access },
       }),
     }),
-    getAuthUser: builder.query<User, void>({
+    getAuthUser: builder.query<{ user: User; employee?: Employee }, void>({
       query: () => ({ url: "/auth/authenticated-user/", method: "POST" }),
     }),
   }),

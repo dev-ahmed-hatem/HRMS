@@ -280,6 +280,7 @@ export const employee3: Employee = {
   created_at: "2025-05-08T14:31:02.935535Z",
 
   user: {
+    id: 3,
     username: "aaa",
     name: "sss",
     phone: "ss",
@@ -318,7 +319,7 @@ const items = (employee: Employee) => [
     children: <PersonalInfo employee={employee} />,
   },
   {
-    label: `الحساب`,
+    label: `حساب الموظف`,
     key: "3",
     children: <EmployeeAccount employee={employee} />,
   },

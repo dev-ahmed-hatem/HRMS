@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'name', 'phone', 'national_id', 'is_superuser', 'is_moderator', 'password',
-                  'password2', 'url', 'is_root', 'last_login']
+                  'password2', 'url', 'is_root', 'last_login', 'is_active']
 
     def get_last_login(self, obj):
         return obj.last_login.astimezone(settings.CAIRO_TZ).strftime('%Y-%m-%d %I:%M%p')

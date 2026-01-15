@@ -44,6 +44,9 @@ class BaseAuthentication(JWTAuthentication):
         #     enforce_csrf(request)
 
         auth_user = self.get_user(validated_token)
+        if not auth_user.is_active:
+            return None
+
         if auth_user is not None:
             auth_user.last_login = timezone.now()
             auth_user.save(update_fields=['last_login'])

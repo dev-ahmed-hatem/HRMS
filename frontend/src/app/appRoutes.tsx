@@ -19,6 +19,8 @@ import NotesPage from "@/pages/notes/NotesPage";
 import SchedulesPage from "@/pages/schedules/SchedulesPage";
 import LoginPage from "@/pages/LoginPage";
 import AuthProvider from "@/providers/AuthProvider";
+import SettingsPage from "@/pages/Settings";
+import { SettingOutlined } from "@ant-design/icons";
 
 export type AppRoute = RouteObject & {
   key?: string;
@@ -116,6 +118,12 @@ export const appRoutes: AppRoute[] = [
         element: <FilesPage />,
         icon: <FaFile />,
         label: "الملفات",
+      },
+      {
+        path: "settings",
+        element: <SettingsPage />,
+        icon: <SettingOutlined />,
+        label: "الإعدادات",
       },
     ],
   },

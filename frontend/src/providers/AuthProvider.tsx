@@ -1,7 +1,8 @@
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { useGetAuthUserQuery } from "@/app/api/endpoints/auth";
-import { useAppDispatch } from "@/app/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/app/redux/hooks";
 import { setUser } from "@/app/slices/authSlice";
+import { setEmployee } from "@/app/slices/employeeSlice";
 import Loading from "@/components/Loading";
 import Base from "@/pages/Base";
 import ErrorPage from "@/pages/Error";
@@ -20,15 +21,18 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   const dispatch = useAppDispatch();
-  const { data, isFetching, isError, error } = useGetAuthUserQuery();
+  const { data, isFetching, isError, error, isSuccess } = useGetAuthUserQuery();
+
+  const user = useAppSelector((state) => state.auth.user);
 
   useEffect(() => {
     if (data) {
-      dispatch(setUser(data));
+      dispatch(setUser(data.user));
+      dispatch(setEmployee(data.employee));
     }
   }, [data]);
 
-  if (isFetching) return <Loading />;
+  if (isFetching || (isSuccess && !user)) return <Loading />;
   if (isError) {
     const err = error as axiosBaseQueryError & AxiosError;
     const next =

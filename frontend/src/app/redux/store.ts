@@ -5,12 +5,14 @@ import {
 } from "@reduxjs/toolkit";
 import api from "../api/apiSlice";
 import authReducer from "@/app/slices/authSlice";
+import employeeReducer from "@/app/slices/employeeSlice";
 
 const store = configureStore({
   reducer: {
     // api reducer
     [api.reducerPath]: api.reducer,
     auth: authReducer,
+    employee: employeeReducer,
   },
   middleware: (getDefaultMiddleware) =>
     // api middleware

@@ -70,10 +70,17 @@ export const attendanceEndpoints = api.injectEndpoints({
     // attendance settings queries
     getAttendanceSettings: builder.query<AttendanceSettings, void>({
       query: () => ({
-        url: "attendance/get-attendance-settings/",
+        url: "attendance/attendance-settings/",
         method: "GET",
       }),
       providesTags: [{ type: "Attendance", id: "settings" }],
+    }),
+    updateAttendanceSettings: builder.mutation<AttendanceSettings, object>({
+      query: (data) => ({
+        url: "attendance/attendance-settings/",
+        method: "PATCH",
+        data
+      }),
     }),
   }),
 });
@@ -84,4 +91,5 @@ export const {
   useUpdateDayAttendanceMutation,
   useDeleteAttendanceRecordMutation,
   useGetAttendanceSettingsQuery,
+  useUpdateAttendanceSettingsMutation,
 } = attendanceEndpoints;

@@ -41,3 +41,9 @@ class AttendanceSettingsReadSerializer(serializers.ModelSerializer):
 
     def get_check_out(self, obj):
         return obj.check_out.strftime('%H:%M') if obj.check_out else None
+
+
+class AttendanceSettingsWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AttendanceSettings
+        fields = "__all__"

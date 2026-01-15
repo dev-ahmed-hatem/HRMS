@@ -1,0 +1,31 @@
+import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
+import { useGetEmployeeQuery } from "@/app/api/endpoints/employees";
+import { useAppSelector } from "@/app/redux/hooks";
+import Loading from "@/components/Loading";
+import EmployeeForm from "@/pages/employees/EmployeeForm";
+import Error from "@/pages/Error";
+import EmployeeSettingsForm from "./EmployeeSettingsForm";
+
+const EmployeeSettingsTab = () => {
+  const employee = useAppSelector((state) => state.employee.employee)!;
+
+  const {
+    data: employeeData,
+    isFetching,
+    isError,
+    error: employeeError,
+  } = useGetEmployeeQuery({ id: employee.id.toString(), format: "form_data" });
+
+  if (isFetching) return <Loading />;
+  if (isError) {
+    const error_title =
+      (employeeError as axiosBaseQueryError).status === 404
+        ? "موظف غير موجود! تأكد من كود الموظف المدخل."
+        : undefined;
+
+    return <Error subtitle={error_title} reload={error_title === undefined} />;
+  }
+  return <EmployeeSettingsForm initialValues={employeeData} />;
+};
+
+export default EmployeeSettingsTab;

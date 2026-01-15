@@ -1,8 +1,8 @@
 import { Divider, Tabs } from "antd";
 import { useAppSelector } from "@/app/redux/hooks";
 import ProfileBanner from "@/components/settings/ProfileBanner";
-import ChangePassword from "@/components/settings/account/ChangePassword";
 import AccountSettingsTab from "@/components/settings/account/AccountSettingsTab";
+import EmployeeSettingsTab from "@/components/settings/employee/EmployeeSettingsTab";
 // import AccountSettingsTab from "@/components/settings/account/AccountSettingsTab";
 // import ProfileBanner from "@/components/settings/account/ProfileBanner";
 // import SupervisorSettingsTab from "@/components/settings/supervisors/SupervisorSettingsTab";
@@ -25,8 +25,16 @@ const SettingsPage = () => {
           <DefaultTabBar {...props} className="md:ps-2" />
         )}
         direction="rtl"
-        defaultActiveKey="account"
         items={[
+          ...(employee
+            ? [
+                {
+                  key: "employee",
+                  label: "بيانات الموظف",
+                  children: <EmployeeSettingsTab />,
+                },
+              ]
+            : []),
           {
             key: "account",
             label: "الحساب",

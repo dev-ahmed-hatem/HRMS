@@ -25,7 +25,7 @@ const EmployeeEdit = () => {
 
     return <Error subtitle={error_title} reload={error_title === undefined} />;
   }
-  return <EmployeeForm initialValues={employeeData} employeeId={emp_id} />;
+  return <EmployeeForm initialValues={employeeData} />;
 };
 
 export default EmployeeEdit;

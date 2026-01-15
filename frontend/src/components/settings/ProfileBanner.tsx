@@ -158,13 +158,15 @@ const ProfileBanner = ({ user, employee }: ProfileBannerProps) => {
                 <span className="text-white">{user.last_login}</span>
               </RowItem>
 
-              <div>
-                <h4 className="text-gray-300 mb-2">الصلاحيات:</h4>
-                <div className="flex flex-wrap gap-2">
-                  {user.is_superuser && <Tag color="gold">التحكم الكامل</Tag>}
-                  {user.is_moderator && <Tag color="red">الإشراف</Tag>}
+              {(user.is_superuser || user.is_moderator) && (
+                <div>
+                  <h4 className="text-gray-300 mb-2">الصلاحيات:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {user.is_superuser && <Tag color="gold">التحكم الكامل</Tag>}
+                    {user.is_moderator && <Tag color="red">الإشراف</Tag>}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {employee?.department && (
                 <RowItem label="القسم">

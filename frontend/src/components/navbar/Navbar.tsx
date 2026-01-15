@@ -1,7 +1,7 @@
 import { IoMenu } from "react-icons/io5";
 import Logo from "../Logo";
 import { RxAvatar } from "react-icons/rx";
-import { Popover } from "antd";
+import { Popover, Tag } from "antd";
 import { useState } from "react";
 import UserMenu from "./UserMenu";
 import { NavLink } from "react-router";
@@ -16,10 +16,36 @@ const Navbar = ({
 }) => {
   const [open, setOpen] = useState(false);
   const user = useAppSelector((state) => state.auth.user);
+  const employee = useAppSelector((state) => state.employee.employee);
 
   const handleOpenChange = (newOpen: boolean) => {
     setOpen(newOpen);
   };
+
+  const role = user?.is_root
+    ? "مطور"
+    : user?.is_superuser
+    ? "مدير"
+    : user?.is_moderator
+    ? "مشرف"
+    : "موظف";
+
+  const getRoleColor = () => {
+    switch (role) {
+      case "مطور":
+        return { color: "purple", bg: "#f5f3ff" };
+      case "مدير":
+        return { color: "gold", bg: "#fefce8" };
+      case "مشرف":
+        return { color: "blue", bg: "#eff6ff" };
+      case "موظف":
+        return { color: "green", bg: "#f0fdf4" };
+      default:
+        return { color: "default", bg: "#f9fafb" };
+    }
+  };
+
+  const roleColor = getRoleColor();
 
   return (
     <div className="padding-container flex justify-between items-center bg-orange py-2">
@@ -38,12 +64,16 @@ const Navbar = ({
         <Popover
           content={
             <UserMenu
-              role={
-                user?.is_root ? "مطور" : user?.is_superuser ? "مدير" : "مشرف"
-              }
+              name={employee?.name ?? user?.name}
+              photo={employee?.image}
+              close={() => setOpen(false)}
             />
           }
-          title={user?.name || <span className="text-red-500">بلا اسم</span>}
+          title={
+            <Tag color={roleColor.color} className="px-3 py-1 font-medium">
+              {role}
+            </Tag>
+          }
           trigger="click"
           open={open}
           onOpenChange={handleOpenChange}

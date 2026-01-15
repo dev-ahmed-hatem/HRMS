@@ -45,7 +45,7 @@ class EmployeeListSerializer(serializers.ModelSerializer):
 class EmployeeWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        exclude = ['created_by', 'is_active']
+        exclude = ['created_by']
 
     def create(self, validated_data):
         auth_user = self.context['request'].user

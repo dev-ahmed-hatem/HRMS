@@ -1,37 +1,42 @@
 import { removeTokens } from "@/utils/storage";
-import { Button, Tag } from "antd";
+import { Avatar, Button, Tag } from "antd";
 import { useNavigate } from "react-router";
-import { LogoutOutlined, SettingOutlined } from "@ant-design/icons";
+import {
+  LogoutOutlined,
+  SettingOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 
-const UserMenu = ({ role }: { role: string }) => {
+const UserMenu = ({
+  photo,
+  name,
+  close,
+}: {
+  photo?: string | null;
+  name?: string | null;
+  close?: Function;
+}) => {
   const navigate = useNavigate();
   const logout = () => {
     removeTokens();
     location.href = "/login";
   };
 
-  const getRoleColor = () => {
-    switch (role) {
-      case "مطور":
-        return { color: "purple", bg: "#f5f3ff" };
-      case "مدير":
-        return { color: "gold", bg: "#fefce8" };
-      case "مشرف":
-        return { color: "blue", bg: "#eff6ff" };
-      default:
-        return { color: "default", bg: "#f9fafb" };
-    }
-  };
-
-  const roleColor = getRoleColor();
-
   return (
     <div>
-      <div className="flex justify-center mb-3">
-        <Tag color={roleColor.color} className="px-3 py-1 font-medium">
-          {role}
-        </Tag>
+      <div className="flex flex-col items-center mb-3">
+        <Avatar
+          size={100}
+          src={photo || undefined}
+          icon={!photo && <UserOutlined />}
+          className="bg-gray-200 text-gray-600"
+        />
+        {name && <div className="mt-2 font-bold">{name}</div>}
       </div>
+
+      {/* <div className="flex justify-center mb-3 font-bold">
+        {name || <span className="text-red-500">بلا اسم</span>}
+      </div> */}
       <div className="w-[80%] mx-auto my-2 h-[1px] bg-gray-300"></div>
       <div className="space-y-2 py-1">
         <div className="space-y-2">
@@ -39,7 +44,10 @@ const UserMenu = ({ role }: { role: string }) => {
             className="
             flex w-full justify-center items-center h-9 text-gray-700 hover:bg-calypso-50
             hover:text-calypso font-medium"
-            onClick={() => navigate("/settings")}
+            onClick={() => {
+              navigate("/settings");
+              if (close) close();
+            }}
             icon={<SettingOutlined className="ml-1" />}
           >
             الإعدادات

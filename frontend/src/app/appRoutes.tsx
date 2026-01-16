@@ -21,7 +21,7 @@ import LoginPage from "@/pages/LoginPage";
 import AuthProvider from "@/providers/AuthProvider";
 import SettingsPage from "@/pages/Settings";
 import { SettingOutlined } from "@ant-design/icons";
-import PortalHome from "@/portal/PortalHome";
+// import PortalHome from "@/portal/PortalHome";
 
 export type AppRoute = RouteObject & {
   key?: string;
@@ -142,7 +142,7 @@ export const appRoutes: AppRoute[] = [
   },
   {
     path: "portal",
-    element: <PortalHome />,
+    element: <></>,
     errorElement: <Base error={true} />,
   },
   {

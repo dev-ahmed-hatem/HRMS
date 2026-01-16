@@ -1,6 +1,6 @@
 from django.conf import settings
 from rest_framework import serializers
-from .models import Project, Task
+from .models import Project, Task, ProjectAssignment, TaskAssignment
 from employees.serializers import DepartmentSerializer
 
 
@@ -128,3 +128,78 @@ class TaskWriteSerializer(serializers.ModelSerializer):
 
     def get_current_project(self, obj: Task):
         return {"name": obj.project.name, "id": obj.project.id}
+
+
+# Assignments Serializers
+# Project Assignments Serializer
+class ProjectAssignmentReadSerializer(serializers.ModelSerializer):
+    assigned_by = serializers.SerializerMethodField()
+    status = serializers.StringRelatedField(source='get_status_display')
+
+    class Meta:
+        model = ProjectAssignment
+        fields = '__all__'
+        read_only_fields = ['id', 'assigned_at']
+
+    def get_assigned_by(self, obj):
+        user = self.context['request'].user
+        name = user.employee.name if hasattr(user, "employee") else user.name
+        if obj.assigned_by:
+            return name
+        return None
+
+
+class ProjectAssignmentWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectAssignment
+        fields = '__all__'
+
+    def create(self, validated_data):
+        assigned_by_employee = True
+        if not self.context.get('request'):
+            raise serializers.ValidationError({
+                'detail': 'قم بتسجيل الدخول أولا'
+            })
+        else:
+            user = self.context['request'].user
+            if not hasattr(user, "employee"):
+                assigned_by_employee = False
+        validated_data['assigned_by_employee'] = assigned_by_employee
+        return ProjectAssignment.objects.create(**validated_data)
+
+
+# Task Assignments Serializer
+class TaskAssignmentReadSerializer(serializers.ModelSerializer):
+    assigned_by = serializers.SerializerMethodField()
+    status = serializers.StringRelatedField(source='get_status_display')
+
+    class Meta:
+        model = TaskAssignment
+        fields = '__all__'
+        read_only_fields = ['id', 'assigned_at']
+
+    def get_assigned_by(self, obj):
+        user = self.context['request'].user
+        name = user.employee.name if hasattr(user, "employee") else user.name
+        if obj.assigned_by:
+            return name
+        return None
+
+
+class TaskAssignmentWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaskAssignment
+        fields = '__all__'
+
+    def create(self, validated_data):
+        assigned_by_employee = True
+        if not self.context.get('request'):
+            raise serializers.ValidationError({
+                'detail': 'قم بتسجيل الدخول أولا'
+            })
+        else:
+            user = self.context['request'].user
+            if not hasattr(user, "employee"):
+                assigned_by_employee = False
+        validated_data['assigned_by_employee'] = assigned_by_employee
+        return TaskAssignment.objects.create(**validated_data)

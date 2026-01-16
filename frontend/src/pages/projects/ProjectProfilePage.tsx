@@ -17,6 +17,7 @@ import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import Error from "@/pages/Error";
 import { TabsProps } from "antd/lib";
 import ProjectStatus from "@/components/projects/ProjectStatus";
+import ProjectNotes from "@/components/projects/ProjectNotes";
 
 const getTabItems = (project: Project) => {
   const items: TabsProps["items"] = [];
@@ -35,10 +36,16 @@ const getTabItems = (project: Project) => {
     children: <ProjectDetails project={project} />,
   });
 
+  items.push({
+    label: `ملاحظات`,
+    key: "3",
+    children: <ProjectNotes project={project!} />,
+  });
+
   if (["قيد التنفيذ", "مكتمل"].includes(project.status)) {
     items.push({
       label: "المهام",
-      key: "3",
+      key: "4",
       children: <ProjectTasks project={project} />,
     });
   }

@@ -19,6 +19,7 @@ export interface Task {
   project_tasks: Task[];
   created_at: string;
   created_by: string;
+  notes?: string;
 }
 
 export type TasksStats = {

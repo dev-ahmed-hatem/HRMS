@@ -1,7 +1,4 @@
-import datetime
-
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from users.models import User
@@ -96,6 +93,12 @@ class Project(AbstractBaseModel):
         null=True,
     )
 
+    notes = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name=_("ملاحظات"),
+    )
+
     def clean(self):
         if self.end_date and self.start_date and self.end_date < self.start_date:
             raise ValidationError(_("تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء."))
@@ -111,6 +114,38 @@ class Project(AbstractBaseModel):
 
     def __str__(self):
         return self.name
+
+
+class ProjectAssignment(models.Model):
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="assignments"
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=PROJECT_STATUS_CHOICES,
+        verbose_name=_("حالة الإسناد"),
+        db_index=True,
+    )
+
+    notes = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name=_("ملاحظات الإسناد"),
+        help_text=_("ملاحظات اختيارية عند إسناد المشروع")
+    )
+
+    assigned_at = models.DateTimeField(auto_now_add=True)
+    assigned_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="assigned_projects"
+    )
+
+    assigned_by_employee = models.BooleanField(default=True, verbose_name=_("تم التعيين من خلال موظف"))
 
 
 class Task(AbstractBaseModel):
@@ -165,6 +200,12 @@ class Task(AbstractBaseModel):
         verbose_name=_("المشروع"),
     )
 
+    notes = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name=_("ملاحظات"),
+    )
+
     class Meta:
         verbose_name = _("مهمة")
         verbose_name_plural = _("المهام")
@@ -178,3 +219,35 @@ class Task(AbstractBaseModel):
 
     def __str__(self):
         return self.title
+
+
+class TaskAssignment(models.Model):
+    task = models.ForeignKey(
+        Task,
+        on_delete=models.CASCADE,
+        related_name="assignments"
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=TASK_STATUS_CHOICES,
+        verbose_name=_("حالة الإسناد"),
+        db_index=True,
+    )
+
+    notes = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name=_("ملاحظات الإسناد"),
+        help_text=_("ملاحظات اختيارية عند إسناد المهمة")
+    )
+
+    assigned_at = models.DateTimeField(auto_now_add=True)
+    assigned_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="assigned_tasks"
+    )
+
+    assigned_by_employee = models.BooleanField(default=True, verbose_name=_("تم التعيين من خلال موظف"))

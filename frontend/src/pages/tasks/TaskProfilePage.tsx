@@ -17,6 +17,7 @@ import Loading from "@/components/Loading";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import Error from "@/pages/Error";
 import { useAppDispatch } from "@/app/redux/hooks";
+import TaskNotes from "@/components/tasks/TaskNotes";
 
 const items = (task: Task) => [
   {
@@ -24,9 +25,15 @@ const items = (task: Task) => [
     key: "1",
     children: <TaskDetails task={task} />,
   },
+
+  {
+    label: `ملاحظات`,
+    key: "2",
+    children: <TaskNotes task={task!} />,
+  },
   {
     label: "مهام مرتبطة",
-    key: "2",
+    key: "3",
     children: <RelatedTasks task={task} />,
   },
 ];

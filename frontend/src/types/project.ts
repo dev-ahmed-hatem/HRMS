@@ -21,7 +21,6 @@ export const badgeStatus: Record<Project["status"], BadgeProps["status"]> = {
   متوقف: "default",
 };
 
-
 export type Project = {
   id: string;
   name: string;
@@ -37,6 +36,7 @@ export type Project = {
   created_by: string;
   tasks: Task[];
   stats: TasksStats;
+  notes?: string;
 };
 
 export type ProjectsStats = {

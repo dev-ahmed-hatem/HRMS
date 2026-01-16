@@ -5,9 +5,9 @@ from django.conf import settings
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, action
-from .models import Project, Task
+from .models import Project, Task, TaskAssignment, ProjectAssignment
 from .serializers import ProjectListSerializer, ProjectWriteSerializer, ProjectReadSerializer, TaskReadSerializer, \
-    TaskWriteSerializer, TaskListSerializer
+    TaskWriteSerializer, TaskListSerializer, ProjectAssignmentWriteSerializer, ProjectAssignmentReadSerializer
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
@@ -216,3 +216,72 @@ def calculate_tasks_stats(project_id=None):
 def tasks_stats(request):
     stats = calculate_tasks_stats()
     return Response(stats, status=status.HTTP_200_OK)
+
+
+# project assignment viewset
+class ProjectAssignmentViewSet(viewsets.ModelViewSet):
+    queryset = ProjectAssignment.objects.all()
+
+    def get_serializer_class(self):
+        if self.action in ["create", "update", "partial_update"]:
+            return ProjectAssignmentWriteSerializer
+        return ProjectAssignmentReadSerializer
+
+    def get_queryset(self):
+        """Filter assignments based on query parameters"""
+        queryset = super().get_queryset()
+
+        # Filter by project
+        project_id = self.request.query_params.get('project_id')
+        if project_id:
+            queryset = queryset.filter(project_id=project_id)
+
+        # Filter by user
+        assigned_by_id = self.request.query_params.get('assigned_by_id')
+        if assigned_by_id:
+            queryset = queryset.filter(assigned_by_id=assigned_by_id)
+
+        # Filter by status
+        status = self.request.query_params.get('status')
+        if status:
+            queryset = queryset.filter(status=status)
+
+        return queryset.select_related('project', 'assigned_by')
+
+    def perform_create(self, serializer):
+        """Set assigned_by to current user"""
+        serializer.save(assigned_by=self.request.user)
+
+
+# task assignment viewset
+class TaskAssignmentViewSet(viewsets.ModelViewSet):
+    queryset = TaskAssignment.objects.all()
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            return TaskWriteSerializer
+        return TaskReadSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        # Filter by project
+        task_id = self.request.query_params.get('task_id')
+        if task_id:
+            queryset = queryset.filter(task_id=task_id)
+
+        # Filter by user
+        assigned_by_id = self.request.query_params.get('assigned_by_id')
+        if assigned_by_id:
+            queryset = queryset.filter(assigned_by_id=assigned_by_id)
+
+        # Filter by status
+        status = self.request.query_params.get('status')
+        if status:
+            queryset = queryset.filter(status=status)
+
+        return queryset.select_related('task', 'assigned_by')
+
+    def perform_create(self, serializer):
+        """Set assigned_by to current user"""
+        serializer.save(assigned_by=self.request.user)

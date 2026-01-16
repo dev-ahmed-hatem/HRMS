@@ -21,12 +21,16 @@ import LoginPage from "@/pages/LoginPage";
 import AuthProvider from "@/providers/AuthProvider";
 import SettingsPage from "@/pages/Settings";
 import { SettingOutlined } from "@ant-design/icons";
+import PortalHome from "@/portal/PortalHome";
 
 export type AppRoute = RouteObject & {
   key?: string;
   label?: string;
   icon?: React.ReactNode;
   children?: AppRoute[];
+  menu_listed?: boolean;
+  breadcrumbed?: boolean;
+  navigation_cards?: boolean;
 };
 
 export const appRoutes: AppRoute[] = [
@@ -49,6 +53,7 @@ export const appRoutes: AppRoute[] = [
         ),
         icon: <FaUser />,
         label: "الموظفين",
+        navigation_cards: true,
       },
       {
         path: "projects",
@@ -60,6 +65,7 @@ export const appRoutes: AppRoute[] = [
         ),
         icon: <FaDiagramProject />,
         label: "المشاريع",
+        navigation_cards: true,
       },
       {
         path: "tasks",
@@ -68,17 +74,20 @@ export const appRoutes: AppRoute[] = [
         ),
         icon: <MdAssignment />,
         label: "المهام",
+        navigation_cards: true,
       },
       {
         path: "attendance",
         element: <AttendancePage />,
         icon: <FaCalendarCheck />,
         label: "الحضور والانصراف",
+        navigation_cards: true,
       },
       {
         path: "financials",
         icon: <FaMoneyBill />,
         label: "الماليات",
+        navigation_cards: true,
         element: <FinancialsPage />,
         children: [
           {
@@ -106,26 +115,35 @@ export const appRoutes: AppRoute[] = [
         element: <SchedulesPage />,
         icon: <FaCalendarDays />,
         label: "جدول المواعيد",
+        navigation_cards: true,
       },
       {
         path: "notes",
         element: <NotesPage />,
         icon: <LuNotebookPen />,
         label: "المذكرات",
+        navigation_cards: true,
       },
       {
         path: "files",
         element: <FilesPage />,
         icon: <FaFile />,
         label: "الملفات",
+        navigation_cards: true,
       },
       {
         path: "settings",
         element: <SettingsPage />,
         icon: <SettingOutlined />,
         label: "الإعدادات",
+        navigation_cards: false,
       },
     ],
+  },
+  {
+    path: "portal",
+    element: <PortalHome />,
+    errorElement: <Base error={true} />,
   },
   {
     path: "login",

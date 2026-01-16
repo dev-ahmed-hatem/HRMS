@@ -212,6 +212,25 @@ const ProjectForm: FC<ProjectFormParams> = ({
           </Row>
         </Card>
 
+        <Card title="ملاحظات" className="mb-6">
+          <Row gutter={16}>
+            <Col xs={24}>
+              <Form.Item
+                name="notes"
+                label="ملاحظات"
+                rules={[{ required: false }]}
+              >
+                <Input.TextArea
+                  placeholder="أدخل الملاحظات"
+                  rows={4}
+                  maxLength={1000}
+                  showCount
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Card>
+
         {/* Submit Button */}
         <Form.Item style={{ textAlign: "center", marginTop: "20px" }}>
           <Button

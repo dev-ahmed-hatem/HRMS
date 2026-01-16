@@ -1,9 +1,12 @@
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import viewsets, status
+from rest_framework.views import APIView
 
 from users.models import User
 from users.serializers import UserSerializer
-from .serializers import DepartmentSerializer, EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer
+from .serializers import DepartmentSerializer, EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer, \
+    EmployeeDashboardSerializer
 from .models import Department, Employee
 from rest_framework.decorators import action, api_view
 from django.db.models import Q
@@ -222,6 +225,21 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         except Employee.DoesNotExist:
             return Response(
                 {'detail': _('موظف غير موجود')},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+class EmployeeDashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            employee = request.user.employee_profile
+            serializer = EmployeeDashboardSerializer(employee, context={'request': request})
+            return Response(serializer.data)
+        except Employee.DoesNotExist:
+            return Response(
+                {'error': 'لا يوجد ملف تعريف للموظف'},
                 status=status.HTTP_404_NOT_FOUND
             )
 

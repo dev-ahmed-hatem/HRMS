@@ -5,6 +5,7 @@ import Loading from "@/components/Loading";
 import EmployeeForm from "@/pages/employees/EmployeeForm";
 import Error from "@/pages/Error";
 import EmployeeSettingsForm from "./EmployeeSettingsForm";
+import { Employee } from "@/types/employee";
 
 const EmployeeSettingsTab = () => {
   const employee = useAppSelector((state) => state.employee.employee)!;
@@ -25,7 +26,7 @@ const EmployeeSettingsTab = () => {
 
     return <Error subtitle={error_title} reload={error_title === undefined} />;
   }
-  return <EmployeeSettingsForm initialValues={employeeData} />;
+  return <EmployeeSettingsForm initialValues={employeeData as Omit<Employee, "mode">} />;
 };
 
 export default EmployeeSettingsTab;

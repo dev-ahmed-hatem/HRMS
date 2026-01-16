@@ -1,6 +1,4 @@
 import { Attendance } from "./attendance";
-import { Project } from "./project";
-import { Task } from "./task";
 import { User } from "./user";
 
 export type Employee = {

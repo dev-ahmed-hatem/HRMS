@@ -49,7 +49,7 @@ type EmployeeSettingsValues = Omit<Employee, "image" | "cv"> & {
 const EmployeeSettingsForm = ({
   initialValues,
 }: {
-  initialValues?: Employee;
+  initialValues?: Omit<Employee, "mode"> & {mode?: "on-site" | "remote" | "hybrid"};
 }) => {
   const [form] = Form.useForm();
   const [image, setImage] = useState<File | null>(null);

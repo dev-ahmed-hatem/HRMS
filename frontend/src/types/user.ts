@@ -8,5 +8,7 @@ export type User = {
   is_moderator: boolean;
   is_superuser: boolean;
   is_root: boolean;
+
+  is_staff: boolean;
   last_login?: string;
 };

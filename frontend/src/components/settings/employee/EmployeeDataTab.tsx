@@ -2,12 +2,11 @@ import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { useGetEmployeeQuery } from "@/app/api/endpoints/employees";
 import { useAppSelector } from "@/app/redux/hooks";
 import Loading from "@/components/Loading";
-import EmployeeForm from "@/pages/employees/EmployeeForm";
 import Error from "@/pages/Error";
-import EmployeeSettingsForm from "./EmployeeSettingsForm";
+import EmployeeDataForm from "./EmployeeDataForm";
 import { Employee } from "@/types/employee";
 
-const EmployeeSettingsTab = () => {
+const EmployeeDataTab = () => {
   const employee = useAppSelector((state) => state.employee.employee)!;
 
   const {
@@ -26,7 +25,7 @@ const EmployeeSettingsTab = () => {
 
     return <Error subtitle={error_title} reload={error_title === undefined} />;
   }
-  return <EmployeeSettingsForm initialValues={employeeData as Omit<Employee, "mode">} />;
+  return <EmployeeDataForm initialValues={employeeData as Omit<Employee, "mode">} />;
 };
 
-export default EmployeeSettingsTab;
+export default EmployeeDataTab;

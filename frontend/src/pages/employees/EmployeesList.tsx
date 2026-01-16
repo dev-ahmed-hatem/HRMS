@@ -72,6 +72,7 @@ const EmployeesList = () => {
   const [selectedList, setSelectedList] = useState<number[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
   const notification = useNotification();
   const navigate = useNavigate();
 
@@ -89,6 +90,7 @@ const EmployeesList = () => {
   const { data, isFetching, isError, refetch } = useGetEmployeesQuery({
     page,
     search,
+    page_size: pageSize,
   });
 
   const rowSelection: TableProps["rowSelection"] = {
@@ -139,7 +141,7 @@ const EmployeesList = () => {
         <Link
           to={"/employees/add"}
           className="h-10 px-6 flex items-center text-white gap-2 rounded-lg
-       bg-green-700 hover:bg-green-600 shadow-[0_2px_0_rgba(0,58,58,0.31)]"
+        bg-green-700 hover:bg-green-600 shadow-[0_2px_0_rgba(0,58,58,0.31)]"
         >
           <PlusOutlined />
           <span>إضافة موظف</span>
@@ -169,8 +171,11 @@ const EmployeesList = () => {
         pagination={tablePaginationConfig({
           total: data?.count,
           current: data?.page,
-          onChange(page) {
+          showQuickJumper: true,
+          pageSize,
+          onChange(page, pageSize) {
             setPage(page);
+            setPageSize(pageSize);
           },
         })}
         bordered

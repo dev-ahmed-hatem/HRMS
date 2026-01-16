@@ -11,8 +11,16 @@ from django.utils.translation import gettext_lazy as _
 
 
 class DepartmentViewSet(viewsets.ModelViewSet):
-    queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
+
+    def get_queryset(self):
+        queryset = Department.objects.all()
+        search = self.request.query_params.get('search', None)
+
+        if search:
+            queryset = queryset.filter(Q(name__icontains=search))
+
+        return queryset
 
 
 class EmployeeViewSet(viewsets.ModelViewSet):

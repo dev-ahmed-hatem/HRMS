@@ -40,13 +40,13 @@ import { IoBriefcase } from "react-icons/io5";
 
 const { Option } = Select;
 
-type EmployeeSettingsValues = Omit<Employee, "image" | "cv"> & {
+type EmployeeDataValues = Omit<Employee, "image" | "cv"> & {
   image?: File | null;
   cv?: File | null;
   birth_date: Dayjs;
 };
 
-const EmployeeSettingsForm = ({
+const EmployeeDataForm = ({
   initialValues,
 }: {
   initialValues?: Omit<Employee, "mode"> & {mode?: "on-site" | "remote" | "hybrid"};
@@ -73,7 +73,7 @@ const EmployeeSettingsForm = ({
     },
   ] = useEmployeeMutation();
 
-  const handleSubmit = (values: EmployeeSettingsValues) => {
+  const handleSubmit = (values: EmployeeDataValues) => {
     const data = {
       ...values,
       birth_date: values.birth_date.format("YYYY-MM-DD"),
@@ -541,4 +541,4 @@ const EmployeeSettingsForm = ({
   );
 };
 
-export default EmployeeSettingsForm;
+export default EmployeeDataForm;

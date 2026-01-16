@@ -31,7 +31,6 @@ import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { useAppDispatch } from "@/app/redux/hooks";
 import { useNotification } from "@/providers/NotificationProvider";
 import EmployeeAccount from "@/components/employee/EmployeeAccount";
-import { Project } from "@/types/project";
 
 // Mock Project data
 export const mockProjects = [
@@ -290,6 +289,7 @@ export const employee3: Employee = {
     is_superuser: false,
     is_root: false,
     last_login: "",
+    is_staff: true,
   },
 
   attendance: [

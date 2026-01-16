@@ -27,7 +27,7 @@ class Employee(models.Model):
 
     department = models.ForeignKey(
         "Department",
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         verbose_name=_("القسم")
     )
 

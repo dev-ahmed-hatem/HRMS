@@ -101,6 +101,8 @@ export const employeesEndpoints = api.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Employee", id: "LIST" }],
     }),
+
+    // departments query (old style)
     getPaginatedDepartments: builder.query<
       PaginatedResponse<Department>,
       Record<string, any> | void
@@ -114,6 +116,16 @@ export const employeesEndpoints = api.injectEndpoints({
         url: `/employees/departments?no_pagination=true&${qs.stringify(
           params || {}
         )}`,
+      }),
+    }),
+    department: builder.mutation<
+      Department,
+      { data?: Department; method?: string; url?: string }
+    >({
+      query: ({ data, method, url }) => ({
+        url: url || `employees/departments/`,
+        method: method || "POST",
+        data,
       }),
     }),
 
@@ -164,6 +176,7 @@ export const {
   useDeleteEmployeesMutation,
   useGetAllDepartmentsQuery,
   useGetPaginatedDepartmentsQuery,
+  useDepartmentMutation,
   useCreateEmployeeAccountMutation,
   useChangeEmployeeAccountPasswordMutation,
   useDeleteEmployeeAccountMutation,

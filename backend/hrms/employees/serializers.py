@@ -6,9 +6,14 @@ from django.conf import settings
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
+    employee_count = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Department
         fields = '__all__'
+
+    def get_employee_count(self, obj: Department):
+        return obj.employee_set.count()
 
 
 class EmployeeReadSerializer(serializers.ModelSerializer):

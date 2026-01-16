@@ -6,7 +6,7 @@ import {
 import { useAppDispatch } from "@/app/redux/hooks";
 import { useNotification } from "@/providers/NotificationProvider";
 import { Project, statusColors } from "@/types/project";
-import { Button, Tag } from "antd";
+import { Button, Tag, Modal, Input } from "antd";
 import { ReactElement, useEffect, useState } from "react";
 import { TbStatusChange } from "react-icons/tb";
 import Loading from "../Loading";
@@ -49,6 +49,9 @@ const ProjectActionButton = ({
   });
 
   const [transition, setTransition] = useState(getButtonText(project?.status));
+  const [open, setOpen] = useState(false);
+  const [notes, setNotes] = useState("");
+
   const notification = useNotification();
   const dispatch = useAppDispatch();
 
@@ -57,8 +60,17 @@ const ProjectActionButton = ({
     { data: switchRes, isLoading: switchingState, isError: switchError },
   ] = useSwitchProjectStatusMutation();
 
-  const handleStatusChange = () => {
-    changeState({ id, status: transition?.nextStatus! });
+  const handleOpenModal = () => {
+    setNotes("");
+    setOpen(true);
+  };
+
+  const handleConfirm = () => {
+    changeState({
+      id,
+      status: transition.nextStatus,
+      notes: notes || undefined,
+    });
   };
 
   useEffect(() => {
@@ -80,6 +92,10 @@ const ProjectActionButton = ({
           }
         )
       );
+
+      setOpen(false);
+      setNotes("");
+
       notification.success({
         message: "تم تغيير الحالة بنجاح",
       });
@@ -91,6 +107,7 @@ const ProjectActionButton = ({
   }, [project]);
 
   if (loading) return <Loading />;
+
   return (
     <>
       <div className="flex flex-col gap-2">
@@ -100,20 +117,47 @@ const ProjectActionButton = ({
         >
           {project!.status}
         </Tag>
+
         {isProjectOverdue && (
           <Tag color="red" className="w-[80px] text-center p-1">
             متأخر
           </Tag>
         )}
       </div>
+
       <Button
         type="primary"
         icon={transition.icon}
-        onClick={handleStatusChange}
+        onClick={handleOpenModal}
         loading={switchingState}
+        disabled={!transition.nextStatus}
       >
-        {transition?.label}
+        {transition.label}
       </Button>
+
+      <Modal
+        open={open}
+        title="تأكيد تغيير حالة المشروع"
+        onCancel={() => setOpen(false)}
+        onOk={handleConfirm}
+        okText="تأكيد"
+        cancelText="إلغاء"
+        confirmLoading={switchingState}
+      >
+        <p className="mb-2">
+          سيتم تغيير حالة المشروع إلى:
+          <Tag color="blue" className="mr-2">
+            {transition.label}
+          </Tag>
+        </p>
+
+        <Input.TextArea
+          rows={4}
+          placeholder="ملاحظات (اختياري)"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+        />
+      </Modal>
     </>
   );
 };

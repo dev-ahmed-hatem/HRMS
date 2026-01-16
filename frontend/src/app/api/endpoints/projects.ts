@@ -44,12 +44,12 @@ export const projectsEndpoints = api.injectEndpoints({
     }),
     switchProjectStatus: builder.mutation<
       { status: ProjectStatus },
-      { id: string; status: string }
+      { id: string; status: string, notes?: string }
     >({
-      query: ({ id, status }) => ({
+      query: ({ id, status, notes }) => ({
         url: `/projects/projects/${id}/change_status/`,
         method: "POST",
-        data: { status },
+        data: { status, notes },
       }),
       invalidatesTags: [{ type: "Project", id: "LIST" }],
     }),

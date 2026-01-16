@@ -10,6 +10,8 @@ from .serializers import ProjectListSerializer, ProjectWriteSerializer, ProjectR
     TaskWriteSerializer, TaskListSerializer, ProjectAssignmentWriteSerializer, ProjectAssignmentReadSerializer
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
+from django.db import transaction
+from django.utils import timezone
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -47,19 +49,48 @@ class ProjectViewSet(viewsets.ModelViewSet):
         try:
             project = Project.objects.get(pk=pk)
         except Project.DoesNotExist:
-            return Response({'detail': _('مشروع غير موجود')}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {'detail': _('مشروع غير موجود')},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
         new_status = request.data.get('status')
+        notes = request.data.get('notes')
 
-        # declare progress start date as now
-        if new_status == "ongoing" and project.status == "pending-approval":
-            project.progress_started = datetime.now()
+        if not new_status:
+            return Response(
+                {'detail': _('الحالة الجديدة مطلوبة')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        if not project.remaining_tasks().exists():
-            new_status = "completed"
+        with transaction.atomic():
 
-        project.status = new_status
-        project.save()
-        return Response({'status': project.get_status_display()}, status=status.HTTP_200_OK)
+            # Start progress timestamp
+            if new_status == "ongoing" and project.status == "pending-approval":
+                project.progress_started = timezone.now()
+
+            # Force completion if no remaining tasks
+            if not project.remaining_tasks().exists():
+                new_status = "completed"
+
+            project.status = new_status
+            project.save(update_fields=["status", "progress_started"])
+
+            # Create assignment record
+            ProjectAssignment.objects.create(
+                project=project,
+                status=new_status,
+                notes=notes,
+                assigned_by=request.user if request.user.is_authenticated else None,
+                assigned_by_employee=hasattr(request.user, "employee"),
+            )
+
+        return Response(
+            {
+                'status': project.get_status_display(),
+            },
+            status=status.HTTP_200_OK
+        )
 
     @action(detail=True, methods=["get"])
     def detailed(self, request, pk=None):

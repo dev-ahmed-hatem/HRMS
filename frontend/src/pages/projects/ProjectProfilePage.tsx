@@ -18,6 +18,7 @@ import Error from "@/pages/Error";
 import { TabsProps } from "antd/lib";
 import ProjectStatus from "@/components/projects/ProjectStatus";
 import ProjectNotes from "@/components/projects/ProjectNotes";
+import ProjectAssignmentsTimeline from "@/components/projects/ProjectAssignmentsTimeline";
 
 const getTabItems = (project: Project) => {
   const items: TabsProps["items"] = [];
@@ -42,10 +43,16 @@ const getTabItems = (project: Project) => {
     children: <ProjectNotes project={project!} />,
   });
 
+  items.push({
+    label: `الجدول الزمني`,
+    key: "4",
+    children: <ProjectAssignmentsTimeline />,
+  });
+
   if (["قيد التنفيذ", "مكتمل"].includes(project.status)) {
     items.push({
       label: "المهام",
-      key: "4",
+      key: "5",
       children: <ProjectTasks project={project} />,
     });
   }

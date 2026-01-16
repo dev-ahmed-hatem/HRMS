@@ -4,6 +4,8 @@ import qs from "query-string";
 import { PaginatedResponse } from "@/types/paginatedResponse";
 import { TagDescription } from "@reduxjs/toolkit/query";
 import { Project } from "@/types/project";
+import { TaskAssignment } from "@/types/assignments";
+import { QueryParams } from "@/types/query_params";
 
 export const tasksEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -45,14 +47,16 @@ export const tasksEndpoints = api.injectEndpoints({
     }),
     switchTaskState: builder.mutation<
       { status: TaskStatus },
-      { task_id: string; project_id: string }
+      { task_id: string; project_id: string; notes?: string }
     >({
-      query: ({ task_id, project_id }) => ({
+      query: ({ task_id, notes }) => ({
         url: `/projects/tasks/${task_id}/switch_state/`,
-        method: "GET",
+        method: "POST",
+        data: { notes },
       }),
       invalidatesTags: (res, error, arg) => [
         { type: "Task", id: "LIST" },
+        { type: "TaskAssignments", id: "LIST" },
         { type: "Project", id: "LIST" },
         { type: "Project", id: arg.project_id },
       ],
@@ -107,6 +111,16 @@ export const tasksEndpoints = api.injectEndpoints({
         }
       },
     }),
+    getTaskAssignments: builder.query<
+      TaskAssignment[] | PaginatedResponse<TaskAssignment[]>,
+      QueryParams | void
+    >({
+      query: (params) => ({
+        url: `/projects/task-assignments?${qs.stringify(params || {})}`,
+        method: "GET",
+      }),
+      providesTags: [{ type: "TaskAssignments", id: "LIST" }],
+    }),
   }),
 });
 
@@ -116,4 +130,5 @@ export const {
   useGetTaskQuery,
   useSwitchTaskStateMutation,
   useTaskMutation,
+  useGetTaskAssignmentsQuery,
 } = tasksEndpoints;

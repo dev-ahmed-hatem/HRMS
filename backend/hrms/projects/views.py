@@ -7,7 +7,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, action
 from .models import Project, Task, TaskAssignment, ProjectAssignment
 from .serializers import ProjectListSerializer, ProjectWriteSerializer, ProjectReadSerializer, TaskReadSerializer, \
-    TaskWriteSerializer, TaskListSerializer, ProjectAssignmentWriteSerializer, ProjectAssignmentReadSerializer
+    TaskWriteSerializer, TaskListSerializer, ProjectAssignmentWriteSerializer, ProjectAssignmentReadSerializer, \
+    TaskAssignmentWriteSerializer, TaskAssignmentReadSerializer
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.db import transaction
@@ -164,7 +165,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         serializer = TaskReadSerializer(task, context={"request": request}).data
         return Response({**serializer, "project_tasks": project_tasks_serialized}, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['post'])
     def switch_state(self, request, pk=None):
         try:
             task = Task.objects.get(pk=pk)
@@ -188,6 +189,15 @@ class TaskViewSet(viewsets.ModelViewSet):
             task.save()
             if updated_project:
                 project.save()
+
+            notes = request.data.get("notes")
+            TaskAssignment.objects.create(
+                task=task,
+                status=task.status,
+                notes=notes,
+                assigned_by=request.user if request.user.is_authenticated else None,
+                assigned_by_employee=hasattr(request.user, "employee"),
+            )
 
             return Response({"status": task.get_status_display()}, status=status.HTTP_200_OK)
         except Exception:
@@ -290,8 +300,8 @@ class TaskAssignmentViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
-            return TaskWriteSerializer
-        return TaskReadSerializer
+            return TaskAssignmentWriteSerializer
+        return TaskAssignmentReadSerializer
 
     def get_queryset(self):
         queryset = super().get_queryset()

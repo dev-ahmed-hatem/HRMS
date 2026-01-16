@@ -1,14 +1,25 @@
-import React, { useEffect } from "react";
-import { Card, Avatar, Tabs, Button, Tag, Popconfirm, Switch } from "antd";
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Avatar,
+  Tabs,
+  Button,
+  Tag,
+  Popconfirm,
+  Switch,
+  Modal,
+  Input,
+} from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getInitials, isOverdue } from "@/utils";
 import TaskDetails from "@/components/tasks/TaskDetails";
 import RelatedTasks from "@/components/tasks/RelatedTasks";
-import { priorityColors, Task } from "@/types/task";
+import { priorityColors, statusColors, Task } from "@/types/task";
 import { Link, useNavigate, useParams } from "react-router";
 import { useNotification } from "@/providers/NotificationProvider";
 import {
   tasksEndpoints,
+  useGetTaskAssignmentsQuery,
   useGetTaskQuery,
   useSwitchTaskStateMutation,
   useTaskMutation,
@@ -18,6 +29,8 @@ import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import Error from "@/pages/Error";
 import { useAppDispatch } from "@/app/redux/hooks";
 import TaskNotes from "@/components/tasks/TaskNotes";
+import AssignmentsTimeline from "@/components/assignments/AssignmentsTimeline";
+import { TaskAssignment } from "@/types/assignments";
 
 const items = (task: Task) => [
   {
@@ -32,13 +45,38 @@ const items = (task: Task) => [
     children: <TaskNotes task={task!} />,
   },
   {
-    label: "مهام مرتبطة",
+    label: `الجدول الزمني`,
     key: "3",
+    children: (
+      <AssignmentsTimeline<TaskAssignment>
+        title="سجل إسنادات المهمة"
+        emptyText="لا توجد إسنادات للمهمة"
+        statusColors={statusColors}
+        useQuery={() =>
+          useGetTaskAssignmentsQuery({
+            task_id: task.id,
+            no_pagination: true,
+          })
+        }
+      />
+    ),
+  },
+  {
+    label: "مهام مرتبطة",
+    key: "4",
     children: <RelatedTasks task={task} />,
   },
 ];
 
 const TaskProfilePage: React.FC = () => {
+  // for modal
+  const [statusModalOpen, setStatusModalOpen] = useState(false);
+  const [notes, setNotes] = useState<string>("");
+
+  const openStatusModal = () => {
+    setStatusModalOpen(true);
+  };
+
   const navigate = useNavigate();
   const notification = useNotification();
   const { task_id } = useParams();
@@ -75,7 +113,11 @@ const TaskProfilePage: React.FC = () => {
     switchStatus({
       task_id: task?.id as string,
       project_id: task?.project?.id as string,
+      notes: notes,
     });
+
+    setStatusModalOpen(false);
+    setNotes("");
   };
 
   const handleDelete = () => {
@@ -140,6 +182,34 @@ const TaskProfilePage: React.FC = () => {
   }
   return (
     <>
+      {/* modal */}
+      <Modal
+        title="تغيير حالة المهمة"
+        open={statusModalOpen}
+        onCancel={() => {
+          setStatusModalOpen(false);
+          setNotes("");
+        }}
+        onOk={toggleStatus}
+        confirmLoading={switching}
+        okText="تأكيد"
+        cancelText="إلغاء"
+      >
+        <div className="space-y-4">
+          <Tag color={task?.status === "مكتمل" ? "orange" : "green"}>
+            الحالة الجديدة: {task?.status === "مكتمل" ? "غير مكتمل" : "مكتمل"}
+          </Tag>
+
+          <Input.TextArea
+            rows={4}
+            placeholder="ملاحظات (اختياري)"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            allowClear
+          />
+        </div>
+      </Modal>
+
       {/* Task Header */}
       <Card
         className={`shadow-lg rounded-xl  ${
@@ -195,7 +265,7 @@ const TaskProfilePage: React.FC = () => {
           <div className="flex items-center gap-2">
             <Switch
               checked={task!.status === "مكتمل"}
-              onChange={toggleStatus}
+              onChange={openStatusModal}
               checkedChildren="مكتمل"
               unCheckedChildren="غير مكتمل"
               loading={switching}

@@ -46,7 +46,7 @@ const getTabItems = (project: Project) => {
   items.push({
     label: `الجدول الزمني`,
     key: "4",
-    children: <ProjectAssignmentsTimeline />,
+    children: <ProjectAssignmentsTimeline projectId={project.id} />,
   });
 
   if (["قيد التنفيذ", "مكتمل"].includes(project.status)) {

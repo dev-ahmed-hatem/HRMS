@@ -3,6 +3,8 @@ import api from "../apiSlice";
 import { Project, ProjectStatus } from "@/types/project";
 import qs from "query-string";
 import { ProjectsStats } from "@/types/project";
+import { ProjectAssignment } from "@/types/assignments";
+import { QueryParams } from "@/types/query_params";
 
 export const projectsEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -44,14 +46,17 @@ export const projectsEndpoints = api.injectEndpoints({
     }),
     switchProjectStatus: builder.mutation<
       { status: ProjectStatus },
-      { id: string; status: string, notes?: string }
+      { id: string; status: string; notes?: string }
     >({
       query: ({ id, status, notes }) => ({
         url: `/projects/projects/${id}/change_status/`,
         method: "POST",
         data: { status, notes },
       }),
-      invalidatesTags: [{ type: "Project", id: "LIST" }],
+      invalidatesTags: [
+        { type: "Project", id: "LIST" },
+        { type: "ProjectAssignments", id: "LIST" },
+      ],
     }),
     project: builder.mutation<
       Project,
@@ -77,6 +82,16 @@ export const projectsEndpoints = api.injectEndpoints({
         }
       },
     }),
+    getProjectAssignments: builder.query<
+      ProjectAssignment[] | PaginatedResponse<ProjectAssignment[]>,
+      QueryParams | void
+    >({
+      query: (params) => ({
+        url: `/projects/project-assignments?${qs.stringify(params || {})}`,
+        method: "GET",
+      }),
+      providesTags: [{ type: "ProjectAssignments", id: "LIST" }],
+    }),
     deleteProject: builder.mutation<void, string>({
       query: (id) => ({
         url: `/projects/projects/${id}/`,
@@ -91,6 +106,7 @@ export const {
   useGetProjectsStatsQuery,
   useGetProjectsQuery,
   useGetProjectQuery,
+  useGetProjectAssignmentsQuery,
   useProjectMutation,
   useSwitchProjectStatusMutation,
   useDeleteProjectMutation,

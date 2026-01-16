@@ -7,10 +7,10 @@ import {
   Button,
   Tooltip,
   Divider,
-  Badge,
-  Space,
   Input,
   Select,
+  Alert,
+  Spin,
 } from "antd";
 import {
   UserOutlined,
@@ -22,15 +22,11 @@ import {
   HistoryOutlined,
   CrownOutlined,
   CommentOutlined,
-  EyeOutlined,
-  MoreOutlined,
 } from "@ant-design/icons";
 import type { ProjectAssignment } from "@/types/assignments";
 import dayjs from "dayjs";
-import "dayjs/locale/ar";
 import { statusColors } from "@/types/project";
-
-dayjs.locale("ar");
+import { useGetProjectAssignmentsQuery } from "@/app/api/endpoints/projects";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -53,75 +49,17 @@ const getRandomColor = (seed: string): string => {
   return colors[index];
 };
 
-// Mock data for project assignments
-const mockAssignments: ProjectAssignment[] = [
-  {
-    id: 1,
-    project: "مشروع تطوير النظام",
-    status: "قيد التنفيذ",
-    assigned_at: "2024-01-15T10:30:00Z",
-    assigned_by: "أحمد محمد",
-    assigned_by_employee: true,
-  },
-  {
-    id: 2,
-    project: "مشروع تطوير النظام",
-    status: "قيد الموافقة",
-    notes: "تمت الموافقة الأولية على خطة المشروع من قبل الإدارة",
-    assigned_at: "2024-01-10T14:20:00Z",
-    assigned_by: "المدير العام",
-    assigned_by_employee: false,
-  },
-  {
-    id: 3,
-    project: "مشروع تطوير النظام",
-    status: "مكتمل",
-    notes: "تم الانتهاء من مرحلة التخطيط والتحليل",
-    assigned_at: "2024-01-05T09:15:00Z",
-    assigned_by: "سارة عبدالله",
-    assigned_by_employee: true,
-  },
-  {
-    id: 4,
-    project: "مشروع تطوير النظام",
-    status: "متوقف",
-    notes: "توقف مؤقت بسبب مشاكل في الميزانية",
-    assigned_at: "2023-12-28T16:45:00Z",
-    assigned_by: "مدير المشاريع",
-    assigned_by_employee: false,
-  },
-  {
-    id: 5,
-    project: "مشروع تطوير النظام",
-    status: "قيد التنفيذ",
-    notes: "بدء مرحلة التطوير الفعلي للمشروع",
-    assigned_at: "2023-12-20T11:00:00Z",
-    assigned_by: "محمد علي",
-    assigned_by_employee: true,
-  },
-  {
-    id: 6,
-    project: "مشروع تطوير النظام",
-    status: "قيد التنفيذ",
-    notes: "تعيين فريق الجودة للاختبارات",
-    assigned_at: "2023-12-15T13:30:00Z",
-    assigned_by: "خالد فهد",
-    assigned_by_employee: true,
-  },
-  {
-    id: 7,
-    project: "مشروع تطوير النظام",
-    status: "مكتمل",
-    notes: "إغلاق المرحلة الأولى بنجاح",
-    assigned_at: "2023-12-10T08:45:00Z",
-    assigned_by: "المشرف العام",
-    assigned_by_employee: false,
-  },
-];
+const ProjectAssignmentsTimeline: React.FC<{ projectId: string }> = ({
+  projectId,
+}: {
+  projectId: string;
+}) => {
+  const { data, isFetching, isError, refetch } = useGetProjectAssignmentsQuery({
+    no_pagination: true,
+    project_id: projectId,
+  });
 
-const ProjectAssignmentsTimeline: React.FC = () => {
-  const [assignments, setAssignments] =
-    useState<ProjectAssignment[]>(mockAssignments);
+  const assignments = (data ?? []) as ProjectAssignment[];
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [assignedByFilter, setAssignedByFilter] = useState<string>("all");
@@ -328,6 +266,51 @@ const ProjectAssignmentsTimeline: React.FC = () => {
   const staffAssignments = assignments.filter(
     (a) => !a.assigned_by_employee
   ).length;
+
+  if (isFetching)
+    return (
+      <Card title="سجل الإسنادات">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: 300,
+          }}
+        >
+          <Spin
+            size="large"
+            tip="جاري تحميل سجل الإسنادات..."
+            style={{ color: "#1890ff" }}
+          />
+        </div>
+      </Card>
+    );
+
+  if (isError)
+    return (
+      <Card title="سجل الإسنادات" className="w-full">
+        <div className="flex justify-center items-center p-4 md:p-8 lg:p-12 xl:p-16">
+          <Alert
+            message="خطأ في تحميل البيانات"
+            description="حدث خطأ أثناء تحميل سجل إسنادات المشروع. يرجى المحاولة مرة أخرى."
+            type="error"
+            showIcon
+            className="w-full max-w-2xl"
+            action={
+              <Button
+                type="primary"
+                onClick={() => refetch()}
+                loading={isFetching}
+                className="mt-4 md:mt-0 md:mr-4"
+              >
+                إعادة المحاولة
+              </Button>
+            }
+          />
+        </div>
+      </Card>
+    );
 
   return (
     <div className="p-4 space-y-6">

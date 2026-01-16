@@ -23,13 +23,26 @@ import {
   CrownOutlined,
   CommentOutlined,
 } from "@ant-design/icons";
-import type { ProjectAssignment } from "@/types/assignments";
+import type { BaseAssignment, ProjectAssignment } from "@/types/assignments";
 import dayjs from "dayjs";
 import { statusColors } from "@/types/project";
 import { useGetProjectAssignmentsQuery } from "@/app/api/endpoints/projects";
+import { PaginatedResponse } from "@/types/paginatedResponse";
 
 const { Search } = Input;
 const { Option } = Select;
+
+interface AssignmentsTimelineProps<T extends BaseAssignment> {
+  title: string;
+  emptyText: string;
+  useQuery: () => {
+    data?: T[] | PaginatedResponse<T[]>;
+    isFetching: boolean;
+    isError: boolean;
+    refetch: () => void;
+  };
+  statusColors: Record<string, string>;
+}
 
 // Generate random pastel colors for assignments
 const getRandomColor = (seed: string): string => {
@@ -49,17 +62,15 @@ const getRandomColor = (seed: string): string => {
   return colors[index];
 };
 
-const ProjectAssignmentsTimeline: React.FC<{ projectId: string }> = ({
-  projectId,
-}: {
-  projectId: string;
-}) => {
-  const { data, isFetching, isError, refetch } = useGetProjectAssignmentsQuery({
-    no_pagination: true,
-    project_id: projectId,
-  });
+export function AssignmentsTimeline<T extends BaseAssignment>({
+  title,
+  emptyText,
+  useQuery,
+  statusColors,
+}: AssignmentsTimelineProps<T>) {
+  const { data, isFetching, isError, refetch } = useQuery();
+  const assignments = (data ?? []) as T[];
 
-  const assignments = (data ?? []) as ProjectAssignment[];
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [assignedByFilter, setAssignedByFilter] = useState<string>("all");
@@ -269,7 +280,7 @@ const ProjectAssignmentsTimeline: React.FC<{ projectId: string }> = ({
 
   if (isFetching)
     return (
-      <Card title="سجل الإسنادات">
+      <Card title={title}>
         <div
           style={{
             display: "flex",
@@ -289,7 +300,7 @@ const ProjectAssignmentsTimeline: React.FC<{ projectId: string }> = ({
 
   if (isError)
     return (
-      <Card title="سجل الإسنادات" className="w-full">
+      <Card title={title} className="w-full">
         <div className="flex justify-center items-center p-4 md:p-8 lg:p-12 xl:p-16">
           <Alert
             message="خطأ في تحميل البيانات"
@@ -319,11 +330,9 @@ const ProjectAssignmentsTimeline: React.FC<{ projectId: string }> = ({
         <div>
           <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
             <HistoryOutlined className="text-blue-500" />
-            سجل إسنادات المشروع
+            {title}
           </h2>
-          <p className="text-gray-600">
-            عرض جميع عمليات الإسناد المرتبطة بهذا المشروع
-          </p>
+          <p className="text-gray-600">عرض جميع الإسنادات المرتبطة</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -454,9 +463,7 @@ const ProjectAssignmentsTimeline: React.FC<{ projectId: string }> = ({
           <h3 className="text-lg font-medium text-gray-600 mb-2">
             لا توجد إسنادات
           </h3>
-          <p className="text-gray-500">
-            لم يتم إجراء أي إسنادات لهذا المشروع بعد
-          </p>
+          <p className="text-gray-500">{emptyText}</p>
         </Card>
       ) : viewMode === "timeline" ? (
         <Timeline
@@ -498,6 +505,6 @@ const ProjectAssignmentsTimeline: React.FC<{ projectId: string }> = ({
       </Card>
     </div>
   );
-};
+}
 
-export default ProjectAssignmentsTimeline;
+export default AssignmentsTimeline;

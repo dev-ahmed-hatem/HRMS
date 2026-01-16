@@ -12,12 +12,13 @@ export type ProjectStatusDisplay =
 export type TaskStatus = "completed" | "incomplete";
 export type TaskStatusDisplay = "مكتمل" | "غير مكتمل";
 
-interface BaseAssignment {
+export interface BaseAssignment {
   id: number;
   notes?: string;
   assigned_at: string;
   assigned_by: string;
   assigned_by_employee: boolean;
+  status: string;
 }
 
 export interface ProjectAssignment extends BaseAssignment {

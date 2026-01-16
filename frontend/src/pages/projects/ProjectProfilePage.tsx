@@ -4,12 +4,13 @@ import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getInitials, isOverdue } from "@/utils";
 import ProjectDetails from "@/components/projects/ProjectDetails";
 import TasksOverview from "@/components/tasks/TasksOverview";
-import { Project } from "@/types/project";
+import { Project, statusColors } from "@/types/project";
 import ProjectTasks from "@/components/projects/ProjectTasks";
 import { useNavigate, useParams } from "react-router";
 import { useNotification } from "@/providers/NotificationProvider";
 import {
   useDeleteProjectMutation,
+  useGetProjectAssignmentsQuery,
   useGetProjectQuery,
 } from "@/app/api/endpoints/projects";
 import Loading from "@/components/Loading";
@@ -18,7 +19,8 @@ import Error from "@/pages/Error";
 import { TabsProps } from "antd/lib";
 import ProjectStatus from "@/components/projects/ProjectStatus";
 import ProjectNotes from "@/components/projects/ProjectNotes";
-import ProjectAssignmentsTimeline from "@/components/projects/ProjectAssignmentsTimeline";
+import { AssignmentsTimeline } from "@/components/assignments/AssignmentsTimeline";
+import { ProjectAssignment } from "@/types/assignments";
 
 const getTabItems = (project: Project) => {
   const items: TabsProps["items"] = [];
@@ -46,7 +48,19 @@ const getTabItems = (project: Project) => {
   items.push({
     label: `الجدول الزمني`,
     key: "4",
-    children: <ProjectAssignmentsTimeline projectId={project.id} />,
+    children: (
+      <AssignmentsTimeline<ProjectAssignment>
+        title="سجل إسنادات المشروع"
+        emptyText="لا توجد إسنادات للمشروع"
+        statusColors={statusColors}
+        useQuery={() =>
+          useGetProjectAssignmentsQuery({
+            project_id: project.id,
+            no_pagination: true,
+          })
+        }
+      />
+    ),
   });
 
   if (["قيد التنفيذ", "مكتمل"].includes(project.status)) {

@@ -206,6 +206,9 @@ class Task(AbstractBaseModel):
         verbose_name=_("ملاحظات"),
     )
 
+    completed_at = models.DateTimeField(null=True, blank=True,
+                                        verbose_name=_("تاريخ الإكتمال"))
+
     class Meta:
         verbose_name = _("مهمة")
         verbose_name_plural = _("المهام")

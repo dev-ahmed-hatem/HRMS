@@ -6,6 +6,7 @@ import qs from "query-string";
 import { User } from "@/types/user";
 import { Project } from "@/types/project";
 import { Task } from "@/types/task";
+import { DashboardData } from "@/types/dashboard";
 
 export const employeesEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -161,6 +162,11 @@ export const employeesEndpoints = api.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    getEmployeeDashboardData: builder.query<DashboardData, number>({
+      query: (id) => ({
+        url: `/employees/employees/${id}/dashboard_data/`,
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -180,4 +186,5 @@ export const {
   useCreateEmployeeAccountMutation,
   useChangeEmployeeAccountPasswordMutation,
   useDeleteEmployeeAccountMutation,
+  useGetEmployeeDashboardDataQuery,
 } = employeesEndpoints;

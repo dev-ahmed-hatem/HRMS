@@ -99,7 +99,7 @@ const PortalBanner = () => {
                     icon={<ClockCircleOutlined />}
                     className="text-sm md:text-base lg:text-lg px-3 lg:px-4 py-1 rounded-full"
                   >
-                    منذ {dayjs(employee.hire_date).format("YYYY-MM-DD")}
+                    منذ {dayjs(employee.hire_date).format("DD-MM-YYYY")}
                   </Tag>
                 )}
               </div>

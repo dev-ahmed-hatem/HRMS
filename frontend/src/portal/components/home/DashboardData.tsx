@@ -31,11 +31,16 @@ import {
   CrownOutlined,
   EditOutlined,
   LogoutOutlined,
+  WarningOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { logout } from "@/components/navbar/UserMenu";
 import { MdAssignment } from "react-icons/md";
 import { type DashboardData } from "@/types/dashboard";
+import EmptyState from "../EmptyState";
+import { useGetEmployeeDashboardDataQuery } from "@/app/api/endpoints/employees";
+import { useAppSelector } from "@/app/redux/hooks";
+import Loading from "@/components/Loading";
 
 const MOCK_DASHBOARD: DashboardData = {
   performance_score: 87,
@@ -74,21 +79,14 @@ const MOCK_DASHBOARD: DashboardData = {
         status: "غير مكتمل",
         priority: "مرتفع",
         due_date: dayjs().toISOString(), // today
-        project: {
-          id: 1,
-          name: "بوابة الموظفين",
-        },
+        project: "بوابة الموظفين",
       },
       {
         id: 5,
         title: "إصلاح مشكلة الأداء",
-        status: "غير مكتمل",
+        status: "مكتمل",
         priority: "مرتفع",
         due_date: dayjs().subtract(2, "day").toISOString(), // overdue
-        project: {
-          id: 2,
-          name: "نظام التقارير",
-        },
       },
     ],
 
@@ -99,21 +97,14 @@ const MOCK_DASHBOARD: DashboardData = {
         status: "غير مكتمل",
         priority: "متوسط",
         due_date: dayjs().add(1, "day").toISOString(),
-        project: {
-          id: 1,
-          name: "بوابة الموظفين",
-        },
+        project: "بوابة الموظفين",
       },
       {
         id: 4,
         title: "كتابة اختبارات الوحدة",
-        status: "غير مكتمل",
+        status: "مكتمل",
         priority: "منخفض",
         due_date: dayjs().add(3, "day").toISOString(),
-        project: {
-          id: 3,
-          name: "نظام التقارير",
-        },
       },
     ],
   },
@@ -168,16 +159,19 @@ const MOCK_DASHBOARD: DashboardData = {
 const DashboardData = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"today" | "upcoming">("today");
+  const employee = useAppSelector((state) => state.employee.employee)!;
+  const { data, isFetching, isError, refetch } =
+    useGetEmployeeDashboardDataQuery(employee.id);
 
-  const dashboard: DashboardData = MOCK_DASHBOARD;
+  const dashboard = data!;
 
   const today = dayjs();
 
   const projectProgress = dashboard?.projects?.active
     ? Math.round(
-        (dashboard.projects?.completed_tasks || 0) /
-          dashboard.projects?.total_tasks || 1
-      ) * 100
+        ((dashboard.projects?.completed_tasks || 0) /
+          dashboard.projects?.total_tasks || 1) * 100
+      )
     : 0;
 
   // Get priority tasks
@@ -196,11 +190,27 @@ const DashboardData = () => {
     }
 
     if (date.isBefore(today, "day")) {
-      return <Tag color="red">متأخرة · {date.format("DD/MM")}</Tag>;
+      return <Tag color="red">متأخرة · {date.format("YYYY-MM-DD")}</Tag>;
     }
 
-    return <Tag color="default">{date.format("DD/MM")}</Tag>;
+    return <Tag color="default">{date.format("YYYY-MM-DD")}</Tag>;
   };
+
+  if (isFetching) return <Loading />;
+  if (isError) {
+    return (
+      <EmptyState
+        icon={<WarningOutlined />}
+        title="تعذر تحميل البيانات"
+        description="حدث خطأ أثناء تحميل بيانات الصفحة الرئيسية. يرجى المحاولة مرة أخرى."
+        actions={
+          <Button type="primary" onClick={() => refetch()}>
+            إعادة المحاولة
+          </Button>
+        }
+      />
+    );
+  }
 
   return (
     <>
@@ -236,6 +246,9 @@ const DashboardData = () => {
               trailColor="rgba(255,255,255,0.12)"
               size="small"
               className="mt-4"
+              format={(percent) => (
+                <span style={{ color: "white" }}>{percent}%</span>
+              )}
             />
           </Card>
         </Col>
@@ -270,6 +283,9 @@ const DashboardData = () => {
               trailColor="rgba(255,255,255,0.12)"
               size="small"
               className="mt-4"
+              format={(percent) => (
+                <span style={{ color: "white" }}>{percent}%</span>
+              )}
             />
           </Card>
         </Col>
@@ -386,7 +402,7 @@ const DashboardData = () => {
       >
         {activeTab === "today" ? (
           <List
-            dataSource={dashboard.tasks.today_focus}
+            dataSource={dashboard?.tasks.today_focus}
             renderItem={(task) => (
               <List.Item
                 className="cursor-pointer hover:bg-gray-50 p-4 rounded-lg transition-colors"
@@ -434,7 +450,7 @@ const DashboardData = () => {
                         {task.project && (
                           <span className="flex items-center gap-1">
                             <ProjectOutlined />
-                            {task.project.name}
+                            {task.project}
                           </span>
                         )}
                       </div>
@@ -443,9 +459,17 @@ const DashboardData = () => {
                 />
               </List.Item>
             )}
-            locale={{ emptyText: "لا توجد مهام حالياً 🎯" }}
+            locale={{
+              emptyText: (
+                <EmptyState
+                  icon={<CheckCircleOutlined />}
+                  title="لا توجد مهام لليوم"
+                  description="جميع مهامك مكتملة أو لا توجد مهام مستحقة حالياً"
+                />
+              ),
+            }}
           />
-        ) : (
+        ) : dashboard.tasks.upcoming.length > 0 ? (
           <Timeline
             items={dashboard.tasks.upcoming.map((task) => ({
               color:
@@ -461,17 +485,41 @@ const DashboardData = () => {
                 >
                   <div className="flex justify-between items-center">
                     <span className="font-medium">{task.title}</span>
-                    {renderTaskDate(task.due_date)}
+                    <Tag
+                      color={task.status === "مكتمل" ? "success" : "processing"}
+                    >
+                      {task.status}
+                    </Tag>
                   </div>
 
-                  {task.project && (
-                    <div className="text-gray-600 text-sm mt-1">
-                      {task.project.name}
+                  <div className="space-y-2">
+                    {task.description && (
+                      <div className="text-gray-600">{task.description}</div>
+                    )}
+
+                    <div className="flex flex-wrap gap-3 text-sm text-gray-500 mt-1">
+                      <span className="flex items-center gap-1">
+                        <CalendarOutlined />
+                        {renderTaskDate(task.due_date)}
+                      </span>
+
+                      {task.project && (
+                        <span className="flex items-center gap-1">
+                          <ProjectOutlined />
+                          {task.project}
+                        </span>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
               ),
             }))}
+          />
+        ) : (
+          <EmptyState
+            icon={<CheckCircleOutlined />}
+            title="لا توجد مهام قادمة"
+            description="لم يتم تعيين مهام قادمة بعد"
           />
         )}
       </Card>
@@ -511,6 +559,8 @@ const DashboardData = () => {
                           ? "processing"
                           : project.status === "قيد الموافقة"
                           ? "warning"
+                          : project.status === "متوقف"
+                          ? "error"
                           : "success"
                       }
                       text={project.status}
@@ -532,10 +582,15 @@ const DashboardData = () => {
                     )}
 
                     <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <CalendarOutlined />
-                        <span>ينتهي {dayjs(project.end_date).fromNow()}</span>
-                      </div>
+                      {project.end_date && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <CalendarOutlined />
+                          <span>
+                            تاريخ الانتهاء{" "}
+                            {dayjs(project.end_date).format("YYYY-MM-DD")}
+                          </span>
+                        </div>
+                      )}
                       <div className="flex items-center gap-2 text-gray-600">
                         <TeamOutlined />
                         <span>{project.team_size || 1} عضو في الفريق</span>
@@ -550,7 +605,7 @@ const DashboardData = () => {
               dashboard.projects.active_projects.length === 0) && (
               <div className="text-center py-8 text-gray-500">
                 <ProjectOutlined className="text-4xl mb-4 text-gray-300" />
-                <div>لا توجد مشاريع نشطة حالياً</div>
+                <div>انت غير معين بأي مشروع حالياً</div>
               </div>
             )}
           </Card>

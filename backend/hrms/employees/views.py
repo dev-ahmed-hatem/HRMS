@@ -168,26 +168,15 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         except Employee.DoesNotExist:
             return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=True, methods=['patch'])
-    def update_user_account(self, request, pk=None):
-        employee = self.get_object()
-
-        if not hasattr(employee, 'user'):
-            return Response(
-                {'error': 'Employee does not have a user account'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        return Response()
-
-        user = employee.user
-        serializer = UserUpdateSerializer(user, data=request.data, partial=True)
-
-        if serializer.is_valid():
-            serializer.save()
+    @action(detail=True, methods=['get'])
+    def dashboard_data(self, request, pk=None):
+        try:
+            employee = Employee.objects.get(id=pk)
+            serializer = EmployeeDashboardSerializer(employee, context={'request': request})
             return Response(serializer.data)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Employee.DoesNotExist:
+            return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=True, methods=['post'])
     def change_password(self, request, pk=None):

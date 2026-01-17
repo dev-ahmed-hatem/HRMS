@@ -114,9 +114,10 @@ class TaskWriteSerializer(serializers.ModelSerializer):
         task = super(TaskWriteSerializer, self).create(validated_data)
 
         # mark project as ongoing if it is completed
-        if task.project.status == "completed":
-            task.project.status = "ongoing"
-            task.project.save()
+        if hasattr(task, "project"):
+            if task.project.status == "completed":
+                task.project.status = "ongoing"
+                task.project.save()
 
         auth_user = self.context['request'].user
         task.created_by = auth_user
@@ -127,7 +128,7 @@ class TaskWriteSerializer(serializers.ModelSerializer):
         return [{"name": emp.name, "id": emp.id, "is_active": emp.is_active} for emp in obj.assigned_to.all()]
 
     def get_current_project(self, obj: Task):
-        return {"name": obj.project.name, "id": obj.project.id}
+        return {"name": obj.project.name, "id": obj.project.id} if obj.project else None
 
 
 class BaseAssignmentReadSerializer(serializers.ModelSerializer):

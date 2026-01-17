@@ -55,7 +55,7 @@ const getTabItems = (project: Project) => {
         statusColors={statusColors}
         useQuery={() =>
           useGetProjectAssignmentsQuery({
-            project_id: project.id,
+            project: project.id,
             no_pagination: true,
           })
         }

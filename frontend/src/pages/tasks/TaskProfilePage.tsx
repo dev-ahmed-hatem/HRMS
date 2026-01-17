@@ -54,7 +54,7 @@ const items = (task: Task) => [
         statusColors={statusColors}
         useQuery={() =>
           useGetTaskAssignmentsQuery({
-            task_id: task.id,
+            task: task.id,
             no_pagination: true,
           })
         }

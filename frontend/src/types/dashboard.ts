@@ -10,10 +10,7 @@ export interface DashboardTask {
   status: TaskStatus;
   priority: TaskPriority;
   due_date: string;
-  project?: {
-    id: number | string;
-    name: string;
-  };
+  project?: string;
 }
 
 export interface DashboardProject {

@@ -174,12 +174,14 @@ class TaskViewSet(viewsets.ModelViewSet):
 
             if task.status == "completed":
                 task.status = "incomplete"
+                task.completed_at = None
                 # Downgrade project status only if it was marked as completed
                 if project.status == "completed":
                     project.status = "ongoing"
                     updated_project = True
             else:
                 task.status = "completed"
+                task.completed_at = timezone.now()
                 # Check if this was the last incomplete task
                 has_remaining_tasks = project.remaining_tasks().exclude(pk=task.pk).exists()
                 if not has_remaining_tasks:
@@ -209,7 +211,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             task = Task.objects.get(id=pk)
             serializer = TaskWriteSerializer(task, context={"request": self.request}).data
             return Response(serializer)
-        except Exception:
+        except Task.DoesNotExist:
             return Response({'detail': _('مهمة غير موجودة')}, status=status.HTTP_404_NOT_FOUND)
 
 

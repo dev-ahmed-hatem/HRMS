@@ -176,17 +176,18 @@ class TaskViewSet(viewsets.ModelViewSet):
                 task.status = "incomplete"
                 task.completed_at = None
                 # Downgrade project status only if it was marked as completed
-                if project.status == "completed":
+                if project and project.status == "completed":
                     project.status = "ongoing"
                     updated_project = True
             else:
                 task.status = "completed"
                 task.completed_at = timezone.now()
                 # Check if this was the last incomplete task
-                has_remaining_tasks = project.remaining_tasks().exclude(pk=task.pk).exists()
-                if not has_remaining_tasks:
-                    project.status = "completed"
-                    updated_project = True
+                if project:
+                    has_remaining_tasks = project.remaining_tasks().exclude(pk=task.pk).exists()
+                    if not has_remaining_tasks:
+                        project.status = "completed"
+                        updated_project = True
 
             task.save()
             if updated_project:
@@ -202,7 +203,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             )
 
             return Response({"status": task.get_status_display()}, status=status.HTTP_200_OK)
-        except Exception:
+        except Task.DoesNotExist:
             return Response({'detail': _('مهمة غير موجودة')}, status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=True, methods=['get'])

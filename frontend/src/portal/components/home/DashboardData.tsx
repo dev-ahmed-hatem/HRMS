@@ -32,6 +32,8 @@ import {
   EditOutlined,
   LogoutOutlined,
   WarningOutlined,
+  ExclamationCircleOutlined,
+  MinusCircleOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { logout } from "@/components/navbar/UserMenu";
@@ -176,21 +178,26 @@ const DashboardData = () => {
 
   // Get priority tasks
   const highPriorityTasks =
-    dashboard?.tasks?.upcoming?.filter((t) => t.priority === "مرتفع") || [];
+    dashboard?.tasks?.today_focus?.filter((t) => t.priority === "مرتفع") || [];
   const overdueTasks =
-    dashboard?.tasks?.upcoming?.filter((t) =>
-      dayjs(t.due_date).isBefore(today, "day")
+    dashboard?.tasks?.today_focus?.filter(
+      (t) =>
+        dayjs(t.due_date).isBefore(today, "day") && t.status === "غير مكتمل"
     ) || [];
 
   const renderTaskDate = (dueDate: string) => {
     const date = dayjs(dueDate);
+
+    if (date.isAfter(today, "day")) {
+      return <Tag color="purple">{date.format("YYYY-MM-DD")}</Tag>;
+    }
 
     if (date.isSame(today, "day")) {
       return <Tag color="blue">اليوم</Tag>;
     }
 
     if (date.isBefore(today, "day")) {
-      return <Tag color="red">متأخرة · {date.format("YYYY-MM-DD")}</Tag>;
+      return <Tag color="red">متأخرة · {date.format("DD-MM-YYYY")}</Tag>;
     }
 
     return <Tag color="default">{date.format("YYYY-MM-DD")}</Tag>;
@@ -420,7 +427,15 @@ const DashboardData = () => {
                     : "bg-green-500"
                 }`}
                     >
-                      {task.priority === "مرتفع" ? "!" : "✓"}
+                      {task.status === "مكتمل" ? (
+                        "✓"
+                      ) : task.priority === "مرتفع" ? (
+                        <FireOutlined />
+                      ) : task.priority === "متوسط" ? (
+                        <ExclamationCircleOutlined />
+                      ) : (
+                        <MinusCircleOutlined />
+                      )}
                     </div>
                   }
                   title={

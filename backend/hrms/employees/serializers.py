@@ -125,7 +125,7 @@ class EmployeeDashboardSerializer(serializers.ModelSerializer):
     # Tasks
     # ---------------------------
     def get_tasks(self, obj):
-        today = timezone.now().date()
+        today = datetime.now(settings.CAIRO_TZ).date()
         tasks_qs = obj.tasks.all().order_by('due_date', 'priority')
         total = tasks_qs.count()
         completed = tasks_qs.filter(status='completed').count()
@@ -144,9 +144,9 @@ class EmployeeDashboardSerializer(serializers.ModelSerializer):
                 "project": task.project.name if task.project else None,
             }
 
-            if task.due_date == today:
+            if task.due_date <= today:
                 today_focus.append(task_data)
-            elif task.due_date > today or task.status != 'completed':
+            else:
                 upcoming.append(task_data)
 
         return {

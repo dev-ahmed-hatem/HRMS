@@ -15,10 +15,12 @@ export const logout = () => {
 const UserMenu = ({
   photo,
   name,
+  settingsUrl,
   close,
 }: {
   photo?: string | null;
   name?: string | null;
+  settingsUrl?: string;
   close?: Function;
 }) => {
   const navigate = useNavigate();
@@ -46,7 +48,7 @@ const UserMenu = ({
             flex w-full justify-center items-center h-9 text-gray-700 hover:bg-calypso-50
             hover:text-calypso font-medium"
             onClick={() => {
-              navigate("/settings");
+              navigate(settingsUrl ?? "/settings");
               if (close) close();
             }}
             icon={<SettingOutlined className="ml-1" />}

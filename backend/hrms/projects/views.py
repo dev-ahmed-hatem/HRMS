@@ -273,12 +273,12 @@ class ProjectAssignmentViewSet(viewsets.ModelViewSet):
         queryset = super().get_queryset()
 
         # Filter by project
-        project_id = self.request.query_params.get('project_id')
+        project_id = self.request.query_params.get('project')
         if project_id:
             queryset = queryset.filter(project_id=project_id)
 
         # Filter by user
-        assigned_by_id = self.request.query_params.get('assigned_by_id')
+        assigned_by_id = self.request.query_params.get('assigned_by')
         if assigned_by_id:
             queryset = queryset.filter(assigned_by_id=assigned_by_id)
 
@@ -307,12 +307,12 @@ class TaskAssignmentViewSet(viewsets.ModelViewSet):
         queryset = super().get_queryset()
 
         # Filter by project
-        task_id = self.request.query_params.get('task_id')
+        task_id = self.request.query_params.get('task')
         if task_id:
             queryset = queryset.filter(task_id=task_id)
 
         # Filter by user
-        assigned_by_id = self.request.query_params.get('assigned_by_id')
+        assigned_by_id = self.request.query_params.get('assigned_by')
         if assigned_by_id:
             queryset = queryset.filter(assigned_by_id=assigned_by_id)
 

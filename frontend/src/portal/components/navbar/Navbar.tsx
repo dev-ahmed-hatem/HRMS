@@ -65,6 +65,7 @@ const Navbar = ({
             <UserMenu
               name={employee?.name ?? user?.name}
               photo={employee?.image}
+              settingsUrl={user?.is_staff ? "/settings" : "/portal/settings"}
               close={() => setOpen(false)}
             />
           }

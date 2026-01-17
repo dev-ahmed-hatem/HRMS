@@ -19,6 +19,7 @@ export interface BaseAssignment {
   assigned_by: string;
   assigned_by_employee: boolean;
   status: string;
+  image?: string;
 }
 
 export interface ProjectAssignment extends BaseAssignment {

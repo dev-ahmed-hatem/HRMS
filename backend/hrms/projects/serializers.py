@@ -130,23 +130,42 @@ class TaskWriteSerializer(serializers.ModelSerializer):
         return {"name": obj.project.name, "id": obj.project.id}
 
 
-# Assignments Serializers
-# Project Assignments Serializer
-class ProjectAssignmentReadSerializer(serializers.ModelSerializer):
+class BaseAssignmentReadSerializer(serializers.ModelSerializer):
     assigned_by = serializers.SerializerMethodField()
-    status = serializers.StringRelatedField(source='get_status_display')
+    status = serializers.StringRelatedField(source="get_status_display")
+    image = serializers.SerializerMethodField()
 
     class Meta:
-        model = ProjectAssignment
-        fields = '__all__'
-        read_only_fields = ['id', 'assigned_at']
+        abstract = True
+        read_only_fields = ["id", "assigned_at"]
 
     def get_assigned_by(self, obj):
-        user = self.context['request'].user
-        name = user.employee.name if hasattr(user, "employee") else user.name
-        if obj.assigned_by:
-            return name
+        if not obj.assigned_by:
+            return None
+
+        user = obj.assigned_by
+        if hasattr(user, "employee"):
+            return user.employee.name
+        return user.name
+
+    def get_image(self, obj):
+        if obj.assigned_by_employee and hasattr(obj.assigned_by, "employee"):
+            employee = obj.assigned_by.employee
+            if employee.image:
+                return self.context['request'].build_absolute_uri(employee.image.url)
         return None
+
+
+class ProjectAssignmentReadSerializer(BaseAssignmentReadSerializer):
+    class Meta(BaseAssignmentReadSerializer.Meta):
+        model = ProjectAssignment
+        fields = "__all__"
+
+
+class TaskAssignmentReadSerializer(BaseAssignmentReadSerializer):
+    class Meta(BaseAssignmentReadSerializer.Meta):
+        model = TaskAssignment
+        fields = "__all__"
 
 
 class ProjectAssignmentWriteSerializer(serializers.ModelSerializer):
@@ -169,22 +188,6 @@ class ProjectAssignmentWriteSerializer(serializers.ModelSerializer):
 
 
 # Task Assignments Serializer
-class TaskAssignmentReadSerializer(serializers.ModelSerializer):
-    assigned_by = serializers.SerializerMethodField()
-    status = serializers.StringRelatedField(source='get_status_display')
-
-    class Meta:
-        model = TaskAssignment
-        fields = '__all__'
-        read_only_fields = ['id', 'assigned_at']
-
-    def get_assigned_by(self, obj):
-        user = self.context['request'].user
-        name = user.employee.name if hasattr(user, "employee") else user.name
-        if obj.assigned_by:
-            return name
-        return None
-
 
 class TaskAssignmentWriteSerializer(serializers.ModelSerializer):
     class Meta:

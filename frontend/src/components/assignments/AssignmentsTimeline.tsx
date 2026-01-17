@@ -23,10 +23,8 @@ import {
   CrownOutlined,
   CommentOutlined,
 } from "@ant-design/icons";
-import type { BaseAssignment, ProjectAssignment } from "@/types/assignments";
+import type { BaseAssignment } from "@/types/assignments";
 import dayjs from "dayjs";
-import { statusColors } from "@/types/project";
-import { useGetProjectAssignmentsQuery } from "@/app/api/endpoints/projects";
 import { PaginatedResponse } from "@/types/paginatedResponse";
 
 const { Search } = Input;
@@ -104,17 +102,25 @@ export function AssignmentsTimeline<T extends BaseAssignment>({
       color: statusColors[assignment.status] || "gray",
       dot: (
         <div className="relative">
-          <Avatar
-            size={40}
-            className={`${bgColorClass} border-2 border-white shadow-md`}
-            icon={
-              assignment.assigned_by_employee ? (
-                <UserOutlined />
-              ) : (
-                <CrownOutlined />
-              )
-            }
-          />
+          {assignment.image ? (
+            <Avatar
+              size={40}
+              className={`${bgColorClass} border-2 border-white shadow-md`}
+              src={assignment.image}
+            />
+          ) : (
+            <Avatar
+              size={40}
+              className={`${bgColorClass} border-2 border-white shadow-md`}
+              icon={
+                assignment.assigned_by_employee ? (
+                  <UserOutlined />
+                ) : (
+                  <CrownOutlined />
+                )
+              }
+            />
+          )}
         </div>
       ),
       children: (
@@ -402,7 +408,9 @@ export function AssignmentsTimeline<T extends BaseAssignment>({
         <Card className="bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200">
           <div className="text-center">
             <div className="text-3xl font-bold text-purple-600">
-              {dayjs(assignments[0]?.assigned_at).format("YYYY-MM-DD")}
+              {assignments.length > 0
+                ? dayjs(assignments[0]?.assigned_at).format("YYYY-MM-DD")
+                : "-"}
             </div>
             <div className="text-purple-800 font-medium">آخر إسناد</div>
           </div>

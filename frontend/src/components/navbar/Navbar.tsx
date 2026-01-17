@@ -67,6 +67,7 @@ const Navbar = ({
               name={employee?.name ?? user?.name}
               photo={employee?.image}
               close={() => setOpen(false)}
+              settingsUrl={user?.is_staff ? "/settings" : "/portal/settings"}
             />
           }
           title={

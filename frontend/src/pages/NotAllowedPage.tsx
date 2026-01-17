@@ -28,7 +28,7 @@ const NotAllowedPage = ({
 
       {/* Subtitle */}
       <p className="text-lg text-gray-600 mb-8 max-w-md">
-        {subtitle || "عذرًا، ليس لديك الصلاحية للوصول إلى هذه الصفحة."}
+        {subtitle || "عذرًا .. ليس لديك الصلاحية للوصول إلى هذه الصفحة."}
       </p>
 
       {/* Action Buttons */}

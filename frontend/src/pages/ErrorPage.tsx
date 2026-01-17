@@ -24,8 +24,8 @@ const ErrorPage = ({
         {subtitle !== undefined
           ? subtitle
           : notFound
-          ? "عذرًا، الصفحة التي تحاول الوصول إليها غير موجودة."
-          : "حدث خطأ غير متوقع. الرجاء إعادة المحاولة لاحقًا."}
+          ? "عذرًا .. الصفحة التي تحاول الوصول إليها غير موجودة."
+          : "حدث خطأ غير متوقع .. الرجاء إعادة المحاولة لاحقًا."}
       </p>
       <div className="flex gap-4 flex-wrap justify-center">
         {reload && !notFound && (

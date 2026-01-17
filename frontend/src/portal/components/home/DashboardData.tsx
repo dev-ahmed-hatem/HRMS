@@ -35,19 +35,143 @@ import {
 import dayjs from "dayjs";
 import { logout } from "@/components/navbar/UserMenu";
 import { MdAssignment } from "react-icons/md";
+import { type DashboardData } from "@/types/dashboard";
 
-const DashboardData = ({ data }: { data: any }) => {
+const MOCK_DASHBOARD: DashboardData = {
+  performance_score: 87,
+  completionRate: 67,
+  rank: 2,
+
+  weekly_performance: 78,
+  weekly_completed_tasks: 6,
+
+  unread_messages: 3,
+
+  notifications: [
+    {
+      title: "مهمة جديدة",
+      message: "تم إسناد مهمة جديدة لك",
+      type: "info",
+      link: "/tasks/1",
+    },
+    {
+      title: "تأخير مشروع",
+      message: "مشروع بوابة الموظفين يقترب من الموعد النهائي",
+      type: "warning",
+      link: "/projects/1",
+    },
+  ],
+
+  tasks: {
+    total: 12,
+    completed: 8,
+
+    today_focus: [
+      {
+        id: 1,
+        title: "مراجعة API",
+        description: "مراجعة نقاط النهاية الخاصة بالمشاريع",
+        status: "غير مكتمل",
+        priority: "مرتفع",
+        due_date: dayjs().toISOString(), // today
+        project: {
+          id: 1,
+          name: "بوابة الموظفين",
+        },
+      },
+      {
+        id: 5,
+        title: "إصلاح مشكلة الأداء",
+        status: "غير مكتمل",
+        priority: "مرتفع",
+        due_date: dayjs().subtract(2, "day").toISOString(), // overdue
+        project: {
+          id: 2,
+          name: "نظام التقارير",
+        },
+      },
+    ],
+
+    upcoming: [
+      {
+        id: 3,
+        title: "تصميم لوحة التحكم",
+        status: "غير مكتمل",
+        priority: "متوسط",
+        due_date: dayjs().add(1, "day").toISOString(),
+        project: {
+          id: 1,
+          name: "بوابة الموظفين",
+        },
+      },
+      {
+        id: 4,
+        title: "كتابة اختبارات الوحدة",
+        status: "غير مكتمل",
+        priority: "منخفض",
+        due_date: dayjs().add(3, "day").toISOString(),
+        project: {
+          id: 3,
+          name: "نظام التقارير",
+        },
+      },
+    ],
+  },
+
+  projects: {
+    total: 5,
+    active: 2,
+    completed_tasks: 18,
+    total_tasks: 25,
+
+    active_projects: [
+      {
+        id: 1,
+        name: "بوابة الموظفين",
+        description: "منصة داخلية لإدارة الموظفين",
+        status: "قيد التنفيذ",
+        progress: 72,
+        end_date: dayjs().add(10, "day").toISOString(),
+        team_size: 4,
+      },
+      {
+        id: 2,
+        name: "نظام التقارير",
+        description: "تحسين تقارير الأداء",
+        status: "قيد التنفيذ",
+        progress: 45,
+        end_date: dayjs().add(20, "day").toISOString(),
+        team_size: 3,
+      },
+      {
+        id: 3,
+        name: "نظام التقارير",
+        description: "تحسين تقارير الأداء",
+        status: "قيد التنفيذ",
+        progress: 45,
+        end_date: dayjs().add(20, "day").toISOString(),
+        team_size: 3,
+      },
+      {
+        id: 4,
+        name: "نظام التقارير",
+        description: "تحسين تقارير الأداء",
+        status: "قيد التنفيذ",
+        progress: 45,
+        end_date: dayjs().add(20, "day").toISOString(),
+        team_size: 3,
+      },
+    ],
+  },
+};
+
+const DashboardData = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"today" | "upcoming">("today");
 
-  const dashboard = data;
+  const dashboard: DashboardData = MOCK_DASHBOARD;
 
   const today = dayjs();
-
-  // Calculate performance metrics
-  const completionRate = dashboard?.tasks?.total
-    ? Math.round((dashboard.tasks.completed / dashboard.tasks.total) * 100)
-    : 0;
 
   const projectProgress = dashboard?.projects?.active
     ? Math.round(
@@ -58,7 +182,7 @@ const DashboardData = ({ data }: { data: any }) => {
 
   // Get priority tasks
   const highPriorityTasks =
-    dashboard?.tasks?.upcoming?.filter((t) => t.priority === "high") || [];
+    dashboard?.tasks?.upcoming?.filter((t) => t.priority === "مرتفع") || [];
   const overdueTasks =
     dashboard?.tasks?.upcoming?.filter((t) =>
       dayjs(t.due_date).isBefore(today, "day")
@@ -107,7 +231,7 @@ const DashboardData = ({ data }: { data: any }) => {
             />
 
             <Progress
-              percent={completionRate}
+              percent={dashboard?.completionRate}
               strokeColor="rgba(59,130,246,0.9)"
               trailColor="rgba(255,255,255,0.12)"
               size="small"
@@ -128,7 +252,7 @@ const DashboardData = ({ data }: { data: any }) => {
               title={
                 <span className="flex items-center gap-2 text-white/80">
                   <ProjectOutlined />
-                  المشاريع النشطة
+                  المشاريع الحالية
                 </span>
               }
               value={dashboard?.projects?.active || 0}
@@ -273,14 +397,14 @@ const DashboardData = ({ data }: { data: any }) => {
                     <div
                       className={`w-10 h-10 rounded-full flex items-center justify-center text-white
                 ${
-                  task.priority === "high"
+                  task.priority === "مرتفع"
                     ? "bg-red-500"
-                    : task.priority === "medium"
+                    : task.priority === "متوسط"
                     ? "bg-orange-500"
                     : "bg-green-500"
                 }`}
                     >
-                      {task.priority === "high" ? "!" : "✓"}
+                      {task.priority === "مرتفع" ? "!" : "✓"}
                     </div>
                   }
                   title={
@@ -288,18 +412,10 @@ const DashboardData = ({ data }: { data: any }) => {
                       <span className="font-medium">{task.title}</span>
                       <Tag
                         color={
-                          task.status === "completed"
-                            ? "success"
-                            : task.status === "in_progress"
-                            ? "processing"
-                            : "default"
+                          task.status === "مكتمل" ? "success" : "processing"
                         }
                       >
-                        {task.status === "completed"
-                          ? "مكتمل"
-                          : task.status === "in_progress"
-                          ? "قيد التنفيذ"
-                          : "معلق"}
+                        {task.status}
                       </Tag>
                     </div>
                   }
@@ -333,9 +449,9 @@ const DashboardData = ({ data }: { data: any }) => {
           <Timeline
             items={dashboard.tasks.upcoming.map((task) => ({
               color:
-                task.priority === "high"
+                task.priority === "مرتفع"
                   ? "red"
-                  : task.priority === "medium"
+                  : task.priority === "متوسط"
                   ? "orange"
                   : "green",
               children: (
@@ -391,9 +507,9 @@ const DashboardData = ({ data }: { data: any }) => {
                     </div>
                     <Badge
                       status={
-                        project.status === "ongoing"
+                        project.status === "قيد التنفيذ"
                           ? "processing"
-                          : project.status === "pending"
+                          : project.status === "قيد الموافقة"
                           ? "warning"
                           : "success"
                       }
@@ -402,17 +518,18 @@ const DashboardData = ({ data }: { data: any }) => {
                   </div>
 
                   <div className="space-y-3">
-                    <div>
-                      <div className="flex justify-between text-sm text-gray-600 mb-1">
-                        <span>تقدم المشروع</span>
-                        <span>{project.progress || 0}%</span>
+                    {project.status === "قيد التنفيذ" && (
+                      <div>
+                        <div className="flex justify-between text-sm text-gray-600 mb-1">
+                          <span>تقدم المشروع</span>
+                        </div>
+                        <Progress
+                          percent={project.progress || 0}
+                          strokeColor="#10b981"
+                          size="small"
+                        />
                       </div>
-                      <Progress
-                        percent={project.progress || 0}
-                        strokeColor="#10b981"
-                        size="small"
-                      />
-                    </div>
+                    )}
 
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div className="flex items-center gap-2 text-gray-600">
@@ -434,13 +551,6 @@ const DashboardData = ({ data }: { data: any }) => {
               <div className="text-center py-8 text-gray-500">
                 <ProjectOutlined className="text-4xl mb-4 text-gray-300" />
                 <div>لا توجد مشاريع نشطة حالياً</div>
-                <Button
-                  type="link"
-                  className="mt-2"
-                  onClick={() => navigate("/projects")}
-                >
-                  استعرض جميع المشاريع
-                </Button>
               </div>
             )}
           </Card>

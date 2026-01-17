@@ -97,7 +97,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def detailed(self, request, pk=None):
         try:
             project = Project.objects.get(pk=pk)
-        except Exception:
+        except Project.DoesNotExist:
             return Response({"detail": _("مشروع غير موجود")}, status=status.HTTP_404_NOT_FOUND)
         tasks = Task.objects.filter(project=project)
         serialized_tasks = TaskListSerializer(tasks, many=True, context={'request': request}).data

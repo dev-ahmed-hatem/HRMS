@@ -1,10 +1,10 @@
 import { dayjs } from "@/utils/locale";
 import { Row, Col, Avatar, Badge, Tag } from "antd";
 import {
-  ApartmentOutlined,
   ClockCircleOutlined,
   CoffeeOutlined,
   IdcardOutlined,
+  TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "@/app/redux/hooks";
@@ -86,7 +86,7 @@ const PortalBanner = () => {
                 {employee?.department && (
                   <Tag
                     color="cyan"
-                    icon={<ApartmentOutlined />}
+                    icon={<TeamOutlined />}
                     className="text-sm md:text-base lg:text-lg px-3 lg:px-4 py-1 rounded-full"
                   >
                     {employee.department}

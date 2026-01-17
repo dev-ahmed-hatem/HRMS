@@ -25,7 +25,7 @@ import {
   useUpdateDayAttendanceMutation,
 } from "@/app/api/endpoints/attendance";
 import Loading from "@/components/Loading";
-import ErrorPage from "@/pages/Error";
+import ErrorPage from "@/pages/ErrorPage";
 import { useGetAllEmployeesQuery } from "@/app/api/endpoints/employees";
 import { AssignedEmployee } from "@/types/employee";
 import { useNotification } from "@/providers/NotificationProvider";

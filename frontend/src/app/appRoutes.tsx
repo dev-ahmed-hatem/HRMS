@@ -1,5 +1,5 @@
 import Base from "@/pages/Base";
-import Error from "@/pages/Error";
+import Error from "@/pages/ErrorPage";
 import SectionView from "@/pages/SectionView";
 import EmployeesList from "@/pages/employees/EmployeesList";
 import ProjectsList from "@/pages/projects/ProjectsList";
@@ -21,7 +21,8 @@ import LoginPage from "@/pages/LoginPage";
 import AuthProvider from "@/providers/AuthProvider";
 import SettingsPage from "@/pages/Settings";
 import { SettingOutlined } from "@ant-design/icons";
-// import PortalHome from "@/portal/PortalHome";
+import PortalBase from "@/portal/PortalBase";
+import ErrorPage from "@/pages/ErrorPage";
 
 export type AppRoute = RouteObject & {
   key?: string;
@@ -142,8 +143,21 @@ export const appRoutes: AppRoute[] = [
   },
   {
     path: "portal",
-    element: <></>,
-    errorElement: <Base error={true} />,
+    element: (
+      <AuthProvider>
+        <PortalBase />
+      </AuthProvider>
+    ),
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "settings",
+        element: <SettingsPage />,
+        icon: <SettingOutlined />,
+        label: "الإعدادات",
+        navigation_cards: false,
+      },
+    ],
   },
   {
     path: "login",

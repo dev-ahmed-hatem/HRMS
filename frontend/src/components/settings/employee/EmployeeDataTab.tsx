@@ -2,7 +2,7 @@ import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { useGetEmployeeQuery } from "@/app/api/endpoints/employees";
 import { useAppSelector } from "@/app/redux/hooks";
 import Loading from "@/components/Loading";
-import Error from "@/pages/Error";
+import Error from "@/pages/ErrorPage";
 import EmployeeDataForm from "./EmployeeDataForm";
 import { Employee } from "@/types/employee";
 

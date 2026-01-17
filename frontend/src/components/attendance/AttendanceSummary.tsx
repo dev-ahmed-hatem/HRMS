@@ -6,7 +6,7 @@ import { ColumnType } from "antd/lib/table";
 import { AttendanceSummary as AttendanceSummaryType } from "@/types/attendance";
 import { useGetAttendanceSummaryQuery } from "@/app/api/endpoints/attendance";
 import Loading from "../Loading";
-import Error from "@/pages/Error";
+import Error from "@/pages/ErrorPage";
 
 const columns: ColumnType<AttendanceSummaryType>[] = [
   {

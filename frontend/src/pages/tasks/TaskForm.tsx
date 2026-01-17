@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { Task, TaskFormParams, TaskFormValues } from "@/types/task";
 import { useLocation, useNavigate } from "react-router";
 import Loading from "@/components/Loading";
-import ErrorPage from "../Error";
+import ErrorPage from "../ErrorPage";
 import { FC, useEffect, useState } from "react";
 import { useNotification } from "@/providers/NotificationProvider";
 import {

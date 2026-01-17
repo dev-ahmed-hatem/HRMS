@@ -1,6 +1,6 @@
 import { Button } from "antd";
 
-const Error = ({
+const ErrorPage = ({
   title,
   subtitle,
   notFound = false,
@@ -54,4 +54,4 @@ const Error = ({
   );
 };
 
-export default Error;
+export default ErrorPage;

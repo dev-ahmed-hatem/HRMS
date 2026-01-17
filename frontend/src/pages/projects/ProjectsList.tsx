@@ -8,7 +8,7 @@ import { Project, statusColors } from "@/types/project";
 import { tablePaginationConfig } from "@/utils/antd";
 import { Link, useNavigate } from "react-router";
 import { AssignedEmployee } from "@/types/employee";
-import Error from "@/pages/Error";
+import Error from "@/pages/ErrorPage";
 import Loading from "@/components/Loading";
 import {
   useGetProjectsQuery,

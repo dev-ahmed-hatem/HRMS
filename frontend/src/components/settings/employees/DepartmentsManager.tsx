@@ -24,7 +24,7 @@ import {
   useDepartmentMutation,
   useGetPaginatedDepartmentsQuery,
 } from "@/app/api/endpoints/employees";
-import ErrorPage from "@/pages/Error";
+import ErrorPage from "@/pages/ErrorPage";
 import Loading from "@/components/Loading";
 import { useNotification } from "@/providers/NotificationProvider";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";

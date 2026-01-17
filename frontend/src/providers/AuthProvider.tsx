@@ -5,7 +5,7 @@ import { setUser } from "@/app/slices/authSlice";
 import { setEmployee } from "@/app/slices/employeeSlice";
 import Loading from "@/components/Loading";
 import Base from "@/pages/Base";
-import ErrorPage from "@/pages/Error";
+import ErrorPage from "@/pages/ErrorPage";
 import { User } from "@/types/user";
 import { AxiosError } from "axios";
 import React, { createContext, useContext, useEffect } from "react";

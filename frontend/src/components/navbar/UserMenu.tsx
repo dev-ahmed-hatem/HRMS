@@ -1,11 +1,16 @@
 import { removeTokens } from "@/utils/storage";
-import { Avatar, Button, Tag } from "antd";
+import { Avatar, Button } from "antd";
 import { useNavigate } from "react-router";
 import {
   LogoutOutlined,
   SettingOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+
+export const logout = () => {
+  removeTokens();
+  location.href = "/login";
+};
 
 const UserMenu = ({
   photo,
@@ -17,10 +22,6 @@ const UserMenu = ({
   close?: Function;
 }) => {
   const navigate = useNavigate();
-  const logout = () => {
-    removeTokens();
-    location.href = "/login";
-  };
 
   return (
     <div>

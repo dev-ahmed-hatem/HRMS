@@ -19,7 +19,7 @@ import {
   useEmployeeMutation,
   useGetAllDepartmentsQuery,
 } from "@/app/api/endpoints/employees";
-import Error from "@/pages/Error";
+import Error from "@/pages/ErrorPage";
 import Loading from "@/components/Loading";
 import { calculateAge } from "@/utils";
 import UploadFile from "@/components/file-handling/UploadFile";

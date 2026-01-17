@@ -26,7 +26,7 @@ import {
 } from "@/app/api/endpoints/tasks";
 import Loading from "@/components/Loading";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
-import Error from "@/pages/Error";
+import Error from "@/pages/ErrorPage";
 import { useAppDispatch } from "@/app/redux/hooks";
 import TaskNotes from "@/components/tasks/TaskNotes";
 import AssignmentsTimeline from "@/components/assignments/AssignmentsTimeline";

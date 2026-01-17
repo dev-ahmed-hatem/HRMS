@@ -9,7 +9,7 @@ import {
   useGetEmployeesQuery,
 } from "@/app/api/endpoints/employees";
 import Loading from "@/components/Loading";
-import Error from "../Error";
+import Error from "../ErrorPage";
 import { ColumnsType } from "antd/es/table";
 import { TableProps } from "antd/lib";
 import SelectedActionsBar from "@/components/SelectedActionBar";

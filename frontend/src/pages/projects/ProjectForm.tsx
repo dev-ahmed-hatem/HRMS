@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { Project, ProjectFormParams, ProjectFormValues } from "@/types/project";
 import { FC, useEffect, useState } from "react";
 import { useGetEmployeesQuery } from "@/app/api/endpoints/employees";
-import Error from "@/pages/Error";
+import Error from "@/pages/ErrorPage";
 import Loading from "@/components/Loading";
 import { useProjectMutation } from "@/app/api/endpoints/projects";
 import { handleServerErrors } from "@/utils/handleForm";

@@ -1,5 +1,5 @@
 import { useParams } from "react-router";
-import Error from "../Error";
+import Error from "../ErrorPage";
 import Loading from "@/components/Loading";
 import ProjectForm from "./ProjectForm";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";

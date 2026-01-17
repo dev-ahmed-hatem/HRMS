@@ -8,7 +8,7 @@ import {
   useGetAttendanceSettingsQuery,
   useUpdateAttendanceSettingsMutation,
 } from "@/app/api/endpoints/attendance";
-import Error from "@/pages/Error";
+import Error from "@/pages/ErrorPage";
 import Loading from "@/components/Loading";
 
 interface AttendanceContextType {

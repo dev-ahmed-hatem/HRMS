@@ -25,7 +25,7 @@ import {
 } from "@/app/api/endpoints/employees";
 import { useParams } from "react-router";
 import Loading from "@/components/Loading";
-import Error from "../Error";
+import Error from "../ErrorPage";
 import { useNavigate } from "react-router";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { useAppDispatch } from "@/app/redux/hooks";

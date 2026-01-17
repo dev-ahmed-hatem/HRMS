@@ -1,6 +1,6 @@
 import { useGetEmployeeQuery } from "@/app/api/endpoints/employees";
 import { useParams } from "react-router";
-import Error from "../Error";
+import Error from "../ErrorPage";
 import Loading from "@/components/Loading";
 import EmployeeForm from "./EmployeeForm";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";

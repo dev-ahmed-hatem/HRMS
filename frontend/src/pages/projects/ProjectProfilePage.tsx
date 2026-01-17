@@ -15,7 +15,7 @@ import {
 } from "@/app/api/endpoints/projects";
 import Loading from "@/components/Loading";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
-import Error from "@/pages/Error";
+import Error from "@/pages/ErrorPage";
 import { TabsProps } from "antd/lib";
 import ProjectStatus from "@/components/projects/ProjectStatus";
 import ProjectNotes from "@/components/projects/ProjectNotes";

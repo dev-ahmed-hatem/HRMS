@@ -16,7 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
                   'password2', 'url', 'is_root', 'last_login', 'is_active', 'is_staff']
 
     def get_last_login(self, obj):
-        return obj.last_login.astimezone(settings.CAIRO_TZ).strftime('%Y-%m-%d %I:%M%p')
+        return obj.last_login.astimezone(settings.CAIRO_TZ).strftime('%Y-%m-%d %I:%M%p') if obj.last_login else None
 
     def validate(self, data):
         if 'password' in data and 'password2' in data:

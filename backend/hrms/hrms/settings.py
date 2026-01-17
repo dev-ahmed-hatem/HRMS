@@ -161,7 +161,7 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 ]
 
 # csrf
-# CSRF_TRUSTED_ORIGINS = ['http://localhost:5173', 'kaffohrms.pythonanywhere.com']
+CSRF_TRUSTED_ORIGINS = ['http://localhost:5173', 'https://kaffohrms.pythonanywhere.com']
 # CSRF_COOKIE_NAME = 'csrftoken'
 # CSRF_HEADER_NAME = 'X-CSRFToken'
 # CSRF_COOKIE_SAMESITE = 'Lax'

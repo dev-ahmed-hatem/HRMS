@@ -11,15 +11,14 @@ import {
   Badge,
   Divider,
   Button,
-  Tooltip,
   Space,
   Alert,
   Timeline,
+  Tooltip,
 } from "antd";
 import {
   ProjectOutlined,
   CheckCircleOutlined,
-  ClockCircleOutlined,
   TeamOutlined,
   UserOutlined,
   CalendarOutlined,
@@ -35,14 +34,19 @@ import {
   HourglassOutlined,
   FireOutlined,
   CrownOutlined,
+  ClockCircleOutlined,
+  EditOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router";
-import Loading from "@/components/Loading";
-import ErrorPage from "@/pages/Error";
-import { useAppSelector } from "@/app/redux/hooks";
-import type { Project } from "@/types/project";
+import { Project } from "@/types/project";
 import { Task } from "@/types/task";
+import { IoSettingsOutline } from "react-icons/io5";
+import { CiFileOn } from "react-icons/ci";
+import { logout } from "@/components/navbar/UserMenu";
+import { LuNotebookPen } from "react-icons/lu";
+import { MdAssignment } from "react-icons/md";
 
 const MOCK_DASHBOARD = {
   employee: {
@@ -89,29 +93,28 @@ const MOCK_DASHBOARD = {
       total: 12,
       completed: 8,
 
-      today: [
+      today_focus: [
         {
           id: 1,
           title: "مراجعة API",
           description: "مراجعة نقاط النهاية الخاصة بالمشاريع",
           status: "in_progress",
           priority: "high",
-          due_date: dayjs().add(2, "hour").toISOString(),
+          due_date: dayjs().toISOString(), // today
           project: {
             id: 1,
             name: "بوابة الموظفين",
           },
         },
         {
-          id: 2,
-          title: "إصلاح خطأ تسجيل الدخول",
-          description: "حل مشكلة token expiry",
-          status: "completed",
-          priority: "medium",
-          due_date: dayjs().toISOString(),
+          id: 5,
+          title: "إصلاح مشكلة الأداء",
+          status: "in_progress",
+          priority: "high",
+          due_date: dayjs().subtract(2, "day").toISOString(), // overdue
           project: {
             id: 2,
-            name: "نظام الصلاحيات",
+            name: "نظام التقارير",
           },
         },
       ],
@@ -165,18 +168,36 @@ const MOCK_DASHBOARD = {
           end_date: dayjs().add(20, "day").toISOString(),
           team_size: 3,
         },
+        {
+          id: 3,
+          name: "نظام التقارير",
+          description: "تحسين تقارير الأداء",
+          status: "ongoing",
+          progress: 45,
+          end_date: dayjs().add(20, "day").toISOString(),
+          team_size: 3,
+        },
+        {
+          id: 4,
+          name: "نظام التقارير",
+          description: "تحسين تقارير الأداء",
+          status: "ongoing",
+          progress: 45,
+          end_date: dayjs().add(20, "day").toISOString(),
+          team_size: 3,
+        },
       ],
     },
   },
 };
 
-const PortalHome: React.FC = () => {
+const PortalHome = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"today" | "upcoming">("today");
 
   const dashboard = MOCK_DASHBOARD;
   const employee = dashboard.employee;
-  
+
   const today = dayjs();
   const greeting = getGreeting();
 
@@ -207,92 +228,136 @@ const PortalHome: React.FC = () => {
       dayjs(t.due_date).isBefore(today, "day")
     ) || [];
 
+  const renderTaskDate = (dueDate: string) => {
+    const date = dayjs(dueDate);
+
+    if (date.isSame(today, "day")) {
+      return <Tag color="blue">اليوم</Tag>;
+    }
+
+    if (date.isBefore(today, "day")) {
+      return <Tag color="red">متأخرة · {date.format("DD/MM")}</Tag>;
+    }
+
+    return <Tag color="default">{date.format("DD/MM")}</Tag>;
+  };
+
   return (
     <div className="p-4 md:p-6 space-y-8">
-      {/* === Welcome Header with Profile === */}
+      {/* Welcome Header */}
       <div className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 rounded-2xl shadow-2xl overflow-hidden">
         <div className="p-6 md:p-8">
           <Row gutter={[24, 24]} align="middle">
             <Col
               xs={24}
-              md={8}
+              md={6}
+              lg={4}
               className="flex justify-center md:justify-start"
             >
               <div className="relative">
-                <Avatar
-                  size={120}
-                  src={employee?.image}
-                  icon={!employee?.image && <UserOutlined />}
-                  className="border-4 border-white/20 shadow-2xl ring-4 ring-blue-500/20"
-                />
+                {/* Avatar */}
+                {employee?.image ? (
+                  <Avatar
+                    size={120}
+                    src={employee.image}
+                    alt={employee.name}
+                    className="border-4 border-white/20 shadow-2xl ring-4 ring-blue-500/30
+                    transition-transform duration-300 hover:scale-105"
+                  />
+                ) : (
+                  <Avatar
+                    size={120}
+                    icon={<UserOutlined />}
+                    className="bg-gradient-to-br from-blue-500 to-purple-600 text-white border-4 border-white/20
+                    shadow-2xl ring-4 ring-blue-500/30 flex items-center justify-center transition-transform duration-300
+                    hover:scale-105"
+                  />
+                )}
+
+                {/* Status Badge */}
                 <Badge
                   status="success"
-                  className="absolute -bottom-2 -right-2 border-4 border-gray-900"
+                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 scale-125"
                 />
               </div>
             </Col>
 
-            <Col xs={24} md={16}>
+            <Col xs={24} md={18} lg={20}>
               <div className="text-center md:text-right">
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                  {greeting}،{" "}
-                  <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+                {/* Greeting */}
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 flex gap-1 items-center">
+                  {greeting} ..{" "}
+                  <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent leading-relaxed">
                     {employee?.name}
                   </span>
-                  <CoffeeOutlined className="text-yellow-300 mr-3" />
+                  <CoffeeOutlined className="text-orange-300 mr-1 align-middle" />
                 </h1>
 
-                <div className="flex flex-wrap gap-3 justify-center md:justify-start mb-4">
-                  <Tag
-                    color="blue"
-                    icon={<TeamOutlined />}
-                    className="text-lg px-4 py-1"
-                  >
-                    {employee?.position}
-                  </Tag>
-                  <Tag
-                    color="purple"
-                    icon={<TrophyOutlined />}
-                    className="text-lg px-4 py-1"
-                  >
-                    {employee?.department?.name}
-                  </Tag>
-                  <Tag
-                    color="green"
-                    icon={<CalendarOutlined />}
-                    className="text-lg px-4 py-1"
-                  >
-                    {employee?.hire_date
-                      ? dayjs(employee.hire_date).format("DD/MM/YYYY")
-                      : ""}
-                  </Tag>
+                {/* Tags */}
+                <div className="flex flex-wrap gap-1 lg:gap-3 gap-y-2 justify-center md:justify-start mb-5">
+                  {employee?.position && (
+                    <Tag
+                      color="blue"
+                      icon={<TeamOutlined />}
+                      className="text-base lg:text-lg px-2 lg:px-4 py-1 rounded-full"
+                    >
+                      {employee.position}
+                    </Tag>
+                  )}
+
+                  {employee?.department?.name && (
+                    <Tag
+                      color="purple"
+                      icon={<TrophyOutlined />}
+                      className="text-base lg:text-lg px-2 lg:px-4 py-1 rounded-full"
+                    >
+                      {employee.department.name}
+                    </Tag>
+                  )}
+
+                  {employee?.hire_date && (
+                    <Tag
+                      color="green"
+                      icon={<CalendarOutlined />}
+                      className="text-base lg:text-lg px-2 lg:px-4 py-1 rounded-full"
+                    >
+                      {dayjs(employee.hire_date).format("DD/MM/YYYY")}
+                    </Tag>
+                  )}
                 </div>
 
+                {/* Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-                    <div className="text-white text-sm mb-1">رقم الموظف</div>
-                    <div className="text-white font-bold text-lg">
-                      {employee?.employee_id}
+                  {[
+                    {
+                      label: "رقم الموظف",
+                      value: employee?.employee_id,
+                    },
+                    {
+                      label: "الأقدمية",
+                      value: `${employee?.tenure || 0} يوم`,
+                    },
+                    {
+                      label: "معدل الإنجاز",
+                      value: `${completionRate}%`,
+                    },
+                    {
+                      label: "اليوم",
+                      value: today.format("dddd، DD MMMM"),
+                    },
+                  ].map((item, index) => (
+                    <div
+                      key={index}
+                      className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center hover:bg-white/15 transition"
+                    >
+                      <div className="text-white/70 text-sm mb-1">
+                        {item.label}
+                      </div>
+                      <div className="text-white font-bold text-lg">
+                        {item.value}
+                      </div>
                     </div>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-                    <div className="text-white text-sm mb-1">الأقدمية</div>
-                    <div className="text-white font-bold text-lg">
-                      {employee?.tenure || "0"} يوم
-                    </div>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-                    <div className="text-white text-sm mb-1">معدل الإنجاز</div>
-                    <div className="text-white font-bold text-lg">
-                      {completionRate}%
-                    </div>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-                    <div className="text-white text-sm mb-1">اليوم</div>
-                    <div className="text-white font-bold text-lg">
-                      {today.format("dddd، DD MMMM")}
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </Col>
@@ -300,17 +365,19 @@ const PortalHome: React.FC = () => {
         </div>
       </div>
 
-      {/* === Quick Stats Overview === */}
+      {/* Stats Overview*/}
       <Row gutter={[16, 16]}>
-        <Col xs={24} md={6}>
+        <Col xs={24} md={12} lg={6}>
           <Card
-            className="h-full rounded-2xl border-0 shadow-xl hover:shadow-2xl transition-all duration-300 
-              bg-gradient-to-br from-blue-500 to-cyan-600 text-white"
+            className="group h-full cursor-pointer rounded-2xl border border-white/5
+            bg-gradient-to-bl from-slate-800 via-slate-800 to-blue-700
+            shadow-lg hover:shadow-xl transition-all duration-300
+            hover:-translate-y-1"
             onClick={() => navigate("/tasks")}
           >
             <Statistic
               title={
-                <span className="flex items-center gap-2 text-white">
+                <span className="flex items-center gap-2 text-white/80">
                   <CheckCircleOutlined />
                   المهام المكتملة
                 </span>
@@ -319,29 +386,32 @@ const PortalHome: React.FC = () => {
               suffix={`/ ${employee?.tasks?.total || 0}`}
               valueStyle={{
                 fontSize: "2rem",
-                fontWeight: "bold",
-                color: "white",
+                fontWeight: 600,
+                color: "rgba(255,255,255,0.95)",
               }}
             />
+
             <Progress
               percent={completionRate}
-              strokeColor="#ffffff"
-              trailColor="rgba(255,255,255,0.3)"
+              strokeColor="rgba(59,130,246,0.9)"
+              trailColor="rgba(255,255,255,0.12)"
               size="small"
               className="mt-4"
             />
           </Card>
         </Col>
 
-        <Col xs={24} md={6}>
+        <Col xs={24} md={12} lg={6}>
           <Card
-            className="h-full rounded-2xl border-0 shadow-xl hover:shadow-2xl transition-all duration-300 
-              bg-gradient-to-br from-green-500 to-emerald-600 text-white"
+            className="group h-full cursor-pointer rounded-2xl border border-white/5
+        bg-gradient-to-bl from-slate-800 via-slate-900 to-emerald-800
+        shadow-lg hover:shadow-xl transition-all duration-300
+        hover:-translate-y-1"
             onClick={() => navigate("/projects")}
           >
             <Statistic
               title={
-                <span className="flex items-center gap-2 text-white">
+                <span className="flex items-center gap-2 text-white/80">
                   <ProjectOutlined />
                   المشاريع النشطة
                 </span>
@@ -350,56 +420,62 @@ const PortalHome: React.FC = () => {
               suffix={`/ ${employee?.projects?.total || 0}`}
               valueStyle={{
                 fontSize: "2rem",
-                fontWeight: "bold",
-                color: "white",
+                fontWeight: 600,
+                color: "rgba(255,255,255,0.95)",
               }}
             />
+
             <Progress
               percent={projectProgress}
-              strokeColor="#ffffff"
-              trailColor="rgba(255,255,255,0.3)"
+              strokeColor="rgba(16,185,129,0.9)"
+              trailColor="rgba(255,255,255,0.12)"
               size="small"
               className="mt-4"
             />
           </Card>
         </Col>
 
-        <Col xs={24} md={6}>
+        <Col xs={24} md={12} lg={6}>
           <Card
-            className="h-full rounded-2xl border-0 shadow-xl hover:shadow-2xl transition-all duration-300 
-              bg-gradient-to-br from-orange-500 to-amber-600 text-white"
+            className="group h-full cursor-pointer rounded-2xl border border-white/5
+        bg-gradient-to-bl from-slate-900 via-slate-900 to-amber-950
+        shadow-lg hover:shadow-xl transition-all duration-300
+        hover:-translate-y-1"
             onClick={() => navigate("/tasks?priority=high")}
           >
             <Statistic
               title={
-                <span className="flex items-center gap-2 text-white">
+                <span className="flex items-center gap-2 text-white/80">
                   <AlertOutlined />
                   مهام عالية الأولوية
                 </span>
               }
               value={highPriorityTasks.length}
-              prefix={<FireOutlined />}
+              prefix={<FireOutlined className="text-amber-400" />}
               valueStyle={{
                 fontSize: "2rem",
-                fontWeight: "bold",
-                color: "white",
+                fontWeight: 600,
+                color: "rgba(255,255,255,0.95)",
               }}
             />
-            <div className="mt-4 text-white/90 text-sm">
+
+            <div className="mt-4 text-sm text-white/60">
               {overdueTasks.length} متأخرة
             </div>
           </Card>
         </Col>
 
-        <Col xs={24} md={6}>
+        <Col xs={24} md={12} lg={6}>
           <Card
-            className="h-full rounded-2xl border-0 shadow-xl hover:shadow-2xl transition-all duration-300 
-              bg-gradient-to-br from-purple-500 to-violet-600 text-white"
+            className="group h-full cursor-pointer rounded-2xl border border-white/5
+        bg-gradient-to-bl from-slate-900 via-slate-900 to-violet-950
+        shadow-lg hover:shadow-xl transition-all duration-300
+        hover:-translate-y-1"
             onClick={() => navigate("/performance")}
           >
             <Statistic
               title={
-                <span className="flex items-center gap-2 text-white">
+                <span className="flex items-center gap-2 text-white/80">
                   <StarOutlined />
                   نقاط الأداء
                 </span>
@@ -408,53 +484,71 @@ const PortalHome: React.FC = () => {
               suffix="/100"
               valueStyle={{
                 fontSize: "2rem",
-                fontWeight: "bold",
-                color: "white",
+                fontWeight: 600,
+                color: "rgba(255,255,255,0.95)",
               }}
             />
-            <div className="mt-4 text-white/90 text-sm flex items-center gap-2">
-              <TrophyOutlined />
+
+            <div className="mt-4 flex items-center gap-2 text-sm text-white/60">
+              <TrophyOutlined className="text-violet-400" />
               {employee?.rank ? `المرتبة ${employee.rank} في القسم` : "ممتاز"}
             </div>
           </Card>
         </Col>
       </Row>
 
-      {/* === Today's Focus === */}
+      {/* Today's tasks */}
       <Card
         title={
           <div className="flex items-center gap-2">
-            <RocketOutlined className="text-blue-500 text-xl" />
-            <span className="text-lg font-bold">تركيز اليوم</span>
+            <MdAssignment className="text-blue-500 text-xl" />
+            <span className="text-lg font-bold">
+              {activeTab === "today" ? "مهام اليوم" : "المهام القادمة"}
+            </span>
             <Tag color="blue" className="mr-auto">
-              {today.format("DD/MM/YYYY")}
+              {today.format("YYYY-MM-DD")}
             </Tag>
           </div>
         }
         className="rounded-2xl shadow-lg border-0"
         extra={
-          <Space>
-            <Button
-              type={activeTab === "today" ? "primary" : "default"}
-              onClick={() => setActiveTab("today")}
-              size="small"
-            >
-              اليوم
-            </Button>
-            <Button
-              type={activeTab === "upcoming" ? "primary" : "default"}
-              onClick={() => setActiveTab("upcoming")}
-              size="small"
-            >
-              القادمة
-            </Button>
+          <Space size="small">
+            <Tooltip title="مهام اليوم">
+              <Button
+                shape="circle"
+                size="middle"
+                icon={<CalendarOutlined />}
+                type={activeTab === "today" ? "primary" : "default"}
+                onClick={() => setActiveTab("today")}
+                className={
+                  activeTab === "today"
+                    ? "shadow-md"
+                    : "text-gray-500 hover:text-blue-500"
+                }
+              />
+            </Tooltip>
+
+            <Tooltip title="المهام القادمة">
+              <Button
+                shape="circle"
+                size="middle"
+                icon={<ScheduleOutlined />}
+                type={activeTab === "upcoming" ? "primary" : "default"}
+                onClick={() => setActiveTab("upcoming")}
+                className={
+                  activeTab === "upcoming"
+                    ? "shadow-md"
+                    : "text-gray-500 hover:text-blue-500"
+                }
+              />
+            </Tooltip>
           </Space>
         }
       >
         {activeTab === "today" ? (
           <List
-            dataSource={employee?.tasks?.today || []}
-            renderItem={(task: Task) => (
+            dataSource={employee.tasks.today_focus}
+            renderItem={(task) => (
               <List.Item
                 className="cursor-pointer hover:bg-gray-50 p-4 rounded-lg transition-colors"
                 onClick={() => navigate(`/tasks/${task.id}`)}
@@ -462,16 +556,14 @@ const PortalHome: React.FC = () => {
                 <List.Item.Meta
                   avatar={
                     <div
-                      className={`
-                      w-10 h-10 rounded-full flex items-center justify-center text-white
-                      ${
-                        task.priority === "high"
-                          ? "bg-red-500"
-                          : task.priority === "medium"
-                          ? "bg-orange-500"
-                          : "bg-green-500"
-                      }
-                    `}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center text-white
+                ${
+                  task.priority === "high"
+                    ? "bg-red-500"
+                    : task.priority === "medium"
+                    ? "bg-orange-500"
+                    : "bg-green-500"
+                }`}
                     >
                       {task.priority === "high" ? "!" : "✓"}
                     </div>
@@ -498,33 +590,33 @@ const PortalHome: React.FC = () => {
                   }
                   description={
                     <div className="space-y-2">
-                      <div className="text-gray-600">{task.description}</div>
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                        <span>
-                          <CalendarOutlined className="mr-1" />
-                          {dayjs(task.due_date).format("hh:mm A")}
+                      {task.description && (
+                        <div className="text-gray-600">{task.description}</div>
+                      )}
+
+                      <div className="flex flex-wrap gap-3 text-sm text-gray-500">
+                        <span className="flex items-center gap-1">
+                          <CalendarOutlined />
+                          {renderTaskDate(task.due_date)}
                         </span>
-                        <span>
-                          <ProjectOutlined className="mr-1" />
-                          {task.project?.name}
-                        </span>
-                        {task.due_date &&
-                          dayjs(task.due_date).isBefore(today, "day") && (
-                            <Tag color="red" className="mr-auto">
-                              متأخرة
-                            </Tag>
-                          )}
+
+                        {task.project && (
+                          <span className="flex items-center gap-1">
+                            <ProjectOutlined />
+                            {task.project.name}
+                          </span>
+                        )}
                       </div>
                     </div>
                   }
                 />
               </List.Item>
             )}
-            locale={{ emptyText: "لا توجد مهام لليوم - استمتع بيومك! ☕" }}
+            locale={{ emptyText: "لا توجد مهام حالياً 🎯" }}
           />
         ) : (
           <Timeline
-            items={employee?.tasks?.upcoming?.slice(0, 5).map((task) => ({
+            items={employee.tasks.upcoming.map((task) => ({
               color:
                 task.priority === "high"
                   ? "red"
@@ -538,13 +630,14 @@ const PortalHome: React.FC = () => {
                 >
                   <div className="flex justify-between items-center">
                     <span className="font-medium">{task.title}</span>
-                    <Tag color="blue">
-                      {dayjs(task.due_date).format("DD/MM")}
-                    </Tag>
+                    {renderTaskDate(task.due_date)}
                   </div>
-                  <div className="text-gray-600 text-sm mt-1">
-                    {task.project?.name}
-                  </div>
+
+                  {task.project && (
+                    <div className="text-gray-600 text-sm mt-1">
+                      {task.project.name}
+                    </div>
+                  )}
                 </div>
               ),
             }))}
@@ -552,9 +645,9 @@ const PortalHome: React.FC = () => {
         )}
       </Card>
 
-      {/* === Active Projects & Quick Actions === */}
+      {/* Projects & Quick Actions */}
       <Row gutter={[16, 16]}>
-        <Col xs={24} lg={16}>
+        <Col xs={24} lg={16} className="h-fit">
           <Card
             title={
               <div className="flex items-center gap-2">
@@ -565,7 +658,7 @@ const PortalHome: React.FC = () => {
             className="rounded-2xl shadow-lg border-0 h-full"
           >
             <div className="space-y-4">
-              {employee?.projects?.active_projects?.map((project: Project) => (
+              {employee?.projects?.active_projects?.map((project) => (
                 <div
                   key={project.id}
                   className="p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all cursor-pointer"
@@ -638,7 +731,7 @@ const PortalHome: React.FC = () => {
           </Card>
         </Col>
 
-        <Col xs={24} lg={8}>
+        <Col xs={24} lg={8} className="h-fit">
           <Card
             title={
               <div className="flex items-center gap-2">
@@ -669,39 +762,23 @@ const PortalHome: React.FC = () => {
 
               <div className="space-y-3">
                 <Button
+                  block
+                  size="large"
                   type="primary"
-                  block
-                  size="large"
-                  icon={<MailOutlined />}
-                  onClick={() => navigate("/messages")}
-                  className="bg-gradient-to-r from-blue-500 to-cyan-500 border-0"
+                  icon={<LogoutOutlined className="text-xl" />}
+                  className="bg-red-600/90 hover:bg-red-500 border-0 flex"
+                  onClick={logout}
                 >
-                  الرسائل الجديدة ({employee?.unread_messages || 0})
+                  تسجيل خروج
                 </Button>
 
                 <Button
                   block
                   size="large"
-                  icon={<ScheduleOutlined />}
-                  onClick={() => navigate("/tasks/create")}
-                >
-                  إنشاء مهمة جديدة
-                </Button>
-
-                <Button
-                  block
-                  size="large"
-                  icon={<HourglassOutlined />}
-                  onClick={() => navigate("/attendance")}
-                >
-                  تسجيل الدخول/الخروج
-                </Button>
-
-                <Button
-                  block
-                  size="large"
-                  icon={<UserOutlined />}
-                  onClick={() => navigate("/profile")}
+                  type="primary"
+                  icon={<EditOutlined />}
+                  className="bg-red/10 text-red hover:bg-red/20 border border-red/20"
+                  onClick={() => navigate("/portal/settings")}
                 >
                   تحديث الملف الشخصي
                 </Button>
@@ -732,169 +809,57 @@ const PortalHome: React.FC = () => {
         </Col>
       </Row>
 
-      {/* === Performance Insights === */}
-      <Card
-        title={
-          <div className="flex items-center gap-2">
-            <TrophyOutlined className="text-amber-500 text-xl" />
-            <span className="text-lg font-bold">رؤى أدائية</span>
-          </div>
-        }
-        className="rounded-2xl shadow-lg border-0"
-      >
-        <Row gutter={[16, 16]}>
-          <Col xs={24} md={8}>
-            <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl">
-              <div className="text-3xl font-bold text-blue-600 mb-2">
-                {employee?.avg_completion_time || "24"}h
-              </div>
-              <div className="text-gray-600">متوسط وقت إنجاز المهمة</div>
-              <Progress
-                percent={85}
-                size="small"
-                className="mt-3"
-                strokeColor="#3b82f6"
-              />
-            </div>
-          </Col>
-
-          <Col xs={24} md={8}>
-            <div className="text-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl">
-              <div className="text-3xl font-bold text-green-600 mb-2">
-                {employee?.quality_score || 92}%
-              </div>
-              <div className="text-gray-600">جودة العمل المنجز</div>
-              <Progress
-                percent={92}
-                size="small"
-                className="mt-3"
-                strokeColor="#10b981"
-              />
-            </div>
-          </Col>
-
-          <Col xs={24} md={8}>
-            <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl">
-              <div className="text-3xl font-bold text-purple-600 mb-2">
-                {employee?.collaboration_score || 88}%
-              </div>
-              <div className="text-gray-600">التعاون مع الفريق</div>
-              <Progress
-                percent={88}
-                size="small"
-                className="mt-3"
-                strokeColor="#8b5cf6"
-              />
-            </div>
-          </Col>
-        </Row>
-
-        <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-white border border-gray-200 rounded-xl">
-          <h4 className="font-bold mb-3">نصائح لتحسين الأداء:</h4>
-          <ul className="space-y-2 text-gray-600">
-            <li className="flex items-start gap-2">
-              <CheckCircleOutlined className="text-green-500 mt-1" />
-              <span>ركز على المهام عالية الأولوية أولاً</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <CheckCircleOutlined className="text-green-500 mt-1" />
-              <span>قم بتحديث حالة المهام بشكل منتظم</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <CheckCircleOutlined className="text-green-500 mt-1" />
-              <span>خطط لأسبوع العمل القادم كل يوم جمعة</span>
-            </li>
-          </ul>
-        </div>
-      </Card>
-
-      {/* === Footer with Quick Links === */}
-      <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-2xl p-6 text-white">
-        <div className="text-center mb-6">
-          <h3 className="text-xl font-bold mb-2">روابط سريعة</h3>
-          <p className="text-gray-300">الوصول السريع للموارد المهمة</p>
+      {/* footer with navigation */}
+      <div className="bg-calypso-950 rounded-2xl p-6 text-white shadow-2xl">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h3 className="text-2xl font-bold mb-2 text-orange">روابط سريعة</h3>
+          <p className="text-gray-400 text-sm">
+            الوصول السريع للموارد المختلفة
+          </p>
         </div>
 
         <Row gutter={[16, 16]} justify="center">
-          <Col xs={12} sm={6} md={4}>
-            <Button
-              type="link"
-              className="text-white hover:text-blue-300 w-full"
-              onClick={() => navigate("/calendar")}
-            >
-              <CalendarOutlined className="text-2xl mb-2 block mx-auto" />
-              التقويم
-            </Button>
-          </Col>
-          <Col xs={12} sm={6} md={4}>
-            <Button
-              type="link"
-              className="text-white hover:text-blue-300 w-full"
-              onClick={() => navigate("/documents")}
-            >
-              <FileOutlined className="text-2xl mb-2 block mx-auto" />
-              المستندات
-            </Button>
-          </Col>
-          <Col xs={12} sm={6} md={4}>
-            <Button
-              type="link"
-              className="text-white hover:text-blue-300 w-full"
-              onClick={() => navigate("/team")}
-            >
-              <TeamOutlined className="text-2xl mb-2 block mx-auto" />
-              فريق العمل
-            </Button>
-          </Col>
-          <Col xs={12} sm={6} md={4}>
-            <Button
-              type="link"
-              className="text-white hover:text-blue-300 w-full"
-              onClick={() => navigate("/reports")}
-            >
-              <BarChartOutlined className="text-2xl mb-2 block mx-auto" />
-              التقارير
-            </Button>
-          </Col>
-          <Col xs={12} sm={6} md={4}>
-            <Button
-              type="link"
-              className="text-white hover:text-blue-300 w-full"
-              onClick={() => navigate("/settings")}
-            >
-              <SettingOutlined className="text-2xl mb-2 block mx-auto" />
-              الإعدادات
-            </Button>
-          </Col>
+          {[
+            {
+              label: "جدول المواعيد",
+              icon: <CalendarOutlined />,
+              path: "/portal/calendar",
+            },
+            {
+              label: "المذكرات",
+              icon: <LuNotebookPen />,
+              path: "/portal/documents",
+            },
+            {
+              label: "فريق العمل",
+              icon: <TeamOutlined />,
+              path: "/portal/team",
+            },
+            {
+              label: "الإعدادات",
+              icon: <IoSettingsOutline />,
+              path: "/portal/settings",
+            },
+          ].map((item, index) => (
+            <Col key={index} xs={12} sm={6} md={4}>
+              <Button
+                type="link"
+                onClick={() => navigate(item.path)}
+                className="w-full h-full flex flex-col items-center justify-center gap-2
+                px-4 py-5 rounded-xl text-white bg-white/5 hover:bg-white/10
+                hover:text-orange transition-all duration-300 focus:outline-none
+                focus:ring-2 focus:ring-blue-400/50 font-bold"
+              >
+                <span className="text-3xl">{item.icon}</span>
+                <span className="text-sm font-medium">{item.label}</span>
+              </Button>
+            </Col>
+          ))}
         </Row>
       </div>
     </div>
   );
 };
-
-// Add these missing icons
-const FileOutlined = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="currentColor"
-    viewBox="0 0 24 24"
-    width="1em"
-    height="1em"
-  >
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" />
-  </svg>
-);
-
-const SettingOutlined = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="currentColor"
-    viewBox="0 0 24 24"
-    width="1em"
-    height="1em"
-  >
-    <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5A3.5 3.5 0 0 1 12 15.5zm0-5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm6.04-3.55l-1.42-1.41-2.12 2.12a5.003 5.003 0 0 0-1.5 0L9.5 5.54l-1.42 1.41 2.12 2.12a5.003 5.003 0 0 0 0 1.5L8.08 12.9l1.42 1.41 2.12-2.12a5.003 5.003 0 0 0 1.5 0l2.12 2.12 1.42-1.41-2.12-2.12a5.003 5.003 0 0 0 0-1.5l2.12-2.12z" />
-  </svg>
-);
 
 export default PortalHome;

@@ -1,39 +1,37 @@
 import { useState } from "react";
-import Navbar from "../components/navbar/Navbar";
+import Navbar from "@/portal/components/navbar/Navbar";
 import Menu from "../components/Menu";
 import { Navigate, Outlet, useMatch } from "react-router";
-import Home from "./Home";
-import Footer from "../components/Footer";
-import Breadcrumbs from "../components/BreadCrumbs";
+import Footer from "@/components/Footer";
 import ScrollToTop from "../components/ScrollToTop";
-import Error from "./ErrorPage";
+import ErrorPage from "@/pages/ErrorPage";
 import { useAppSelector } from "@/app/redux/hooks";
-import NotAllowedPage from "./NotAllowedPage";
+import NotAllowedPage from "@/pages/NotAllowedPage";
+import PortalHome from "./pages/PortalHome";
 
-const Base = ({ error }: { error?: any }) => {
+const PortalBase = ({ error }: { error?: any }) => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
-  const isHome = useMatch("/");
+  const isHome = useMatch("/portal");
 
   const user = useAppSelector((state) => state.auth.user)!;
   const employee = useAppSelector((state) => state.employee.employee)!;
 
-  if (isHome && employee !== null) return <Navigate to={"/portal"} />;
+  if (isHome && employee === null) return <Navigate to={"/"} />;
 
-  return user.is_staff ? (
+  return !user.is_staff ? (
     <>
       <ScrollToTop />
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
       <Menu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
       {error ? (
         // error display
-        <Error />
+        <ErrorPage />
       ) : isHome ? (
         // home page
-        <Home />
+        <PortalHome />
       ) : (
         // nested routes
         <div className="padding-container py-7">
-          <Breadcrumbs />
           <Outlet />
         </div>
       )}
@@ -44,4 +42,4 @@ const Base = ({ error }: { error?: any }) => {
   );
 };
 
-export default Base;
+export default PortalBase;

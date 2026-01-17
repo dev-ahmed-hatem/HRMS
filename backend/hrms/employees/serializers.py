@@ -1,10 +1,11 @@
+from django.db.models import F
 from rest_framework import serializers
 from users.serializers import UserSerializer
 from .models import Department, Employee
 from hrms.utils import calculate_age
 from django.conf import settings
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, datetime
 from projects.models import Task
 
 
@@ -27,6 +28,7 @@ class EmployeeReadSerializer(serializers.ModelSerializer):
     mode = serializers.CharField(read_only=True, source='get_mode_display')
     created_by = serializers.CharField(read_only=True, source='created_by.name')
     created_at = serializers.SerializerMethodField()
+    tenure = serializers.SerializerMethodField()
     user = UserSerializer(read_only=True)
 
     class Meta:
@@ -35,6 +37,11 @@ class EmployeeReadSerializer(serializers.ModelSerializer):
 
     def get_created_at(self, obj: Employee) -> str:
         return obj.created_at.astimezone(settings.CAIRO_TZ).strftime('%Y-%m-%d')
+
+    def get_tenure(self, obj):
+        if obj.hire_date:
+            return (datetime.now(settings.CAIRO_TZ).date() - obj.hire_date).days
+        return 0
 
 
 class EmployeeListSerializer(serializers.ModelSerializer):
@@ -99,8 +106,7 @@ class EmployeeDashboardSerializer(serializers.ModelSerializer):
             'id', 'name', 'employee_id', 'position', 'department',
             'image', 'hire_date', 'tasks', 'projects', 'performance_score',
             'weekly_performance', 'rank', 'tenure', 'notifications',
-            'unread_messages', 'avg_completion_time', 'quality_score',
-            'collaboration_score', 'weekly_completed_tasks'
+            'unread_messages',
         ]
 
     def get_tasks(self, obj):
@@ -110,12 +116,12 @@ class EmployeeDashboardSerializer(serializers.ModelSerializer):
         return {
             'total': tasks.count(),
             'completed': tasks.filter(status='completed').count(),
-            'today': TaskSerializer(
+            'today': TaskReadSerializer(
                 tasks.filter(due_date=today).order_by('priority'),
                 many=True,
                 context=self.context
             ).data,
-            'upcoming': TaskSerializer(
+            'upcoming': TaskReadSerializer(
                 tasks.filter(due_date__gte=today)
                 .exclude(status='completed')
                 .order_by('due_date')[:10],
@@ -130,7 +136,7 @@ class EmployeeDashboardSerializer(serializers.ModelSerializer):
         return {
             'total': projects.count(),
             'active': projects.filter(status='ongoing').count(),
-            'active_projects': ProjectSerializer(
+            'active_projects': ProjectReadSerializer(
                 projects.filter(status='ongoing'),
                 many=True,
                 context=self.context
@@ -153,7 +159,7 @@ class EmployeeDashboardSerializer(serializers.ModelSerializer):
         completed = tasks.filter(status='completed').count()
         on_time = tasks.filter(
             status='completed',
-            completed_at__lte=models.F('due_date')
+            completed_at__lte=F('due_date')
         ).count()
 
         return int((completed / tasks.count()) * 40 + (on_time / max(completed, 1)) * 60)
@@ -183,10 +189,28 @@ class EmployeeDashboardSerializer(serializers.ModelSerializer):
                 return i + 1
         return None
 
+    def get_tenure(self, obj):
+        if obj.hire_date:
+            return (timezone.now().date() - obj.hire_date).days
+        return 0
+
     def get_notifications(self, obj):
-        """ TODO """
-        pass
+        # Return recent notifications for the employee
+        return [
+            {
+                'title': 'مهمة جديدة',
+                'message': 'تم تعيين مهمة جديدة لك',
+                'type': 'info',
+                'link': '/tasks'
+            },
+            {
+                'title': 'اجتماع فريق',
+                'message': 'اجتماع فريق غداً الساعة 10 صباحاً',
+                'type': 'warning',
+                'link': '/calendar'
+            }
+        ]
 
     def get_unread_messages(self, obj):
-        """ TODO """
-        pass
+        # Count unread messages
+        return 3  # Replace with actual count

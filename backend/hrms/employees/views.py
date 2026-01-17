@@ -49,7 +49,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             employee = Employee.objects.get(pk=pk)
             data = EmployeeReadSerializer(employee, context={"request": self.request}).data
             return Response(data)
-        except Exception:
+        except Employee.DoesNotExist:
             return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=True, methods=['get'])
@@ -62,7 +62,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
                 employee.user.is_active = employee.is_active
                 employee.user.save(update_fields=['is_active'])
             return Response({"is_active": employee.is_active})
-        except Exception:
+        except Employee.DoesNotExist:
             return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=True, methods=['get'])

@@ -4,7 +4,6 @@ import {
   Row,
   Col,
   Statistic,
-  Avatar,
   Progress,
   List,
   Tag,
@@ -20,57 +19,33 @@ import {
   ProjectOutlined,
   CheckCircleOutlined,
   TeamOutlined,
-  UserOutlined,
   CalendarOutlined,
   TrophyOutlined,
   BarChartOutlined,
   AlertOutlined,
   StarOutlined,
-  RocketOutlined,
-  CoffeeOutlined,
   BellOutlined,
-  MailOutlined,
   ScheduleOutlined,
-  HourglassOutlined,
   FireOutlined,
   CrownOutlined,
-  ClockCircleOutlined,
   EditOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router";
-import { Project } from "@/types/project";
-import { Task } from "@/types/task";
 import { IoSettingsOutline } from "react-icons/io5";
-import { CiFileOn } from "react-icons/ci";
 import { logout } from "@/components/navbar/UserMenu";
 import { LuNotebookPen } from "react-icons/lu";
 import { MdAssignment } from "react-icons/md";
+import Banner from "../components/home/PortalBanner";
 
 const MOCK_DASHBOARD = {
   employee: {
-    id: 1,
-    name: "أحمد محمد",
-    employee_id: "EMP-1024",
-    position: "مهندس برمجيات",
-    image: null,
-    department: {
-      id: 1,
-      name: "تقنية المعلومات",
-    },
-    hire_date: "2022-03-15",
-    tenure: 680,
-
     performance_score: 87,
     rank: 2,
 
     weekly_performance: 78,
     weekly_completed_tasks: 6,
-
-    avg_completion_time: 18,
-    quality_score: 92,
-    collaboration_score: 88,
 
     unread_messages: 3,
 
@@ -199,14 +174,6 @@ const PortalHome = () => {
   const employee = dashboard.employee;
 
   const today = dayjs();
-  const greeting = getGreeting();
-
-  function getGreeting() {
-    const hour = dayjs().hour();
-    if (hour < 12) return "صباح الخير";
-    if (hour < 18) return "مساء الخير";
-    return "مساء الخير";
-  }
 
   // Calculate performance metrics
   const completionRate = employee?.tasks?.total
@@ -245,125 +212,7 @@ const PortalHome = () => {
   return (
     <div className="p-4 md:p-6 space-y-8">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 rounded-2xl shadow-2xl overflow-hidden">
-        <div className="p-6 md:p-8">
-          <Row gutter={[24, 24]} align="middle">
-            <Col
-              xs={24}
-              md={6}
-              lg={4}
-              className="flex justify-center md:justify-start"
-            >
-              <div className="relative">
-                {/* Avatar */}
-                {employee?.image ? (
-                  <Avatar
-                    size={120}
-                    src={employee.image}
-                    alt={employee.name}
-                    className="border-4 border-white/20 shadow-2xl ring-4 ring-blue-500/30
-                    transition-transform duration-300 hover:scale-105"
-                  />
-                ) : (
-                  <Avatar
-                    size={120}
-                    icon={<UserOutlined />}
-                    className="bg-gradient-to-br from-blue-500 to-purple-600 text-white border-4 border-white/20
-                    shadow-2xl ring-4 ring-blue-500/30 flex items-center justify-center transition-transform duration-300
-                    hover:scale-105"
-                  />
-                )}
-
-                {/* Status Badge */}
-                <Badge
-                  status="success"
-                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 scale-125"
-                />
-              </div>
-            </Col>
-
-            <Col xs={24} md={18} lg={20}>
-              <div className="text-center md:text-right">
-                {/* Greeting */}
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 flex gap-1 items-center">
-                  {greeting} ..{" "}
-                  <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent leading-relaxed">
-                    {employee?.name}
-                  </span>
-                  <CoffeeOutlined className="text-orange-300 mr-1 align-middle" />
-                </h1>
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-1 lg:gap-3 gap-y-2 justify-center md:justify-start mb-5">
-                  {employee?.position && (
-                    <Tag
-                      color="blue"
-                      icon={<TeamOutlined />}
-                      className="text-base lg:text-lg px-2 lg:px-4 py-1 rounded-full"
-                    >
-                      {employee.position}
-                    </Tag>
-                  )}
-
-                  {employee?.department?.name && (
-                    <Tag
-                      color="purple"
-                      icon={<TrophyOutlined />}
-                      className="text-base lg:text-lg px-2 lg:px-4 py-1 rounded-full"
-                    >
-                      {employee.department.name}
-                    </Tag>
-                  )}
-
-                  {employee?.hire_date && (
-                    <Tag
-                      color="green"
-                      icon={<CalendarOutlined />}
-                      className="text-base lg:text-lg px-2 lg:px-4 py-1 rounded-full"
-                    >
-                      {dayjs(employee.hire_date).format("DD/MM/YYYY")}
-                    </Tag>
-                  )}
-                </div>
-
-                {/* Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                  {[
-                    {
-                      label: "رقم الموظف",
-                      value: employee?.employee_id,
-                    },
-                    {
-                      label: "الأقدمية",
-                      value: `${employee?.tenure || 0} يوم`,
-                    },
-                    {
-                      label: "معدل الإنجاز",
-                      value: `${completionRate}%`,
-                    },
-                    {
-                      label: "اليوم",
-                      value: today.format("dddd، DD MMMM"),
-                    },
-                  ].map((item, index) => (
-                    <div
-                      key={index}
-                      className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center hover:bg-white/15 transition"
-                    >
-                      <div className="text-white/70 text-sm mb-1">
-                        {item.label}
-                      </div>
-                      <div className="text-white font-bold text-lg">
-                        {item.value}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Col>
-          </Row>
-        </div>
-      </div>
+      <Banner />
 
       {/* Stats Overview*/}
       <Row gutter={[16, 16]}>

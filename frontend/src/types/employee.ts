@@ -19,6 +19,7 @@ export type Employee = {
   national_id: string;
   position: string;
   hire_date: string;
+  tenure?: number;
   cv?: string;
   image?: string;
   is_active: boolean;

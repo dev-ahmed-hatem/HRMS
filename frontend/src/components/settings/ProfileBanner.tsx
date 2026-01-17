@@ -1,4 +1,4 @@
-import { Card, Avatar, Tag, Badge, Tooltip } from "antd";
+import { Card, Avatar, Tag, Badge } from "antd";
 import {
   UserOutlined,
   IdcardOutlined,

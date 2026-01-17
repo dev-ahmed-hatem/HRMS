@@ -20,6 +20,7 @@ export type Employee = {
   position: string;
   hire_date: string;
   tenure?: number;
+  completion_rate?: number;
   cv?: string;
   image?: string;
   is_active: boolean;

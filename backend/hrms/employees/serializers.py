@@ -29,6 +29,7 @@ class EmployeeReadSerializer(serializers.ModelSerializer):
     created_by = serializers.CharField(read_only=True, source='created_by.name')
     created_at = serializers.SerializerMethodField()
     tenure = serializers.SerializerMethodField()
+    completion_rate = serializers.SerializerMethodField()
     user = UserSerializer(read_only=True)
 
     class Meta:
@@ -42,6 +43,16 @@ class EmployeeReadSerializer(serializers.ModelSerializer):
         if obj.hire_date:
             return (datetime.now(settings.CAIRO_TZ).date() - obj.hire_date).days
         return 0
+
+    def get_completion_rate(self, obj: Employee):
+        tasks = obj.tasks.all()
+        total = obj.tasks.count()
+        completed = tasks.filter(status="completed").count()
+
+        if not total or total == 0:
+            return 0
+
+        return round((completed / total) * 100)
 
 
 class EmployeeListSerializer(serializers.ModelSerializer):

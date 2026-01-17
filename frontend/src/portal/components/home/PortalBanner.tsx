@@ -9,7 +9,7 @@ import {
 } from "@ant-design/icons";
 import { useAppSelector } from "@/app/redux/hooks";
 
-const PortalBanner = ({ completionRate }: { completionRate?: number }) => {
+const PortalBanner = () => {
   const employee = useAppSelector((state) => state.employee.employee)!;
 
   const today = dayjs();
@@ -68,11 +68,11 @@ const PortalBanner = ({ completionRate }: { completionRate?: number }) => {
                 <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent leading-relaxed">
                   {employee?.name}
                 </span>
-                <CoffeeOutlined className="text-orange-300 mr-1 align-middle" />
+                <CoffeeOutlined className="text-orange-300 mr-1 align-baseline" />
               </h1>
 
               {/* Tags */}
-              <div className="flex flex-wrap md:gap-2 lg:gap-3 justify-center md:justify-start mb-5">
+              <div className="flex flex-wrap gap-y-2 md:gap-2 lg:gap-3 justify-center md:justify-start mb-5">
                 {employee?.position && (
                   <Tag
                     color="geekblue"
@@ -99,7 +99,7 @@ const PortalBanner = ({ completionRate }: { completionRate?: number }) => {
                     icon={<ClockCircleOutlined />}
                     className="text-sm md:text-base lg:text-lg px-3 lg:px-4 py-1 rounded-full"
                   >
-                    {dayjs(employee.hire_date).format("YYYY-MM-DD")}
+                    منذ {dayjs(employee.hire_date).format("YYYY-MM-DD")}
                   </Tag>
                 )}
               </div>
@@ -117,7 +117,9 @@ const PortalBanner = ({ completionRate }: { completionRate?: number }) => {
                   },
                   {
                     label: "معدل الإنجاز",
-                    value: completionRate ? `${completionRate}%` : "-",
+                    value: employee.completion_rate
+                      ? `${employee.completion_rate}%`
+                      : "-",
                   },
                   {
                     label: "اليوم",
